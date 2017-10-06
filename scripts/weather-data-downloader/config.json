@@ -1,0 +1,20 @@
+{
+  "url": "https://dane.imgw.pl/data/dane_pomiarowo_obserwacyjne/",
+  "year": "2016",
+  "linksFilename": "links.txt",
+  "htmlContentFilename": "content.html",
+  "dataDir": "data/",
+  "chunkSize": 8096,
+
+  "codes": {
+    "temperature": {
+        "observer": "B100A06000",
+        "probe": "B100B06000"
+    },
+    "wind": {
+      "angle": "B201C06000",
+      "velocity": "B200C060C1"
+    },
+    "humidity": "B500C06000"
+  }
+}

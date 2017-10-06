@@ -1,0 +1,3 @@
+scripts/weather-data-downloader/data/
+scripts/weather-data-downloader/__pycache__/
+scripts/weather-data-downloader/.vscode/
