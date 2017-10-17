@@ -3,3 +3,6 @@ scripts/weather-data-downloader/__pycache__/
 scripts/weather-data-downloader/.vscode/
 scripts/weather-data-downloader/content.html
 scripts/weather-data-downloader/links.txt
+thesis/articles/
+thesis/*.log
+

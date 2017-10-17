@@ -15,9 +15,15 @@ logger.setLevel(logging.INFO)
 def callback_decorator(config):
   def callback(links):
     logger.info("Saving {0} links to file [{1}]".format(len(links), config["linksFilename"]))
+    station_codes = config["stations"].keys()
+
     with open(config["linksFilename"], "w+") as output_file:
       for link in links:
-        output_file.write(link + "\n")
+        # skip the data_YYYY_MM prefix
+        code = link.split("/")[-1] \
+          .split(".")[0][13:]
+        if (code in station_codes):
+          output_file.write(link + "\n")
   return callback
 
 # Main

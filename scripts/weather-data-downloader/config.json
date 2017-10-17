@@ -5,16 +5,22 @@
   "htmlContentFilename": "content.html",
   "dataDir": "data/",
   "chunkSize": 8096,
-
-  "codes": {
-    "temperature": {
-        "observer": "B100A06000",
-        "probe": "B100B06000"
-    },
-    "wind": {
-      "angle": "B201C06000",
-      "velocity": "B200C060C1"
-    },
-    "humidity": "B500C06000"
+  "stations": {
+    "350190566": "KRAKOW-BALICE",
+    "150190340": "KRAKOW-BIELANY",
+    "250199987": "KRAKOW-BIELANY-KLASZTOR", 
+    "250209979": "KRAKOW-ŁĘG", 
+    "250190390": "KRAKOW-OBSERWATORIUM",
+    "150199984": "KRAKOW-OLSZA",
+    "250199984": "KRAKOW-SWOSZOWICE",
+    "250190470": "KRAKOW-WOLA-JUSTOWSKA"
+  },
+  "params": {
+    "temperature": "B100E00200",
+    "atm-pressure": "B400F00200",
+    "wind-velocity": "B200E002C2",
+    "wind-angle": "B201E002C2",
+    "humidity": "B500E00200",
+    "rainfall6h": "B600K002FS"
   }
 }
