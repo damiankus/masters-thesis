@@ -1,4 +1,4 @@
-\documentclass[11pt,oneside]{book}
+\documentclass[11pt,oneside, a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
 \usepackage{graphicx}
@@ -8,6 +8,24 @@
 \chapter{Modeling techniques}
 
 \section{Decision trees}
+A decision tree is a tree-like capable of classifying its inputs based on values of a set of chosen discrete-valued attributes (real-valued attributes must be first discretized). Each of the non-leaf nodes represents a test which determines the next node to visit while traversing the tree in a top-down fashion. The classification process is finished after reaching a leaf with a class label assigned to it.
+\\
+An example of a decision tree is shown in Figure \ref{fig:decision-tree}. Its leaves symbolize the probability that a given person will buy a car within  5 years period.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=0.70]{figures/decision-tree.png}
+\caption{An example of a decision tree}
+\label{fig:decision-tree}
+\end{figure}
+
+\subsection{Tree induction}
+Many algorithms for decision tree induction have been proposed. Some of the notable examples are: ID3 \cite{QUINLAN1986}, C4.5 \cite{QUINLAN1993} and RandomForest \cite{HO1995}. The basic idea behind them will be explained on the basis of the ID3 algorithm presented in \cite{HAN2005} and \cite{QUINLAN1986}.
+\\
+At the beginning it is necessary to identify the attribute that will act as a criterion for specifying the classes that samples should be assigned to. In the example shown in Figure \ref{fig:decision-tree} it would be the probabi 
+
+
+
 \section{Bayesian networks}
 \section{Neural networks}
 An artificial neural network (ANN) is a network comprised of connected processing units called neurons. A neuron is capable of calculating a linear combination of its inputs and an additional parameter called bias. The output of a neuron is passed as an argument to an activation function for example a continuous sigmoidal function
@@ -34,7 +52,7 @@ It's worth noting that the term n-layered network refers in this case to the num
 
 \subsection{Feedforward networks}
 It is possible to create neural networks with virtually arbitrary topologies, for example containing neurons with inputs from the next layer. It is however preferable to design networks in such a way that neurons from layer $n$ can have inputs only from layer $n-1$ and outputs passed to layer $n+1$. Neurons in the layer $n$ are fully connected with neurons in the layer $n+1$. Networks that are organized in such a fashion are called feedforward neural networks. One of the benefits of such networks is the ease of analyzing them and, consequently, designing learning algorithms. 
-An example of a feedforward network is shown in the figure \ref{fig:feedforward-network}. For the sake of clarity it is assumed that evaluation of the activation function is integrated into the processing units. The solid black circles represent the bias inputs.
+An example of a feedforward network is shown in Figure \ref{fig:feedforward-network}. For the sake of clarity it is assumed that evaluation of the activation function is integrated into the processing units. The solid black circles represent the bias inputs.
 \begin{figure}[htp]
 \centering
 \includegraphics[scale=0.6]{figures/feedforward-network.png}
@@ -100,7 +118,9 @@ The learning procedure can be stopped after a specific condition has been reache
 \end{itemize}
 
 \paragraph{Pseudocode}\mbox{}\\
-The whole learning algorithm is presented in the figure \ref{alg:backpropagation}. The pseudocode as well as the rest of the subsection \ref{ssec:network-training} is based on \cite{HAN2005}.
+The whole learning algorithm is presented in Figure. The pseudocode as well as the rest of the subsection \ref{ssec:network-training} is based on \cite{HAN2005}.
+
+
 
 \bibliography{bibliography-in-progress.bib}{}
 \bibliographystyle{plain}
