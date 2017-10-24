@@ -1,0 +1,63 @@
+\documentclass[a4paper, 11pt]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\pagestyle{headings}
+
+\begin{document}
+\chapter{Modeling techniques}
+
+\section{Decision trees}
+\section{Bayesian networks}
+\section{Neural networks}
+An artificial neural network (ANN) is a network comprised of connected processing units called neurons. A neuron is capable of calculating a linear combination of its inputs and an additional parameter called bias. The output of a neuron is passed as an argument to an activation function for example a continuous sigmoidal function
+
+\begin{equation} \label{eq:sigmoid}
+g(x) = \frac{1}{1 + e^{-x}}
+\end{equation}
+Thus the value calculated by a neuron can be expressed in the form
+
+\begin{equation} \label{eq:neuron}
+y = g(\sum_{i} w_i x_i + b)
+\end{equation}
+where $w_i$ is the weight of the i-th input value $x_i$, $g$ is the activation function and $b$ is the bias. Expression \ref{eq:neuron} can be visualized as shown in figure \ref{fig:neuron}.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=1.00]{figures/neuron.png}
+\caption{An artificial neuron}
+\label{fig:neuron}
+\end{figure}
+
+As pointed in \cite{BISHOP1995} a single neuron can be used as a binary classifier in the case of two linearly separable classes. Combining $n$ neurons in a single-layer network allows to classify members of $n$ classes separable with a hyperplane. Two-layered networks are capable of recognizing members of a class represented by a convex region. Networks with three layers or more can represent arbitrary decision regions with an arbitrary precision.
+It's worth noting that the term n-layered network refers in this case to the number of layers of hidden (other than output) neurons.
+
+\subsection{Feedforward networks}
+It is possible to create neural networks with virtually arbitrary topologies, for example containing neurons with inputs from the next layer. It is however preferable to design networks in such a way that neurons from layer $n$ can have inputs only from layer $n-1$ and outputs passed to layer $n+1$. Neurons in the layer $n$ are fully connected with neurons in the layer $n+1$. Networks that are organized in such a fashion are called feedforward neural networks. One of the benefits of such networks is the ease of analyzing them and, consequently, designing learning algorithms. 
+An example of a feedforward network is shown in the figure \ref{fig:feedforward-network}. 
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=1.00]{figures/feedforward-network.png}
+\caption{A two-layered feedforward network}
+\label{fig:feedforward-network}
+\end{figure}
+
+\subsection{Network training}
+The goal of the process of network training is to optimize its classification accuracy by the means of gradual update of neurons' input weights.
+\\
+Before the training starts input data is divided into two subsets: training and test data.
+Weights of the neuron inputs are set randomly.
+\\
+The next phase is called forward propagation. Samples from the training set (in the form of floating-point valued vectors) are passed as inputs to the network. The output values of the neurons in the first hidden layer are computed and passed to the next layer and so forth. The process is repeated until the network outputs are calculated.
+\\
+Now it is possible to verify network's accuracy by computing the value of a chosen error function, for example a standard sum of squares function
+\begin{equation}
+Err = \frac{1}{2}\sum_{i=1}^{n}(y_i - t_i)^2
+\end{equation}
+where $n$ is the number of outputs and $t_i$ refers to the expected value of the i-th output (it is known for the training samples).
+\\
+In order to 
+
+\bibliography{bibliography-in-progress.bib}{}
+\bibliographystyle{plain}
+\end{document}
