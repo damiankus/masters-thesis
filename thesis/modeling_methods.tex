@@ -1,4 +1,5 @@
 \documentclass[11pt,oneside, a4paper]{report}
+\usepackage{algorithm}
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
 \usepackage{graphicx}
@@ -22,8 +23,15 @@ An example of a decision tree is shown in Figure \ref{fig:decision-tree}. Its le
 \subsection{Tree induction}
 Many algorithms for decision tree induction have been proposed. Some of the notable examples are: ID3 \cite{QUINLAN1986}, C4.5 \cite{QUINLAN1993} and RandomForest \cite{HO1995}. The basic idea behind them will be explained on the basis of the ID3 algorithm presented in \cite{HAN2005} and \cite{QUINLAN1986}.
 \\
-At the beginning it is necessary to identify the attribute that will act as a criterion for specifying the classes that samples should be assigned to. In the example shown in Figure \ref{fig:decision-tree} it would be the probabi 
+At the beginning it is necessary to identify an attribute C that will act as a criterion for specifying classes ${C_1, C_2, ... , C_m}$ that samples should be assigned to ($m$ is the number of distinct values that $C$ can take).\\
+Next an attribute needs to be chosen in order to partition the data. The choice is made on the basis of the information gain expressed as follows
 
+\begin{equation} \label{eq:information-gain}
+I(s_1, s_2, ..., s_m) = - \sum_{i=1}^{m} p_i \log_{2}(p_i)
+\end{equation}
+\\
+where $s_i$ is the number of samples in the class $C_i$ and $p_i$ is the probability of a sample being a member of the $C_i$ class. The value of $p_i$ can be expressed as the ratio $\frac{s_i}{s}$ where $s$ is the number of all samples.
+Information gain determines the quantity of information required to perform the classification. 
 
 
 \section{Bayesian networks}

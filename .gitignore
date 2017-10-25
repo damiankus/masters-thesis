@@ -5,4 +5,4 @@ scripts/weather-data-downloader/content.html
 scripts/weather-data-downloader/links.txt
 thesis/articles/
 thesis/*.log
-
+thesis/*.swp
