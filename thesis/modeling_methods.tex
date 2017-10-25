@@ -45,7 +45,32 @@ Gain(A) = I(s_1, s_2, ... , s_m) - E(A)
 
 After computing the information gain for each attribute, the one with the highest value is chosen and a partition node is added to the tree. For each value ${a_1, a_2, ..., a_v}$ a new branch is created. Samples are split into groups based on their value of the chosen attribute. Then the whole process is repeated for each group of samples. If there are no samples with the value $a_i$, a leaf labeled with the class most frequent among samples is attached to that branch. Induction is continued until all the samples have been processed or there are no attributes left.
 
-\section{Bayesian networks}
+\section{Bayesian classifiers}
+Bayesian classifiers are based on the idea, that samples can be categorized by estimating the possibility of them belonging to a specific class. That possibility can be presented as the conditional probability $P(C_i|X)$. In estimating this value, Bayesian classifiers utilize the Bayes theorem, which allows to express the probability $P(C_i|X)$ in terms of a priori possibilities $P(X), P(C_i)$ and posterior probability $P(X|C_i)$ that can be estimated based on the sample data
+
+\begin{equation} \label{eq:bayes-theorem}
+P(C_i|X) = \frac{P(X|C_i)P(C_i)}{P(X)}
+\end{equation}
+
+A basic Bayes classifier, called a naive Bayes classifier, makes the assumption that each of the class $C_i$ is conditionally independent from any other class. Because of that, it is possible to easily find the value 
+
+\begin{equation} \label{eq:naive-bayes}
+P(X|C_i) = \prod_{k=1}^{n} P(x_k|C_i)
+\end{equation}
+where $n$ is the number of samples and $x_k$ is the value of k-th attribute ($A_k$) of sample $X$. In case of $A_k$ being a discrete value $P(x_k|C_i)$ can be estimated by
+ 
+\begin{equation} \label{eq:bayes-discrete}
+P(x_k|C_i) = \frac{s_ik}{s_i}
+\end{equation}
+
+where $s_ik$ is the number of samples from class $C_i$ with $x_k$ as the value of the attribute $X$ and $s_i$ is the number of all samples in the $C_i$ class. If $A_k$ is continuous and assuming that it has a Gaussian distribution, expression \ref{eq:bayes-discrete} is estimated by
+
+\begin{equation} \label{eq:bayes-continuous}
+P(x_k|C_i) = g(x_k, \mu_{C_i}, \sigma_{C_i}) = \frac{1}{\sqrt{2\pi\sigma_{c_i}}}e^{-\frac{(x_k-\mu_{c_i})^2}{2{\sigma_{C_i}^2}}}
+\end{equation}
+
+where $g(x_k, \mu_{C_i}, \sigma_{C_i})$ is a Gaussian density function, $\mu_{C_i}$ is the mean and $\sigma_{C_i}$ is the standard deviation of values of $A_k$ for samples in the class $C_i$.
+
 \section{Neural networks}
 An artificial neural network (ANN) is a network comprised of connected processing units called neurons. A neuron is capable of calculating a linear combination of its inputs and an additional parameter called bias. The output of a neuron is passed as an argument to an activation function for example a continuous sigmoidal function
 
