@@ -2,11 +2,11 @@
     "wunderground": {
         "dbstring": "",
         "api-endpoint": "http://api.wunderground.com/api/e631c8092e0a1b4f/conditions/q/{}:{}.json",
+        "api-key": "e631c8092e0a1b4f",
         "response-file": "wunderground/krakow-response.json",
         "stations-file": "wunderground/krakow-stations.json",
-        "api-key": "e631c8092e0a1b4f",
-        "json-keys": ["current_observation"],
-        "params": {
+        "url-params": ["type", "id"],
+        "schema": {
             "current_observation": {
                 "observation_time_rfc822": "Fri, 24 Nov 2017 18:47:21 +0100",
                 "observation_epoch": "1511545641",
@@ -36,8 +36,12 @@
         }
     },
     "openweathermap": {
-        "api-endpoint": "http://openweathermap.org/data/2.5/weather?q=Krakow,PL&appid=b1b15e88fa797225412429c1c50c122a1",
-        "params": {
+        "dbstring": "",
+        "api-endpoint": "http://openweathermap.org/data/2.5/weather?q={},{}&appid=b1b15e88fa797225412429c1c50c122a1",
+        "api-key": "b1b15e88fa797225412429c1c50c122a1",
+        "stations-file": "owm/krakow-stations.json",
+        "url-params": ["city", "country"],
+        "schema": {
             "wind": {
                 "speed": 0.5
             },

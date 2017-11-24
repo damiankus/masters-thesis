@@ -16,38 +16,42 @@ def load_stations(in_path, out_path, city='Krakow'):
         airports = [dict([(key, station[key]) for key in airport_keys])
                     for station in neighbors['airport']['station']
                     if station['city'] == city]
-        pws = [dict([(key, station[key]) for key in pws_keys])
-               for station in neighbors['pws']['station']]
+        pwss = [dict([(key, station[key]) for key in pws_keys])
+                for station in neighbors['pws']['station']]
+        for airport in airports:
+            airport['type'] = 'icao'
+            airport['id'] = airport.pop('icao')
+        for pws in pwss:
+            pws['type'] = 'pws'
+
         with open(out_path, 'w+') as out_file:
-            stations = {'stations': [
-                {
-                    'type': 'airport',
-                    'type-id': 'icao',
-                    'id-attr': 'icao',
-                    'locations': airports,
-                },
-                {
-                    'type': 'pws',
-                    'type-id': 'pws',
-                    'id-attr': 'id',
-                    'locations': pws
-                }
-            ]}
+            stations = {'stations': airports + pwss}
             json.dump(stations, out_file, indent=4)
             print('Saved list of stations in: [{}]'.format(out_path))
             return stations
 
 
-def traverse_dict(d, example):
-    pass
+def traverse_dict(d, schema):
+    result = None
+    if isinstance(schema, dict):
+        result = {}
+        for key, item in schema.items():
+            result[key] = traverse_dict(d[key], item)
+    elif isinstance(schema, list):
+        result = []
+        for idx, item in enumerate(schema):
+            result.append(traverse_dict(d[idx], item))
+    else:
+        result = d
+    return result
 
 
-def get(url, params):
+def get(url, schema):
     """
     @type url: string
     @param url: A complete URL to the API endpoint.
-    @type params: dict
-    @param params: A sample response used for finding
+    @type schema: dict
+    @param schema: A sample response used for finding
         the way to traverse other responses based on
         the structure of nested JSON objects.
     """
@@ -56,7 +60,7 @@ def get(url, params):
     with urllib.request.urlopen(url) as res:
         json_string = str(res.read(), 'utf-8')
         observation = json.loads(json_string)
-        measures = dict([(key, observation[key]) for key in params])
+        measures = traverse_dict(observation, schema)
         print(measures)
 
 
@@ -73,16 +77,12 @@ if __name__ == "__main__":
         stations = load_stations(config['response-file'],
                                  config['stations-file'])
 
-    if stations is None:
+    for service_name, config in global_config.items():
+        print('Gathering data for {}'.format(service_name))
         with open(config['stations-file']) as stations_file:
             stations = json.load(stations_file)
-
-    stations = stations['stations']
-    endpoint = config['api-endpoint']
-    for station_group in stations:
-        for location in station_group['locations']:
-            get(endpoint.format(station_group['type-id'],
-                                location[station_group['id-attr']]),
-                config['json-keys'],
-                config['params'])
-
+        stations = stations['stations']
+        endpoint = config['api-endpoint']
+        for station in stations:
+            params = [station[param] for param in config['url-params']]
+            get(endpoint.format(*params), config['schema'])
