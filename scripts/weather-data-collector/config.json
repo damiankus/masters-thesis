@@ -1,0 +1,35 @@
+{
+    "wunderground": {
+        "dbstring": "",
+        "api-endpoint": "http://api.wunderground.com/api/e631c8092e0a1b4f/conditions/q/{}:{}.json",
+        "response-file": "krakow-response.json",
+        "stations-file": "krakow-stations.json",
+        "api-key": "e631c8092e0a1b4f",
+        "json-keys": ["current_observation"],
+        "params": [
+            "observation_time_rfc822",
+            "observation_epoch",
+            "local_time_rfc822",
+            "local_epoch",
+            "weather",
+            "temp_c",
+            "relative_humidity",
+            "wind_string",
+            "wind_dir",
+            "wind_degrees",
+            "wind_mph",
+            "wind_kph",
+            "wind_gust_kph",
+            "pressure_mb",
+            "dewpoint_c",
+            "heat_index_c",
+            "windchill_c",
+            "feelslike_c",
+            "visibility_km",
+            "solarradiation",
+            "UV",
+            "precip_1hr_metric",
+            "precip_today_metric"
+        ]
+    }
+}
