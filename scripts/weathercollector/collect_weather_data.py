@@ -38,26 +38,24 @@ def load_stations(in_path, out_path, city='Krakow'):
             return stations
 
 
-def get(url, json_keys, params):
+def traverse_dict(d, example):
+    pass
+
+
+def get(url, params):
     """
     @type url: string
     @param url: A complete URL to the API endpoint.
-    @type json_keys: list
-    @param json_keys: A list of keys of objects nested within the JSON response
-        contatining the measured values. They are used to traverse the response
-        object in a top-down fashion, for example:
-        [key1, key2, key3] -> res[key1][key2][key3]
-    @type params: list
-    @param params: A list of parameter names used to
-        obtain their measured values.
+    @type params: dict
+    @param params: A sample response used for finding
+        the way to traverse other responses based on
+        the structure of nested JSON objects.
     """
 
     print('Connecting to: {}'.format(url))
     with urllib.request.urlopen(url) as res:
         json_string = str(res.read(), 'utf-8')
         observation = json.loads(json_string)
-        for key in json_keys:
-            observation = observation[key]
         measures = dict([(key, observation[key]) for key in params])
         print(measures)
 

@@ -1,9 +1,10 @@
 scripts/imgw-collector/data/
-scripts/imgw-collector/__pycache__/
-scripts/imgw-collector/.vscode/
 scripts/imgw-collector/content.html
 scripts/imgw-collector/links.txt
 scripts/agh-meteo/
+**/__pycache__
+**/.cache
+**/.vscode
 thesis/articles/
 thesis/*.log
 thesis/*.swp

@@ -1,0 +1,268 @@
+{
+    "stations": [
+        {
+            "type-id": "icao",
+            "type": "airport",
+            "id-attr": "icao",
+            "locations": [
+                {
+                    "icao": "EPKK",
+                    "lat": "50.08333206",
+                    "city": "Krakow",
+                    "lon": "19.79999924"
+                },
+                {
+                    "icao": "EPKK",
+                    "lat": "50.08000183",
+                    "city": "Krakow",
+                    "lon": "19.79999924"
+                }
+            ]
+        },
+        {
+            "type-id": "pws",
+            "type": "pws",
+            "id-attr": "id",
+            "locations": [
+                {
+                    "id": "IKRAKW10",
+                    "neighborhood": "\u0141\u0119g",
+                    "lat": 50.063408,
+                    "city": "Krak\u00f3w",
+                    "lon": 20.01828
+                },
+                {
+                    "id": "IKRAKW10",
+                    "neighborhood": "\u0141\u0119g",
+                    "lat": 50.063408,
+                    "city": "Krak\u00f3w",
+                    "lon": 20.01828
+                },
+                {
+                    "id": "IKRAKW20",
+                    "neighborhood": "osiedle 2 Pu\u0142ku Lotniczego",
+                    "lat": 50.074944,
+                    "city": "Krak\u00f3w",
+                    "lon": 20.008799
+                },
+                {
+                    "id": "IMACZYZY2",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.080566,
+                    "city": "Czyzyny",
+                    "lon": 20.010767
+                },
+                {
+                    "id": "IKRAKW25",
+                    "neighborhood": "aleja Jana Paw\u0142a II",
+                    "lat": 50.07621,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.992937
+                },
+                {
+                    "id": "IMAOPOLS5",
+                    "neighborhood": "Markowskiego, Czyzyny, Krakow",
+                    "lat": 50.075287,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.991611
+                },
+                {
+                    "id": "ILESSERP2",
+                    "neighborhood": "",
+                    "lat": 50.078949,
+                    "city": "KRAKOW",
+                    "lon": 19.981495
+                },
+                {
+                    "id": "IKRAKOW20",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.046726,
+                    "city": "Krakow",
+                    "lon": 19.98159
+                },
+                {
+                    "id": "IKRAKW26",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.043674,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.980804
+                },
+                {
+                    "id": "IMARAKOW2",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.077888,
+                    "city": "Rakowice",
+                    "lon": 19.974623
+                },
+                {
+                    "id": "IKRAKW27",
+                    "neighborhood": "Kazimierza Cha\u0142upnika",
+                    "lat": 50.074749,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.971878
+                },
+                {
+                    "id": "IKRAKW71",
+                    "neighborhood": "Pilot\u00f3w",
+                    "lat": 50.077858,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.969696
+                },
+                {
+                    "id": "IMAPRADN4",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.091858,
+                    "city": "Pradnik Czerwony",
+                    "lon": 19.987921
+                },
+                {
+                    "id": "IKRAKW18",
+                    "neighborhood": "Grzeg\u00f3rzecka",
+                    "lat": 50.05658,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.961317
+                },
+                {
+                    "id": "IKRAKOW18",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.048706,
+                    "city": "Krakow",
+                    "lon": 19.964943
+                },
+                {
+                    "id": "IKRAKW96",
+                    "neighborhood": "Reduta",
+                    "lat": 50.093864,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.983732
+                },
+                {
+                    "id": "IMALOPOL4",
+                    "neighborhood": "Reduta",
+                    "lat": 50.093945,
+                    "city": "Krakow",
+                    "lon": 19.982286
+                },
+                {
+                    "id": "IKRAKW34",
+                    "neighborhood": "Mrozowa",
+                    "lat": 50.08419,
+                    "city": "Krak\u00f3w",
+                    "lon": 20.071598
+                },
+                {
+                    "id": "IKRAKW81",
+                    "neighborhood": "Przemys\u0142owa",
+                    "lat": 50.049255,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.959326
+                },
+                {
+                    "id": "IKRAKW42",
+                    "neighborhood": "Walcowa",
+                    "lat": 50.08252,
+                    "city": "Krak\u00f3w",
+                    "lon": 20.073946
+                },
+                {
+                    "id": "IMAKLEPA4",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.064701,
+                    "city": "Kleparz",
+                    "lon": 19.94903
+                },
+                {
+                    "id": "IKRAKW55",
+                    "neighborhood": "\u015awi\u0119tego Wawrzy\u0144ca",
+                    "lat": 50.050686,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.950514
+                },
+                {
+                    "id": "IKRAKW86",
+                    "neighborhood": "bulwar Podolski",
+                    "lat": 50.047539,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.951586
+                },
+                {
+                    "id": "IMASTRAD4",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.043602,
+                    "city": "Stradom",
+                    "lon": 19.954132
+                },
+                {
+                    "id": "IKRAKW57",
+                    "neighborhood": "Pawia",
+                    "lat": 50.068146,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.945423
+                },
+                {
+                    "id": "IKRAKW33",
+                    "neighborhood": "Pawia",
+                    "lat": 50.064651,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.944981
+                },
+                {
+                    "id": "IMAKROWO2",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.066109,
+                    "city": "Krowodrza",
+                    "lon": 19.944918
+                },
+                {
+                    "id": "IKRAKW65",
+                    "neighborhood": "aleja 29 Listopada",
+                    "lat": 50.100002,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.963535
+                },
+                {
+                    "id": "IKRAKOW16",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.054539,
+                    "city": "Krakow",
+                    "lon": 19.939676
+                },
+                {
+                    "id": "IMAPRADN2",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.086239,
+                    "city": "Pradnik",
+                    "lon": 19.943727
+                },
+                {
+                    "id": "IMAKROWO4",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.071026,
+                    "city": "Krowodrza",
+                    "lon": 19.9363
+                },
+                {
+                    "id": "IKRAKW84",
+                    "neighborhood": "Kremerowska",
+                    "lat": 50.067669,
+                    "city": "Krak\u00f3w",
+                    "lon": 19.929142
+                },
+                {
+                    "id": "IMAKROWO3",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.069462,
+                    "city": "Krowodrza",
+                    "lon": 19.92911
+                },
+                {
+                    "id": "IMALUBOC2",
+                    "neighborhood": "Krak\u00f3w",
+                    "lat": 50.098541,
+                    "city": "Lubocza",
+                    "lon": 20.092024
+                }
+            ]
+        }
+    ]
+}
