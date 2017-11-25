@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import logging
 import mysql.connector as sql
 import os.path
 import time
@@ -15,6 +16,27 @@ class InvalidSchemaTypeException(Exception):
 
 class MissingDictException(Exception):
     pass
+
+
+logger = logging.getLogger('weather-data-collector')
+logger.setLevel(logging.DEBUG)
+
+
+def init_logger(log_filename='collector.log'):
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler(log_filename)
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
 
 
 def load_stations(in_path, out_path, city='Krakow'):
@@ -37,7 +59,7 @@ def load_stations(in_path, out_path, city='Krakow'):
         with open(out_path, 'w+') as out_file:
             stations = {'stations': airports + pwss}
             json.dump(stations, out_file, indent=4)
-            print('Saved list of stations in: [{}]'.format(out_path))
+            logger.debug('Saved list of stations in: [{}]'.format(out_path))
             return stations
 
 
@@ -62,7 +84,7 @@ def traverse_dict(d, schema):
     return result
 
 
-def flatten_dict(d, key='', sep='-'):
+def flatten_dict(d, key='', sep='_'):
     result = {}
     prefix = key + sep if (key != '') else ''
     if isinstance(d, dict):
@@ -84,8 +106,15 @@ def flatten_dict(d, key='', sep='-'):
     return result
 
 
-def save_in_db(connection, d):
-    pass
+def save_in_db(connection, d, stat_template, cols=[]):
+    if len(cols) == 0:
+        cols = list(d.keys())
+    vals = [d[col] for col in cols]
+    statement = stat_template.format(
+        cols=','.join(cols), vals=','.join(['%s'] * len(cols)))
+    cursor = connection.cursor()
+    cursor.execute(statement, vals)
+    connection.commit()
 
 
 def get(url, schema):
@@ -98,44 +127,63 @@ def get(url, schema):
         the structure of nested JSON objects.
     """
 
-    print('Connecting to: {}'.format(url))
+    logger.debug('Connecting to: {}'.format(url))
     with urllib.request.urlopen(url) as res:
         json_string = str(res.read(), 'utf-8')
         observation = json.loads(json_string)
-        measures = traverse_dict(observation, schema)
-        return measures
+        observation = traverse_dict(observation, schema)
+        if len(observation) == 1:
+            _, observation = observation.popitem()
+        return flatten_dict(observation)
+
+
+def apath(rel_path):
+    return os.path.join(os.path.dirname(__file__), rel_path)
 
 
 if __name__ == "__main__":
     global_config = None
     stations = None
-    with open('config.json', 'r') as config_file:
+    with open(apath('config.json'), 'r') as config_file:
         global_config = json.load(config_file)
 
     # Requests to the Wunderground API
-    config = global_config['wunderground']
-    if not os.path.isfile(config['stations-file']):
+    config = global_config['services']['wunderground']
+    if not os.path.isfile(apath(config['stations-file'])):
         print('Parsing a sample response from API')
-        stations = load_stations(config['response-file'],
-                                 config['stations-file'])
+        stations = load_stations(apath(config['response-file']),
+                                 apath(config['stations-file']))
 
-    for service_name, config in global_config.items():
-        print('Gathering data for {}'.format(service_name))
-        with open(config['stations-file']) as stations_file:
+    init_logger(apath(global_config['log-file']))
+    logger.debug('=== A NEW SESSION HAS BEEN INITIALIZED ===')
+
+    for service_name, config in global_config['services'].items():
+        logger.debug('Gathering data for {}'.format(service_name))
+        with open(apath(config['stations-file'])) as stations_file:
             stations = json.load(stations_file)
         stations = stations['stations']
         endpoint = config['api-endpoint']
-
         max_calls = config['max-calls']
         retry_period_s = config['retry-period-s'] + 1
         performed_calls = 0
-        for station in stations:
-            params = [station[param] for param in config['url-params']]
-            get(endpoint.format(*params), config['schema'])
-
-            performed_calls += 1
-            if performed_calls >= max_calls:
-                print('Waiting [{} s] to prevent max API calls exceedance'
-                      .format(retry_period_s))
-                time.sleep(retry_period_s)
-                performed_calls = 0
+        connection = None
+        insert_template = 'INSERT INTO ' + config['table'] \
+            + '({cols}) VALUES({vals})'
+        try:
+            connection = sql.connect(**config['db-connection'])
+            for station in stations:
+                params = [station[param] for param in config['url-params']]
+                observation = get(endpoint.format(*params), config['schema'])
+                save_in_db(connection, observation, insert_template)
+                performed_calls += 1
+                if performed_calls >= max_calls:
+                    logger.debug(
+                        'Waiting [{} s] to prevent max API calls exceedance'
+                        .format(retry_period_s))
+                    time.sleep(retry_period_s)
+                    performed_calls = 0
+        except Exception as e:
+            logger.error(e)
+        finally:
+            if connection is not None:
+                connection.close()

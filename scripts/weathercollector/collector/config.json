@@ -1,89 +1,106 @@
 {
-    "wunderground": {
-        "db-connection": {
-            "user": "dakus",
-            "password": "jNCPuHwQ80GgYNoc",
-            "host": "mysql.agh.edu.pl",
-            "database": "dakus"
-        },
-        "api-endpoint": "http://api.wunderground.com/api/e631c8092e0a1b4f/conditions/q/{}:{}.json",
-        "api-key": "e631c8092e0a1b4f",
-        "max-calls": 10,
-        "retry-period-s": 60,
-        "response-file": "wunderground/krakow-response.json",
-        "stations-file": "wunderground/krakow-stations.json",
-        "url-params": ["type", "id"],
-        "schema": {
-            "current_observation": {
-                "observation_time_rfc822": "Fri, 24 Nov 2017 18:47:21 +0100",
-                "observation_epoch": "1511545641",
-                "local_time_rfc822": "Fri, 24 Nov 2017 18:49:13 +0100",
-                "local_epoch": "1511545753",
-                "weather": "Clear",
-                "temp_c": 5.8,
-                "relative_humidity": "80%",
-                "wind_string": "Calm",
-                "wind_dir": "North",
-                "wind_degrees": -9999,
-                "wind_kph": 0,
-                "wind_gust_kph": 0,
-                "pressure_mb": "1015",
-                "pressure_in": "29.98",
-                "dewpoint_c": 3,
-                "heat_index_c": "NA",
-                "windchill_c": "6",
-                "feelslike_c": "6",
-                "visibility_km": "3.5",
-                "solarradiation": "--",
-                "UV": "-1",
-                "precip_1hr_metric": " 0",
-                "precip_today_metric": "--"
-            }
-        }
-    },
-    "openweathermap": {
-        "db-connection": {
-            "user": "dakus1",
-            "password": "owKK5gKeVdTeMfVK",
-            "host": "mysql.agh.edu.pl",
-            "database": "dakus1"
-        },
-        "api-endpoint": "http://openweathermap.org/data/2.5/weather?q={},{}&appid=b1b15e88fa797225412429c1c50c122a1",
-        "api-key": "b1b15e88fa797225412429c1c50c122a1",
-        "max-calls": 60,
-        "retry-period-s": 60,
-        "stations-file": "owm/krakow-stations.json",
-        "url-params": ["city", "country"],
-        "schema": {
-            "wind": {
-                "speed": 0.5
+    "log-file": "collector.log",
+    "services": {
+        "wunderground": {
+            "db-connection": {
+                "user": "dakus",
+                "password": "jNCPuHwQ80GgYNoc",
+                "host": "mysql.agh.edu.pl",
+                "database": "dakus"
             },
-            "id": 3094802,
-            "main": {
-                "temp_min": 4,
-                "humidity": 93,
-                "temp_max": 4,
-                "pressure": 1015,
-                "temp": 4
-            },
-            "visibility": 2700,
-            "name": "Krakow",
-            "coord": {
-                "lon": 19.92,
-                "lat": 50.08
-            },
-            "clouds": {
-                "all": 12
-            },
-            "weather": [
-                {
-                    "main": "Mist",
-                    "description": "mist",
-                    "icon": "50n",
-                    "id": 701
+            "table": "observations",
+            "api-endpoint": "http://api.wunderground.com/api/e631c8092e0a1b4f/conditions/q/{}:{}.json",
+            "api-key": "e631c8092e0a1b4f",
+            "max-calls": 10,
+            "retry-period-s": 60,
+            "response-file": "wunderground/krakow-response.json",
+            "stations-file": "wunderground/krakow-stations.json",
+            "url-params": ["type", "id"],
+            "schema": {
+                "current_observation": {
+                    "observation_location": {
+                        "city": "Łęg, Kraków",
+                        "latitude": "50.063408",
+                        "longitude": "20.018280",
+                        "elevation": "646 ft"
+                    },
+                    "observation_time_rfc822": "Fri, 24 Nov 2017 18:47:21 +0100",
+                    "observation_epoch": "1511545641",
+                    "local_time_rfc822": "Fri, 24 Nov 2017 18:49:13 +0100",
+                    "local_epoch": "1511545753",
+                    "weather": "Clear",
+                    "temp_c": 5.8,
+                    "relative_humidity": "80%",
+                    "wind_string": "Calm",
+                    "wind_dir": "North",
+                    "wind_degrees": -9999,
+                    "wind_kph": 0,
+                    "wind_gust_kph": 0,
+                    "pressure_mb": "1015",
+                    "pressure_in": "29.98",
+                    "dewpoint_c": 3,
+                    "heat_index_c": "NA",
+                    "windchill_c": "6",
+                    "feelslike_c": "6",
+                    "visibility_km": "3.5",
+                    "solarradiation": "--",
+                    "UV": "-1",
+                    "precip_1hr_metric": " 0",
+                    "precip_today_metric": "--"
                 }
-            ],
-            "dt": 1511555400
+            }
+        },
+        "openweathermap": {
+            "db-connection": {
+                "user": "dakus1",
+                "password": "owKK5gKeVdTeMfVK",
+                "host": "mysql.agh.edu.pl",
+                "database": "dakus1"
+            },
+            "table": "observations",
+            "api-endpoint": "http://openweathermap.org/data/2.5/weather?q={},{}&appid=b1b15e88fa797225412429c1c50c122a1",
+            "api-key": "b1b15e88fa797225412429c1c50c122a1",
+            "max-calls": 60,
+            "retry-period-s": 60,
+            "stations-file": "owm/krakow-stations.json",
+            "url-params": ["city", "country"],
+            "schema": {
+                "wind": {
+                    "speed": 0.5
+                },
+                "sys": {
+                    "sunset": 1511534722,
+                    "type": 1,
+                    "sunrise": 1511503727,
+                    "message": 0.0028,
+                    "country": "PL",
+                    "id": 5352
+                },
+                "main": {
+                    "temp_min": 4,
+                    "humidity": 93,
+                    "temp_max": 4,
+                    "pressure": 1015,
+                    "temp": 4
+                },
+                "visibility": 2700,
+                "name": "Krakow",
+                "coord": {
+                    "lon": 19.92,
+                    "lat": 50.08
+                },
+                "clouds": {
+                    "all": 12
+                },
+                "weather": [
+                    {
+                        "main": "Mist",
+                        "description": "mist",
+                        "id": 701
+                    }
+                ],
+                "dt": 1511555400
+            }
         }
     }
 }

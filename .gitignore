@@ -6,6 +6,7 @@ scripts/agh-meteo/
 **/.cache
 **/.vscode
 **/*.egg-info/
+**/*.log
 thesis/articles/
 thesis/*.log
 thesis/*.swp

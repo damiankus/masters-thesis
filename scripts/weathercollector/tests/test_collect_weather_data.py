@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import pytest
+from unittest.mock import patch
 from collector.collect_weather_data import traverse_dict, \
     flatten_dict, \
+    save_in_db, \
     InvalidSchemaTypeException, MissingDictException
 
 
@@ -108,3 +110,13 @@ def test_flatten_dict():
         actual['coord']['lon'] = 1
     with pytest.raises(KeyError):
         actual['id']
+
+
+@patch('mysql.connector')
+def test_db_statement_completion():
+    template = 'INSERT INTO tab({}) VALUES({})'
+    d = flatten_dict({
+        "id": 42,
+        "cod": 200
+    })
+
