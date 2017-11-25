@@ -1,0 +1,29 @@
+﻿CREATE TABLE observations (
+	ID SERIAL PRIMARY KEY,
+	
+)
+"current_observation": {
+                "observation_time_rfc822": "Fri, 24 Nov 2017 18:47:21 +0100",
+                "observation_epoch": "1511545641",
+                "local_time_rfc822": "Fri, 24 Nov 2017 18:49:13 +0100",
+                "local_epoch": "1511545753",
+                "weather": "Clear",
+                "temp_c": 5.8,
+                "relative_humidity": "80%",
+                "wind_string": "Calm",
+                "wind_dir": "North",
+                "wind_degrees": -9999,
+                "wind_kph": 0,
+                "wind_gust_kph": 0,
+                "pressure_mb": "1015",
+                "pressure_in": "29.98",
+                "dewpoint_c": 3,
+                "heat_index_c": "NA",
+                "windchill_c": "6",
+                "feelslike_c": "6",
+                "visibility_mi": "2.2",
+                "visibility_km": "3.5",
+                "solarradiation": "--",
+                "UV": "-1",
+                "precip_1hr_metric": " 0",
+                "precip_today_metric": "--"

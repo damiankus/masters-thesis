@@ -1,24 +1,9 @@
+#!/usr/bin/env python3
+
 import pytest
-# from weathercollector.collect_weather_data import traverse_dict
-
-
-def traverse_dict(d, schema):
-    if type(d) != type(schema):
-        raise AttributeError(
-            'Dictionary structure is not compatible with the schema')
-    result = None
-    if isinstance(schema, dict):
-        result = {}
-        for key, item in schema.items():
-            result[key] = traverse_dict(d[key], item)
-    elif isinstance(schema, list):
-        result = []
-        for idx, item in enumerate(schema):
-            result.append(traverse_dict(d[idx], item))
-    else:
-        print('{} <-> {}'.format(d, schema))
-        result = d
-    return result
+from collector.collect_weather_data import traverse_dict
+from errors.custom_errors import \
+    InvalidSchemaTypeException, MissingDictException
 
 
 def test_json_traversion():
@@ -30,7 +15,7 @@ def test_json_traversion():
             {'ca': 0},
         ]
     }
-    obj = {
+    d = {
         'a': 1,
         'b': {
             'ba': 2,
@@ -49,11 +34,51 @@ def test_json_traversion():
             {'ca': 4},
         ]
     }
-    actual = traverse_dict(obj, schema)
+    actual = traverse_dict(d, schema)
     assert actual['b']['bb'] == expected['b']['bb']
-    assert actual['c']['ca'] == expected['c']['ca']
-    with pytest.assertRises(KeyError):
+    assert actual['c'][0]['ca'] == expected['c'][0]['ca']
+    with pytest.raises(KeyError):
         actual['a'] != 1
 
 
-test_json_traversion()
+def test_traverse_list_too_short():
+    schema = {
+        'b': [1, 2, 3, 4]
+    }
+    d = {
+        'b': [3, 3, 3]
+    }
+    with pytest.raises(IndexError):
+        traverse_dict(d, schema)
+
+
+def test_traverse_missing_key():
+    schema = {
+        'b': [1, 2, 3, 4]
+    }
+    d = {
+        'a': 0
+    }
+    with pytest.raises(KeyError):
+        traverse_dict(d, schema)
+
+
+def test_missing_schema():
+    schema = {
+        'a': None
+    }
+    d = {
+        'a': [1, 2, 3]
+    }
+    with pytest.raises(InvalidSchemaTypeException):
+        traverse_dict(d, schema)
+
+
+def test_missing_dict():
+    schema = {
+        'b': [1, 2, 3, 4]
+    }
+    d = None
+    with pytest.raises(MissingDictException):
+        traverse_dict(d, schema)
+

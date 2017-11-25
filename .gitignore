@@ -5,6 +5,7 @@ scripts/agh-meteo/
 **/__pycache__
 **/.cache
 **/.vscode
+**/*.egg-info/
 thesis/articles/
 thesis/*.log
 thesis/*.swp

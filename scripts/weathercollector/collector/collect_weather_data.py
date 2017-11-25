@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import urllib.request
-import urllib.error
-import urllib.parse
 import json
 import os.path
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from errors.custom_errors import InvalidSchemaTypeException, MissingDictException
 
 
 def load_stations(in_path, out_path, city='Krakow'):
@@ -33,11 +35,18 @@ def load_stations(in_path, out_path, city='Krakow'):
 
 def traverse_dict(d, schema):
     result = None
+
+    if (type(d) == dict or type(d) == list) and type(d) != type(schema):
+        raise InvalidSchemaTypeException
     if isinstance(schema, dict):
+        if d is None:
+            raise MissingDictException
         result = {}
         for key, item in schema.items():
             result[key] = traverse_dict(d[key], item)
     elif isinstance(schema, list):
+        if d is None:
+            raise MissingDictException
         result = []
         for idx, item in enumerate(schema):
             result.append(traverse_dict(d[idx], item))
@@ -61,7 +70,7 @@ def get(url, schema):
         json_string = str(res.read(), 'utf-8')
         observation = json.loads(json_string)
         measures = traverse_dict(observation, schema)
-        print(measures)
+        return measures
 
 
 if __name__ == "__main__":
@@ -83,6 +92,18 @@ if __name__ == "__main__":
             stations = json.load(stations_file)
         stations = stations['stations']
         endpoint = config['api-endpoint']
+
+        # Set max calls to value less by 1
+        # to be sure not to exceed the number of calls limit
+        max_calls = config['max-calls'] - 1
+        retry_period_s = config['retry-period-s']
+        performed_calls = 0
         for station in stations:
             params = [station[param] for param in config['url-params']]
-            get(endpoint.format(*params), config['schema'])
+            # get(endpoint.format(*params), config['schema'])
+            performed_calls += 1
+            if performed_calls >= max_calls:
+                print('Waiting [{} s] to prevent max API calls exceedance'
+                      .format(retry_period_s))
+                time.sleep(retry_period_s)
+                performed_calls = 0
