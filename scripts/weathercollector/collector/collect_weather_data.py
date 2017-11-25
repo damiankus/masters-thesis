@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 
 import json
+import mysql.connector as sql
 import os.path
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from errors.custom_errors import InvalidSchemaTypeException, MissingDictException
+
+
+class InvalidSchemaTypeException(Exception):
+    pass
+
+
+class MissingDictException(Exception):
+    pass
 
 
 def load_stations(in_path, out_path, city='Krakow'):
@@ -35,7 +43,6 @@ def load_stations(in_path, out_path, city='Krakow'):
 
 def traverse_dict(d, schema):
     result = None
-
     if (type(d) == dict or type(d) == list) and type(d) != type(schema):
         raise InvalidSchemaTypeException
     if isinstance(schema, dict):
@@ -53,6 +60,32 @@ def traverse_dict(d, schema):
     else:
         result = d
     return result
+
+
+def flatten_dict(d, key='', sep='-'):
+    result = {}
+    prefix = key + sep if (key != '') else ''
+    if isinstance(d, dict):
+        for child_key, item in d.items():
+            i = flatten_dict(item, prefix + child_key)
+            result.update(i)
+    elif isinstance(d, list):
+        if len(d) == 1:
+            result = flatten_dict(d[0], key)
+        else:
+            for idx, item in enumerate(d):
+                i = flatten_dict(item, prefix + str(idx))
+                result.update(i)
+    elif key != 'id':
+        # Delete ID attributes in order to
+        # prevent conflict while iinserting them
+        # into a database
+        result[key] = d
+    return result
+
+
+def save_in_db(connection, d):
+    pass
 
 
 def get(url, schema):
@@ -93,14 +126,13 @@ if __name__ == "__main__":
         stations = stations['stations']
         endpoint = config['api-endpoint']
 
-        # Set max calls to value less by 1
-        # to be sure not to exceed the number of calls limit
-        max_calls = config['max-calls'] - 1
-        retry_period_s = config['retry-period-s']
+        max_calls = config['max-calls']
+        retry_period_s = config['retry-period-s'] + 1
         performed_calls = 0
         for station in stations:
             params = [station[param] for param in config['url-params']]
-            # get(endpoint.format(*params), config['schema'])
+            get(endpoint.format(*params), config['schema'])
+
             performed_calls += 1
             if performed_calls >= max_calls:
                 print('Waiting [{} s] to prevent max API calls exceedance'

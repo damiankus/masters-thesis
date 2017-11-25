@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import pytest
-from collector.collect_weather_data import traverse_dict
-from errors.custom_errors import \
+from collector.collect_weather_data import traverse_dict, \
+    flatten_dict, \
     InvalidSchemaTypeException, MissingDictException
 
 
@@ -82,3 +82,29 @@ def test_missing_dict():
     with pytest.raises(MissingDictException):
         traverse_dict(d, schema)
 
+
+def test_flatten_dict():
+    d = {
+        "id": 42,
+        "cod": 200,
+        "coord": {
+            "lon": 19.92,
+            "lat": 50.08
+        },
+        "weather": [
+            {
+                "main": "Mist",
+                "description": "mist",
+                "icon": "50n",
+                "id": 701
+            }
+        ],
+    }
+    actual = flatten_dict(d)
+    assert actual['cod'] == 200
+    assert int(actual['coord-lon']) == 19
+    assert actual['weather-id'] == 701
+    with pytest.raises(KeyError):
+        actual['coord']['lon'] = 1
+    with pytest.raises(KeyError):
+        actual['id']
