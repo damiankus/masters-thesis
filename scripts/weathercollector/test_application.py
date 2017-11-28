@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import patch
-from collector.collect_weather_data import traverse_dict, \
+from collector.application import traverse_dict, \
     flatten_dict, \
     save_in_db, \
     InvalidSchemaTypeException, MissingDictException

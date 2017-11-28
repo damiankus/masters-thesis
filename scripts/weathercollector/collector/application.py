@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 
-import json
+
 import logging
-import mysql.connector as sql
-import os.path
-import time
-import urllib.error
-import urllib.parse
-import urllib.request
+import sys
 
 
 class InvalidSchemaTypeException(Exception):
@@ -18,11 +13,16 @@ class MissingDictException(Exception):
     pass
 
 
+# Logger initiation is performed before imports
+# in order to make sure that import errors will
+# be caught and logged (helpful while deploying
+# to an AWS Elasticbeanstalk instance)
+
 logger = logging.getLogger('weather-data-collector')
 logger.setLevel(logging.DEBUG)
 
 
-def init_logger(log_filename='collector.log'):
+def init_logger(log_filename='/opt/python/log/collector.log'):
     # create file handler which logs even debug messages
     fh = logging.FileHandler(log_filename)
     fh.setLevel(logging.DEBUG)
@@ -37,6 +37,23 @@ def init_logger(log_filename='collector.log'):
     # add the handlers to the logger
     logger.addHandler(fh)
     logger.addHandler(ch)
+
+
+def log_all_errors(type, value, tb):
+    logger.error("Uncaught exception: {0}".format(str(value)))
+
+
+init_logger()
+sys.excepthook = log_all_errors
+
+
+import json
+import mysql.connector as sql
+import os.path
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 
 
 def load_stations(in_path, out_path, city='Krakow'):
@@ -59,7 +76,7 @@ def load_stations(in_path, out_path, city='Krakow'):
         with open(out_path, 'w+') as out_file:
             stations = {'stations': airports + pwss}
             json.dump(stations, out_file, indent=4)
-            logger.debug('Saved list of stations in: [{}]'.format(out_path))
+            logger.info('Saved list of stations in: [{}]'.format(out_path))
             return stations
 
 
@@ -127,7 +144,7 @@ def get(url, schema):
         the structure of nested JSON objects.
     """
 
-    logger.debug('Connecting to: {}'.format(url))
+    logger.info('Connecting to: {}'.format(url))
     with urllib.request.urlopen(url) as res:
         json_string = str(res.read(), 'utf-8')
         observation = json.loads(json_string)
@@ -142,6 +159,8 @@ def apath(rel_path):
 
 
 if __name__ == "__main__":
+    logger.debug('=== A NEW SESSION HAS BEEN INITIALIZED ===')
+
     global_config = None
     stations = None
     with open(apath('config.json'), 'r') as config_file:
@@ -156,11 +175,14 @@ if __name__ == "__main__":
 
     init_logger(apath(global_config['log-file']))
     logger.debug('=== A NEW SESSION HAS BEEN INITIALIZED ===')
+    logger.debug(global_config['log-file'])
 
     for service_name, config in global_config['services'].items():
-        logger.debug('Gathering data for {}'.format(service_name))
+        logger.info('Gathering data for {}'.format(service_name))
+
         with open(apath(config['stations-file'])) as stations_file:
             stations = json.load(stations_file)
+
         stations = stations['stations']
         endpoint = config['api-endpoint']
         max_calls = config['max-calls']
@@ -169,6 +191,7 @@ if __name__ == "__main__":
         connection = None
         insert_template = 'INSERT INTO ' + config['table'] \
             + '({cols}) VALUES({vals})'
+
         try:
             connection = sql.connect(**config['db-connection'])
             for station in stations:
@@ -177,7 +200,7 @@ if __name__ == "__main__":
                 save_in_db(connection, observation, insert_template)
                 performed_calls += 1
                 if performed_calls >= max_calls:
-                    logger.debug(
+                    logger.info(
                         'Waiting [{} s] to prevent max API calls exceedance'
                         .format(retry_period_s))
                     time.sleep(retry_period_s)

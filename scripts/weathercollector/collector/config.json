@@ -1,5 +1,5 @@
 {
-    "log-file": "collector.log",
+    "log-file": "/opt/python/log/collector.log",
     "services": {
         "wunderground": {
             "db-connection": {
