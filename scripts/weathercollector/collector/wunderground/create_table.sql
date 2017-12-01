@@ -13,15 +13,15 @@ SELECT * FROM services;
 
 DROP TABLE IF EXISTS observations;
 CREATE TABLE observations (
-	ID int NOT NULL AUTO_INCREMENT,
+	ID SERIAL NOT NULL,
 	observation_location_city CHAR(36),
 	observation_location_latitude NUMERIC(9, 6),
 	observation_location_longitude NUMERIC(9, 6),
 	observation_location_elevation CHAR(10),
     observation_time_rfc822 CHAR(36),
-	observation_epoch INT(11),
+	observation_epoch NUMERIC(11),
 	local_time_rfc822 CHAR(36),
-	local_epoch INT(11),
+	local_epoch NUMERIC(11),
 	weather CHAR(20),
 	temp_c NUMERIC(3, 1),
 	relative_humidity CHAR(5),

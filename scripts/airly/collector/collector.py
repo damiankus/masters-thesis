@@ -174,6 +174,7 @@ if __name__ == "__main__":
                                  apath(config['stations-file']))
 
     init_logger(apath(global_config['log-file']))
+    logger.debug('=== A NEW SESSION HAS BEEN INITIALIZED ===')
     logger.debug(global_config['log-file'])
 
     for service_name, config in global_config['services'].items():
@@ -185,7 +186,6 @@ if __name__ == "__main__":
         stations = stations['stations']
         endpoint = config['api-endpoint']
         max_calls = config['max-calls']
-        api_keys = config['api-keys']
         retry_period_s = config['retry-period-s'] + 1
         performed_calls = 0
         connection = None
@@ -196,18 +196,17 @@ if __name__ == "__main__":
             connection = sql.connect(**config['db-connection'])
             for station in stations:
                 params = [station[param] for param in config['url-params']]
-                key_idx = performed_calls % len(api_keys)
-                url = endpoint.format(*params, api_key=api_keys[key_idx])
-                print(url)
-                observation = get(url, config['schema'])
+                observation = get(endpoint.format(*params), config['schema'])
                 save_in_db(connection, observation, insert_template)
                 performed_calls += 1
-                if performed_calls % max_calls == 0 \
-                        and performed_calls >= max_calls:
+                if performed_calls >= max_calls:
                     logger.info(
                         'Waiting [{} s] to prevent max API calls exceedance'
                         .format(retry_period_s))
                     time.sleep(retry_period_s)
+                    performed_calls = 0
+        except Exception as e:
+            logger.error(e)
         finally:
             if connection is not None:
                 connection.close()

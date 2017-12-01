@@ -8,6 +8,8 @@ scripts/agh-meteo/
 **/*.egg-info/
 **/*.log
 **/*.zip
+**/config*.json
 thesis/articles/
 thesis/*.log
+
 thesis/*.swp

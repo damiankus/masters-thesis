@@ -3,14 +3,14 @@
     "services": {
         "wunderground": {
             "db-connection": {
-                "user": "dakus",
-                "password": "jNCPuHwQ80GgYNoc",
-                "host": "mysql.agh.edu.pl",
-                "database": "dakus"
+                "user": "collector",
+                "password": "collec-tor",
+                "host": "wunderground.cjr8aplf7vjv.eu-central-1.rds.amazonaws.com",
+                "database": "wunderground"
             },
             "table": "observations",
-            "api-endpoint": "http://api.wunderground.com/api/e631c8092e0a1b4f/conditions/q/{}:{}.json",
-            "api-key": "e631c8092e0a1b4f",
+            "api-endpoint": "http://api.wunderground.com/api/{api_key}/conditions/q/{}:{}.json",
+            "api-keys": ["e631c8092e0a1b4f", "2c1ee61638f521e4"],
             "max-calls": 10,
             "retry-period-s": 60,
             "response-file": "wunderground/krakow-response.json",
@@ -52,14 +52,14 @@
         },
         "openweathermap": {
             "db-connection": {
-                "user": "dakus1",
-                "password": "owKK5gKeVdTeMfVK",
-                "host": "mysql.agh.edu.pl",
-                "database": "dakus1"
+                "user": "collector",
+                "password": "collec-tor",
+                "host": "owm.cjr8aplf7vjv.eu-central-1.rds.amazonaws.com",
+                "database": "owm"
             },
             "table": "observations",
-            "api-endpoint": "http://openweathermap.org/data/2.5/weather?q={},{}&appid=b1b15e88fa797225412429c1c50c122a1",
-            "api-key": "b1b15e88fa797225412429c1c50c122a1",
+            "api-endpoint": "http://openweathermap.org/data/2.5/weather?q={},{}&appid={api_key}",
+            "api-keys": ["b1b15e88fa797225412429c1c50c122a1"],
             "max-calls": 60,
             "retry-period-s": 60,
             "stations-file": "owm/krakow-stations.json",
