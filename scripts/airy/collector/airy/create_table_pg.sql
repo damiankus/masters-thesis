@@ -19,30 +19,32 @@ select * from stations;
 
 DROP TABLE observations;
 CREATE TABLE observations (
-	details_0_type CHAR(15),
-	details_0_unit CHAR(5),
-	details_0_value NUMERIC(20, 15), 
+	id SERIAL PRIMARY KEY,
+	station_id INT REFERENCES stations(id),
 	details_1_type CHAR(15),
 	details_1_unit CHAR(5),
-	details_1_value NUMERIC(20, 15), 
+	details_1_value NUMERIC(22, 15), 
 	details_2_type CHAR(15),
 	details_2_unit CHAR(5),
-	details_2_value NUMERIC(20, 15),
+	details_2_value NUMERIC(22, 15),
 	details_3_type CHAR(15),
 	details_3_unit CHAR(5),
-	details_3_value NUMERIC(20, 15), 
+	details_3_value NUMERIC(22, 15), 
 	details_4_type CHAR(15),
 	details_4_unit CHAR(5),
-	details_4_value NUMERIC(20, 15),
+	details_4_value NUMERIC(22, 15),
 	details_5_type CHAR(15),
 	details_5_unit CHAR(5),
-	details_5_value NUMERIC(20, 15), 
+	details_5_value NUMERIC(22, 15), 
 	details_6_type CHAR(15),
 	details_6_unit CHAR(5),
-	details_6_value NUMERIC(20, 15), 
+	details_6_value NUMERIC(22, 15), 
 	details_7_type CHAR(15),
 	details_7_unit CHAR(5),
-	details_7_value NUMERIC(20, 15), 
+	details_7_value NUMERIC(22, 15),
+	details_8_type CHAR(15),
+	details_8_unit CHAR(5),
+	details_8_value NUMERIC(22, 15), 
 	measurementTime NUMERIC(15)
 );
-SELECT * FROM observations;
+SELECT MIN(measurementtime), MAX(measurementtime) FROM observations;

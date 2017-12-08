@@ -9,7 +9,7 @@ scripts/agh-meteo/
 **/*.log
 **/*.zip
 **/config*.json
+**/*.secret
 thesis/articles/
 thesis/*.log
-
 thesis/*.swp

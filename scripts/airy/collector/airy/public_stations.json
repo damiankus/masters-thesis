@@ -1,0 +1,18 @@
+[
+        {
+        "configuration_useDefaultPosition": false,
+        "location_longitude": 19.912719,
+        "location_city": "Krak\u00f3w",
+        "manufacturer": "Sensonar",
+        "configuration_useLabel": false,
+        "configuration_isPublic": true,
+        "types": "dust",
+        "initDate": 1490191566000,
+        "location_latitude": 50.067873,
+        "configuration_isEnabled": true,
+        "label": "Kawiory 42",
+        "id": 234,
+        "location_address": "Centrum Informatyki Akademii G\u00f3rniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Krak\u00f3w, Polska",
+        "uuid": "0042"
+    }
+]

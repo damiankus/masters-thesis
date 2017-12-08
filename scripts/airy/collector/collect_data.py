@@ -6,7 +6,7 @@ import os.path
 import psycopg2
 import sys
 import time
-from api_utils import get, get_token
+from api_utils import get, get_token, revoke_token
 from dict_utils import flatten_dict
 from logging_utils import init_logger, logging_hook
 
@@ -35,8 +35,13 @@ def save_in_db(connection, d, stat_template, cols=[]):
     statement = stat_template.format(
         cols=','.join(cols), vals=','.join(['%s'] * len(cols)))
     cursor = connection.cursor()
-    cursor.execute(statement, vals)
-    connection.commit()
+
+    try:
+        cursor.execute(statement, vals)
+        connection.commit()
+    except Exception as e:
+        connection.rollback()
+        logger.error(str(e))
 
 
 def apath(rel_path):
@@ -64,17 +69,13 @@ if __name__ == "__main__":
         with open(apath(config['stations'])) as stations_file:
             stations = json.load(stations_file)
 
-        token, _ = get_token(config['auth-endpoint'])
+        token, refresh_token = get_token(config['auth-endpoint'])
         endpoint = config['api-endpoint']
         max_calls = config['max-calls']
         retry_period_s = config['retry-period-s'] + 1
         performed_calls = 0
         connection = None
-        date_since = config['date-since']
-        date_to = config['date-to']
-        date_step = config['date-step']
-        insert_template = 'INSERT INTO ' + config['table'] \
-            + '({cols}) VALUES({vals})'
+
         try:
             connection = psycopg2.connect(**config['db-connection'])
             if should_save_stations:
@@ -85,11 +86,23 @@ if __name__ == "__main__":
                                  .format(station['id']))
 
             for station in stations:
-                params = [station[param] for param in config['url-params']]
-                url = endpoint.format(*params)
-                print(url)
-                for observation in get(url, config['schema'], token):
-                    save_in_db(connection, observation, insert_template)
+                token = revoke_token(
+                    config['auth-refresh-endpoint'], refresh_token)
+                insert_template = 'INSERT INTO ' + config['table'] \
+                    + '({cols}) VALUES({vals})'
+
+                date_step = (config['date-to'] - config['date-since']) \
+                    // config['date-steps']
+                for start_date in range(config['date-since'],
+                                        config['date-to'],
+                                        date_step):
+                    params = [station[param] for param in config['url-params']]
+                    params.extend([start_date, start_date + date_step])
+                    url = endpoint.format(*params)
+                    logger.debug('Connecting to {}'.format(url))
+                    for observation in get(url, config['schema'], token):
+                        observation['station_id'] = station['id']
+                        save_in_db(connection, observation, insert_template)
 
                 performed_calls += 1
                 if performed_calls >= max_calls:

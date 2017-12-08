@@ -37,4 +37,4 @@ CREATE TABLE observations (
 );
 ALTER TABLE observations CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-SELECT * FROM observations order by dt
+SELECT * FROM observations order by dt;

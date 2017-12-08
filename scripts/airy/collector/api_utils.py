@@ -18,7 +18,7 @@ def get_token(url, auth_phrase=b'fslab:monitoring'):
         return res_dict['access_token'], res_dict['refresh_token']
 
 
-def refresh_token(url, refresh_token, auth_phrase=b'fslab:monitoring'):
+def revoke_token(url, refresh_token, auth_phrase=b'fslab:monitoring'):
     req = urllib.request.Request(url.format(refresh_token), data=b'')
     req.add_header('Authorization', b'Basic ' + base64.b64encode(auth_phrase))
     with urllib.request.urlopen(req) as res:

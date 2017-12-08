@@ -17,12 +17,8 @@ def extract_attrs(d, schema):
         if d is None:
             raise MissingDictException
         result = []
-
-        # TODO: length of the list of measurments
-        # may differ between responses from various stations
-
-        for idx, item in enumerate(schema):
-            result.append(extract_attrs(d[idx], item))
+        for idx in range(min(len(d), len(schema))):
+            result.append(extract_attrs(d[idx], schema[idx]))
     else:
         result = d
     return result
@@ -36,12 +32,9 @@ def flatten_dict(d, key='', sep='_', skip_id=False):
             i = flatten_dict(item, prefix + child_key)
             result.update(i)
     elif isinstance(d, list):
-        if len(d) == 1:
-            result = flatten_dict(d[0], key)
-        else:
-            for idx, item in enumerate(d):
-                i = flatten_dict(item, prefix + str(idx))
-                result.update(i)
+        for idx, item in enumerate(d):
+            e = flatten_dict(item, prefix + str(idx + 1))
+            result.update(e)
     elif key != 'id' or skip_id is False:
         # Delete ID attributes in order to
         # prevent conflict while inserting them
