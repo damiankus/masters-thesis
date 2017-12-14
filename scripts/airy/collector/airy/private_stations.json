@@ -462,28 +462,6 @@
         "id": 23
     },
     {
-        "manufacturer": "Sensonar",
-        "uuid": "0042",
-        "label": "Kawiory 42",
-        "initDate": 1490191566000,
-        "location": {
-            "latitude": 50.067873,
-            "longitude": 19.912719,
-            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
-            "city": "Kraków"
-        },
-        "configuration": {
-            "isPublic": true,
-            "isEnabled": true,
-            "useLabel": false,
-            "useDefaultPosition": false
-        },
-        "types": [
-            "dust"
-        ],
-        "id": 234
-    },
-    {
         "manufacturer": "Airly",
         "uuid": "Airly_137",
         "initDate": 1488386573000,

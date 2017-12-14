@@ -6,6 +6,7 @@ import os.path
 import psycopg2
 import sys
 import time
+import datetime
 from api_utils import get, get_token, revoke_token
 from dict_utils import flatten_dict
 from logging_utils import init_logger, logging_hook
@@ -26,6 +27,16 @@ def load_stations(in_path, out_path, city='Kraków'):
             json.dump(stations, out_file, indent=4)
             logger.info('List of stations saved in: [{}]'.format(out_path))
             return stations
+
+
+def transform_observation(observation):
+    res = {}
+    res['measurementMillis'] = observation['measurementTime']
+    for d in observation['details']:
+        res[d['type']] = d['value']
+        res[d['type'] + '_' + 'unit'] = d['unit']
+    res['station_id'] = observation['station_id']
+    return res
 
 
 def save_in_db(connection, d, stat_template, cols=[]):
@@ -102,7 +113,8 @@ if __name__ == "__main__":
                     logger.debug('Connecting to {}'.format(url))
                     for observation in get(url, config['schema'], token):
                         observation['station_id'] = station['id']
-                        save_in_db(connection, observation, insert_template)
+                        save_in_db(connection, transform_observation(
+                            observation), insert_template)
 
                 performed_calls += 1
                 if performed_calls >= max_calls:

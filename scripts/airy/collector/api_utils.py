@@ -47,5 +47,5 @@ def get(url, schema, token):
                 observation = extract_attrs(observation, schema)
                 if len(observation) == 1:
                     _, observation = observation.popitem()
-                results.append(flatten_dict(observation))
+                results.append(observation)
         return results
