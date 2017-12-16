@@ -1,0 +1,9 @@
+         Format API:  https://dane.imgw.pl/assets/libs/klasyfikacje.json
+Archiwa do pobrania:  https://dane.imgw.pl/data/dane_pomiarowo_obserwacyjne/
+
+{"kod": "B100E00200", "nazwa": "Temperatura powietrza chwilowa-pomiar minutowy-synop", "jednostka": "C"},
+{"kod": "B400F00200", "nazwa": "CiĹnienie minutowe-synop", "jednostka": "hPa"},
+{"kod": "B200E002C2", "nazwa": "PrÄdkoĹÄ wiatru Ĺrednia za ostatnie 2 min.-pomiar minutowy-synop", "jednostka": "m/s"},
+{"kod": "B201E002C2", "nazwa": "Kierunek wiatru Ĺredni za ostatnie 2 min.-pomiar minutowy-synop", "jednostka": "st. kÄta"},
+{"kod": "B500E00200", "nazwa": "WilgotnoĹÄ wzglÄdna chwilowa-pomiar minutowy-synop", "jednostka": "%"},
+{"kod": "B600K002FS", "nazwa": "Suma opadu SEBA za 6h-pomiar minutowy-synop", "jednostka": "mm"},
