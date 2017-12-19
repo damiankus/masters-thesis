@@ -45,12 +45,17 @@ for (aggrType in c("avg", "min", "max", "count")) {
                     measArgs,
                     "FROM observations", 
                     "WHERE station_id = %d",
+                    "AND timereadable > '2017-10-01'::timestamp",
                     "GROUP BY measurementdate",
                     "ORDER BY measurementdate", sep = " ")
   
-  for (idx in 1:nrow(stations)) {
-    id <- stations[idx, "id"]
-    location <- stations[idx, "location_address"]
+  # for (idx in 1:nrow(stations)) {
+    # id <- stations[idx, "id"]
+    # location <- stations[idx, "location_address"]
+  
+  idx <- which(stations$id == 234)
+  location <- stations[idx, "location_address"]
+  for (id in c(234)) {
     targetDir <- file.path(targetRootDir, id)
     dir.create(targetDir)
     targetDir <- file.path(targetDir, aggrType)
