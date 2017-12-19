@@ -1,5 +1,6 @@
 install.packages('RPostgreSQL')
 require('RPostgreSQL')
+require("ggplot2")
 driver <- dbDriver('PostgreSQL')
 passwd <- { 'pass' }
 con <- dbConnect(driver, dbname='airy',
@@ -10,18 +11,35 @@ con <- dbConnect(driver, dbname='airy',
 rm(passwd)
 dbExistsTable(con, 'stations')
 stations <- dbGetQuery(con, 'SELECT * FROM stations');
-pollutants <- dbGetQuery(con, "SELECT type FROM pollutants")[,1]
-pollutants <- unlist(lapply(pollutants, trimws))
+pollutants <- dbGetQuery(con, "SELECT * FROM pollutants")
+pollutants[,"type"] <- unlist(lapply(pollutants[,"type"], trimws))
+pollutants[,"unit"] <- unlist(lapply(pollutants[,"unit"], trimws))
 
-aggrFormatterFactory <- function(aggrFunName) {
+aggrFormatterFactory <- function (aggrFunName) {
   function (argName) {
     paste(toupper(aggrFunName), "(", argName, ") AS ", argName, sep="") 
   }
 }
 
+plot_pol <- function (pol) {
+  p <- ggplot(observations, aes_string(x = "measurementdate", y = pol["type"])) +
+    geom_line(aes_string(color = pol["type"])) +
+    geom_point() +
+    scale_colour_gradient(low = "blue", high = "red") +
+    scale_x_date(date_labels = "%d-%m-%y", date_breaks = "1 month") +
+    labs(x = "Date of measurement", y = paste(aggrType, pol["type"], "[", pol["unit"] ,"]", sep=" "))
+  
+  plotPath <- paste(aggrType, "_", pol["type"], "_station_", id, ".jpg", sep = "")
+  plotPath <- file.path(targetRootDir, plotPath)
+  ggsave(plotPath, width = 16, height = 10, dpi = 200)
+  print(paste("Plot saved under", plotPath, sep=" "))
+}
+
+targetRootDir <- file.path(getwd(), "airy")
+dir.create(targetRootDir)
 for (aggrType in c("avg", "min", "max", "count")) {
   aggr <- aggrFormatterFactory(aggrType)
-  measArgs <- unlist(lapply(pollutants, aggr))
+  measArgs <- unlist(lapply(pollutants[,"type"], aggr))
   measArgs <- paste(measArgs, collapse=", ")
   measurmentStat <- paste("SELECT DATE(timereadable) as measurementdate,",
                     measArgs,
@@ -29,24 +47,13 @@ for (aggrType in c("avg", "min", "max", "count")) {
                     "WHERE station_id = %d",
                     "GROUP BY measurementdate",
                     "ORDER BY measurementdate", sep = " ")
-  
   for (id in c(234)) {
-    targetRootDir <- file.path(getwd(), "Dokumenty/masters-thesis/analysis/airy", id)
+    targetRootDir <- file.path(getwd(), "airy", id)
     dir.create(targetRootDir)
     targetRootDir <- file.path(targetRootDir, aggrType)
     dir.create(targetRootDir)
-    
     observations <- dbGetQuery(con, sprintf(measurmentStat, id))
-    for (pol in pollutants) {
-      plotPath <- paste(aggrType, "_", pol, "_station_", id, ".jpg", sep = "") 
-      plotPath <- file.path(targetRootDir, plotPath)
-      jpeg(plotPath)
-      plot(observations[,pol],
-           type="l",
-           main=sprintf("Measurments of %s for station [%d]", pol, id))
-      dev.off()
-      print(paste("Plot saved under", plotPath, sep=" "))
-    }
+    apply(pollutants, 1, plot_pol)
   }
 }
 
