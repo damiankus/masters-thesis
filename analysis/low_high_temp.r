@@ -19,6 +19,8 @@ plot_pol <- function (pol) {
   p <- ggplot(observations, aes_string(x = "measurementdate", y = pol["type"])) +
     geom_line(aes_string(color = pol["type"])) +
     geom_point() +
+    geom_line(aes(y = temperature), colour = "black") +
+    geom_line(aes(y = dow), colour = "green") +
     scale_colour_gradient(low = "blue", high = "red") +
     labs(x = "Date of measurement", y = paste(pol["type"], "[", pol["unit"] ,"]", sep=" ")) +
     ggtitle(location)
@@ -37,19 +39,18 @@ measurmentStat <- paste("SELECT timereadable as measurementdate,",
                         measArgs,
                         "FROM observations", 
                         "WHERE station_id = %d",
-                        "AND timereadable >= '2017-11-25'::timestamp",
-                        "AND timereadable <= '2017-12-16'::timestamp",
+                        # "AND timereadable >= '2017-11-25'::timestamp",
+                        # "AND timereadable <= '2017-12-16'::timestamp",
+                        "AND timereadable >= '2017-10-18'::timestamp",
+                        "AND timereadable <= '2017-11-15'::timestamp",
                         "ORDER BY measurementdate", sep = " ")
-
-# for (idx in 1:nrow(stations)) {
-# id <- stations[idx, "id"]
-# location <- stations[idx, "location_address"]
 
 idx <- which(stations$id == 234)
 location <- stations[idx, "location_address"]
 
 for (id in c(234)) {
-  targetDir <- file.path(targetRootDir, id, "cold")
+  targetDir <- file.path(targetRootDir, id, "warm")
+  # targetDir <- file.path(targetRootDir, id, "cold")
   dir.create(targetDir)
   observations <- dbGetQuery(con, sprintf(measurmentStat, id))
   apply(pollutants, 1, plot_pol)

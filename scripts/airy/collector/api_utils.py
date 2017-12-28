@@ -5,7 +5,7 @@ import base64
 import urllib.error
 import urllib.parse
 import urllib.request
-from dict_utils import extract_attrs, flatten_dict
+from dict_utils import extract_attrs
 
 
 def get_token(url, auth_phrase=b'fslab:monitoring'):

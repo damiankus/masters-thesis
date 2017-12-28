@@ -18,7 +18,7 @@ def fetch_decorator(config):
   def fetch_archive(url):
     filepath = config["dataDir"] + url.split("/")[-1]
     logger.info("Fetching data from [{0}]".format(url))
-    res =  requests.get(url, stream=True)
+    res = requests.get(url, stream=True)
 
     with open(filepath, "wb+") as output_file:
       for chunk in res.iter_content(chunk_size=config["chunkSize"]):
@@ -37,7 +37,7 @@ with open("config.json", "r") as config_file:
     with open(config["linksFilename"], "r") as links_file:
       if (not os.path.exists(config["dataDir"])):
         os.makedirs(config["dataDir"])
-    
+
       links = [line.rstrip() for line in links_file.readlines() if (len(line) > 0)]
       executor = ThreadPoolExecutor(max_workers=5)
       executor.map(fetch_decorator(config), links)

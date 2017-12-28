@@ -57,6 +57,7 @@ UPDATE observations SET timeReadable = 	to_timestamp(measurementMillis / 1000);
 ALTER TABLE observations ADD COLUMN dow int;
 UPDATE observations SET dow = EXTRACT(DOW FROM timeReadable);
 
+DROP TABLE units;
 CREATE TEMP TABLE units AS 
 (
 SELECT DISTINCT 'temperature' AS temperature, temperature_unit,
@@ -72,8 +73,9 @@ SELECT DISTINCT 'temperature' AS temperature, temperature_unit,
 'c6h6' as c6h6, c6h6_unit
 FROM observations
 );
-drop table units;
+select * from units;
 
+DROP TABLE pollutants;
 WITH tmp_pol (type, unit) AS
 (
 SELECT temperature, temperature_unit FROM units
@@ -98,4 +100,5 @@ SELECT pm2_5, pm2_5_unit FROM units
 UNION ALL
 SELECT c6h6, c6h6_unit  FROM units
 ) 
-SELECT * INTO type_unit FROM tmp_pol;
+SELECT * INTO pollutants;
+

@@ -13,6 +13,7 @@ scripts/imgw-collector/links.txt
 **/*.jpg*
 **/*.jpeg*
 **/*.png*
+**/*.Rhistory
 thesis/articles/
 thesis/*.log
 thesis/*.swp

@@ -21,7 +21,7 @@ CREATE TABLE observations (
 DROP TABLE stations;
 SELECT station_id as id, station_name
 INTO stations
-FROM 
+FROM
 (
 	SELECT DISTINCT station_id, station_name, lower(station_name) as name
 	FROM observations
@@ -40,7 +40,7 @@ ORDER BY station_name;
 
 
 DELETE FROM observations
-WHERE station_name NOT IN 
+WHERE station_name NOT IN
 (
 	SELECT station_name FROM stations
 );
