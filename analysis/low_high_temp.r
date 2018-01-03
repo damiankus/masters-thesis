@@ -25,9 +25,13 @@ plotAllPollutants <- function (observations, stationId, targetDir) {
 }
 
 plotCorrMat <- function (observations) {
-  M <- cor(observations[sapply(observations, is.numeric)])
-  print(M)
+  M <- cor(observations[sapply(observations, is.numeric)], use = "everything")
   corrplot(M, method = "ellipse")
+}
+
+filter_empty_cols <- function (df) {
+  which_na <- sapply(df, function (c) sum(is.na(c)) < length(c))
+  df[,which_na]
 }
 
 main <- function () {
@@ -49,15 +53,16 @@ main <- function () {
   pollutants <- rbind(pollutants, c("dow", "Sun 0-6 Sat"))
   
   plot_pollution <- function (pol, observations, min_temp, max_temp) {
-    max_pol <- max(observations[,pol["type"]])
-    min_pol <- min(observations[,pol["type"]])
+    column <- observations[,pol["type"]]
+    max_pol <- max(column, na.rm = TRUE)
+    min_pol <- min(column, na.rm = TRUE)
     dates <- observations[,"measurementdate"]
     offset <- min_pol - min_temp
     scale_factor <- max_pol / max_temp
     scaled_temperatures <- sapply(observations[,"temperature"], function(t) (t + offset) * scale_factor)
     scaled_temperatures <- data.frame(scaled_temperatures, dates)
     colnames(scaled_temperatures) <- c("temperature", "measurementdate")
-
+    
     max_dow <- 6
     scale_factor <- 0.75 * (max_pol / max_dow)
     scaled_dows <- sapply(observations[,"dow"], function(dow) dow * scale_factor)
@@ -88,7 +93,7 @@ main <- function () {
                           "FROM observations", 
                           "WHERE station_id = %d",
                           "AND timereadable >= '2017-11-25'::timestamp",
-                          "AND timereadable <= '2017-12-16'::timestamp",
+                          "AND timereadable <= '2017-12-01'::timestamp",
                           # "AND timereadable >= '2017-10-18'::timestamp",
                           # "AND timereadable <= '2017-11-15'::timestamp",
                           "ORDER BY measurementdate", sep = ' ')
@@ -102,12 +107,15 @@ main <- function () {
     targetDir <- file.path(targetRootDir, id)
     dir.create(targetDir)
     observations <- dbGetQuery(con, sprintf(measurmentStat, id))
-    min_temp <- min(observations[,"temperature"])
-    max_temp <- max(observations[,"temperature"])
+    observations <- filter_empty_cols(observations)
+    filtered_pollutants <- pollutants[pollutants$type %in% colnames(observations),]
+    min_temp <- min(observations[,"temperature"], na.rm = TRUE)
+    max_temp <- max(observations[,"temperature"], na.rm = TRUE)
     apply(pollutants, 1, plot_pollution, observations, min_temp, max_temp)
     plotAllPollutants(observations, id, targetDir)
     plotCorrMat(observations)
   }
 }
+
 
 main()
