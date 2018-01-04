@@ -46,7 +46,6 @@ def save_in_db(connection, d, stat_template, cols=[]):
     statement = stat_template.format(
         cols=','.join(cols), vals=','.join(['%s'] * len(cols)))
     cursor = connection.cursor()
-
     try:
         cursor.execute(statement, vals)
         connection.commit()

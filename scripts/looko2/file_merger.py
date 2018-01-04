@@ -18,10 +18,16 @@ class FileMerger:
             paths = [os.path.join(self.dir_path, filename)
                      for filename in os.listdir(self.dir_path)
                      if filename.endswith(self.ext)]
+            is_first = True
             for filepath in paths:
                 if filepath != self.target_path:
                     logger.info('Appending file {}'.format(filepath))
                     with open(filepath, 'r') as input_file:
+                        if not is_first:
+                            # skip the header line
+                            next(input_file)
+                        else:
+                            is_first = False
                         for line in input_file:
                             output_file.write(line)
         logger.info('Merged file saved under {}'.format(self.target_path))
