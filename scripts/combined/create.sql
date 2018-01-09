@@ -122,3 +122,35 @@ WHERE s.uuid = 'Airly_3'
 AND timestamp::date = '2017-03-01'
 AND timestamp > '2017-03-01 17:00:00';
 
+ALTER TABLE observations DROP COLUMN is_holiday;
+ALTER TABLE observations ADD COLUMN is_holiday BOOLEAN DEFAULT FALSE;
+
+UPDATE observations 
+SET is_holiday = TRUE
+WHERE EXTRACT(DOW FROM timestamp) = 0 
+OR EXTRACT(DOW FROM timestamp) = 6	
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
+OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
+
+ALTER TABLE observations DROP COLUMN period_of_day;
+ALTER TABLE observations ADD COLUMN period_of_day CHAR(7);
+
+UPDATE observations 
+SET period_of_day = 'night'
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 7;
+UPDATE observations 
+SET period_of_day = 'day'
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 8 AND 16;
+UPDATE observations 
+SET period_of_day = 'evening'
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 17 AND 24;
+
+ALTER TABLE observations DROP COLUMN is_heating_season;
+ALTER TABLE observations ADD COLUMN is_heating_season BOOLEAN DEFAULT FALSE;
