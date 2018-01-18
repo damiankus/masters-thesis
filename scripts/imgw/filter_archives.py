@@ -21,15 +21,16 @@ def filter_decorator(config):
   def filter_archive(archive_path):
     filename = archive_path.split("/")[-1]
     # prefix format data_YYYY_MM_
-    date = "_".join(filename[:13].split("_")[1:3])
-    code = filename.split(".")[0][13:]
+    date = "_".join(filename.split("_")[1:-1])
+    code = filename.split("_")[-1].split('.')[0]
     csv_path = os.path.join(config["dataDir"], config["stations"][code] + "_" + date + ".csv")
+    print(csv_path)
     logger.info("Unpacking [{0}] to [{1}]".format(archive_path, csv_path))
     with gzip.open(archive_path, "rb") as archive:
       with open(csv_path, "wb+") as csv_file:
         for line in archive:
           # code is the third vale in a line
-          code = line.split(b";")[2]
+          code = line.split(b";")[3]
           if (code in param_codes):
             csv_file.write(line + b"\r\n")
   return filter_archive

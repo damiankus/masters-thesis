@@ -90,7 +90,7 @@ if __name__ == "__main__":
             connection = psycopg2.connect(**config['db-connection'])
             if should_save_stations:
                 for station in stations:
-                    template = 'INSERT INTO stations({cols}) VALUES({vals})'
+                    template = 'INSERT INTO monitoring_agh_stations({cols}) VALUES({vals})'
                     save_in_db(connection, station, template)
                     logger.debug('Station [{}] has been saved in the DB'
                                  .format(station['id']))

@@ -1,13 +1,13 @@
-﻿DROP TABLE observations;
-DROP TABLE stations;
+﻿DROP TABLE airly_observations;
+DROP TABLE airly_stations;
 
-CREATE TABLE stations (
+CREATE TABLE airly_stations (
     id INT PRIMARY KEY,
     lattitude NUMERIC(9, 6),
     longitude NUMERIC(9, 6)
 );
 
-CREATE TABLE observations (
+CREATE TABLE airly_observations (
     id SERIAL PRIMARY KEY,
     utc_time TIMESTAMP,
     station_id INT NOT NULL REFERENCES stations(id),

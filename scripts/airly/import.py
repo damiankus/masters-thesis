@@ -24,7 +24,7 @@ class AirlyImporter:
             raise e
 
     def import_stations(self, in_path):
-        statement = 'INSERT INTO stations(id, lattitude, longitude)\
+        statement = 'INSERT INTO airly_stations(id, lattitude, longitude)\
             VALUES(%s, %s, %s)'
         self.save_from_csv(in_path, statement, lambda c, h: [c])
 
@@ -42,7 +42,7 @@ class AirlyImporter:
     def import_observations(self, in_path):
         colnames = ['utc_time', 'station_id', 'temperature',
                     'humidity', 'pressure', 'pm1', 'pm2_5', 'pm10']
-        statement = 'INSERT INTO observations({}) VALUES({})' \
+        statement = 'INSERT INTO airly_observations({}) VALUES({})' \
             .format(','.join(colnames), ','.join(['%s'] * len(colnames)))
         self.save_from_csv(in_path, statement, self.preprocess_observations)
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         connection = psycopg2.connect(**conn_params)
         importer = AirlyImporter(connection)
         importer.import_stations('sensor_locations.csv')
-        importer.import_observations('airly-observations.csv')
+        importer.import_observations('airly_observations.csv')
     finally:
         if connection:
             connection.close()

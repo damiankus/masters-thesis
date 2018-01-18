@@ -123,10 +123,10 @@ AND timestamp::date = '2017-03-01'
 AND timestamp > '2017-03-01 17:00:00';
 
 ALTER TABLE observations DROP COLUMN is_holiday;
-ALTER TABLE observations ADD COLUMN is_holiday BOOLEAN DEFAULT FALSE;
+ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
 
 UPDATE observations 
-SET is_holiday = TRUE
+SET is_holiday = 1
 WHERE EXTRACT(DOW FROM timestamp) = 0 
 OR EXTRACT(DOW FROM timestamp) = 6	
 OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
@@ -139,18 +139,58 @@ OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
 OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
 OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
 
+-- ===================================
+--
+-- ===================================
+
 ALTER TABLE observations DROP COLUMN period_of_day;
-ALTER TABLE observations ADD COLUMN period_of_day CHAR(7);
+ALTER TABLE observations ADD COLUMN period_of_day INT;
 
 UPDATE observations 
-SET period_of_day = 'night'
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 7;
+SET period_of_day = 0
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
 UPDATE observations 
-SET period_of_day = 'day'
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 8 AND 16;
+SET period_of_day = 1
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
 UPDATE observations 
-SET period_of_day = 'evening'
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 17 AND 24;
+SET period_of_day = 2
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
+UPDATE observations 
+SET period_of_day = 3
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
+
+-- ===================================
+--
+-- ===================================
 
 ALTER TABLE observations DROP COLUMN is_heating_season;
 ALTER TABLE observations ADD COLUMN is_heating_season BOOLEAN DEFAULT FALSE;
+UPDATE observations 
+SET is_heating_season = TRUE
+WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
+OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
+
+-- ===================================
+--
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN day_of_week;
+ALTER TABLE observations ADD COLUMN day_of_week INT;
+UPDATE observations 
+SET day_of_week = EXTRACT(DOW FROM timestamp);
+
+-- ===================================
+--
+-- ===================================
+
+
+DROP TABLE combined_observations;
+CREATE TABLE combined_observations AS (
+SELECT o.*, mo.avg_wind_speed, mo.avg_wind_dir
+FROM observations AS o
+INNER JOIN (SELECT time, sm_hour_avg AS avg_wind_speed, dm_hour_avg AS avg_wind_dir
+FROM meteo_observations) AS mo
+ON mo.time = o.timestamp
+);
+
+select * from combined_observations limit 10;

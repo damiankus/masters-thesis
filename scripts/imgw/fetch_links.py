@@ -20,8 +20,11 @@ def callback_decorator(config):
     with open(config["linksFilename"], "w+") as output_file:
       for link in links:
         # skip the data_YYYY_MM prefix
+        print(link)
         code = link.split("/")[-1] \
-          .split(".")[0][13:]
+          .split("_")[-1] \
+          .split(".")[0]
+        print(code)
         if (code in station_codes):
           output_file.write(link + "\n")
   return callback
@@ -43,7 +46,7 @@ with open("config.json", "r") as config_file:
 
     logger.info("Saving links HTML to file {0}".format(config["htmlContentFilename"]))
     with open(config["htmlContentFilename"], "w+") as html_file:
-      
+
       # Skip the DOCTYPE header to prevent parsing errors
       links_html = links_html[links_html.find("\n") + 1:]
       html_file.write(links_html)

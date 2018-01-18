@@ -6,3 +6,5 @@ pg_dump -d airy -t airy_stations | psql -d pollution
 pg_dump -d airy -t airy_observations | psql -d pollution
 pg_dump -d looko2 -t looko2_stations | psql -d pollution
 pg_dump -d looko2 -t looko2_observations | psql -d pollution
+pg_dump -d agh-meteo -t meteo_observations | psql -d pollution
+
