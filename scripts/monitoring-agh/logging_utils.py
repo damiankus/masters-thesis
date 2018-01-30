@@ -3,7 +3,7 @@
 import logging
 
 
-def init_logger(logger, log_filename='airy-collector.log'):
+def init_logger(logger, log_filename='monitoring-agh-collector.log'):
     # create file handler which logs even debug messages
     fh = logging.FileHandler(log_filename)
     fh.setLevel(logging.DEBUG)

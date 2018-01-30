@@ -1,28 +1,28 @@
-﻿DROP TABLE observations;
-DROP TABLE stations;
+﻿DROP TABLE monitoring_agh_observations;
+DROP TABLE monitoring_agh_stations;
 
-CREATE TABLE stations (	
+CREATE TABLE monitoring_agh_stations (	
 	id INT PRIMARY KEY,
 	configuration_isEnabled BOOLEAN,
-        configuration_isPublic BOOLEAN,
-        configuration_useDefaultPosition BOOLEAN,
-        configuration_useLabel BOOLEAN,
-        initDate NUMERIC(15),
-        location_address CHAR(100),
-        location_city CHAR(20),
-        location_latitude NUMERIC(9, 6),
-        location_longitude NUMERIC(9, 6),
-        manufacturer CHAR(20),
-        types_1 CHAR(20),
-        description CHAR(30),
-        label CHAR(50),
-        uuid CHAR(20)
+    configuration_isPublic BOOLEAN,
+    configuration_useDefaultPosition BOOLEAN,
+    configuration_useLabel BOOLEAN,
+    initDate NUMERIC(15),
+    location_address CHAR(100),
+    location_city CHAR(20),
+    location_latitude NUMERIC(9, 6),
+    location_longitude NUMERIC(9, 6),
+    manufacturer CHAR(20),
+    types_1 CHAR(20),
+    description CHAR(30),
+    label CHAR(50),
+    uuid CHAR(20)
 );
-select * from stations;
+select * from monitoring_agh_stations;
 
-CREATE TABLE observations (
+CREATE TABLE monitoring_agh_observations (
 	id SERIAL PRIMARY KEY,
-	station_id INT REFERENCES stations(id),
+	station_id INT REFERENCES monitoring_agh_stations(id),
 	temperature_unit CHAR(5),
 	temperature NUMERIC(22, 15), 
 	co_unit CHAR(5),
@@ -48,14 +48,15 @@ CREATE TABLE observations (
 	measurementMillis NUMERIC(15)
 );
 
-select * from observations where station_id = 234;
+select * from monitoring_agh_observations where station_id = 2025 limit 100;
+select * from monitoring_agh_stations limit 100;
 
-ALTER TABLE observations ADD COLUMN timeReadable TIMESTAMP;
-UPDATE observations SET timeReadable = 	to_timestamp(measurementMillis / 1000);
+ALTER TABLE monitoring_agh_observations ADD COLUMN timeReadable TIMESTAMP;
+UPDATE monitoring_agh_observations SET timeReadable = 	to_timestamp(measurementMillis / 1000);
 
 -- DAY OF THE WEEK 0 - Sunday, 6 - Saturday
-ALTER TABLE observations ADD COLUMN dow int;
-UPDATE observations SET dow = EXTRACT(DOW FROM timeReadable);
+ALTER TABLE monitoring_agh_observations ADD COLUMN dow int;
+UPDATE monitoring_agh_observations SET dow = EXTRACT(DOW FROM timeReadable);
 
 DROP TABLE units;
 CREATE TEMP TABLE units AS 
@@ -71,7 +72,7 @@ SELECT DISTINCT 'temperature' AS temperature, temperature_unit,
 'pm10' as pm10, pm10_unit,
 'pm2_5' as pm2_5, pm2_5_unit,
 'c6h6' as c6h6, c6h6_unit
-FROM observations
+FROM monitoring_agh_observations
 );
 select * from units;
 

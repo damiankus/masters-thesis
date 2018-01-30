@@ -1,0 +1,2 @@
+mysql-connector-python-rf==2.2.2
+psycopg2==2.7.3.2

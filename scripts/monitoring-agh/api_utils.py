@@ -48,4 +48,6 @@ def get(url, schema, token):
                 if len(observation) == 1:
                     _, observation = observation.popitem()
                 results.append(observation)
+        else:
+            results = observations
         return results

@@ -13,13 +13,13 @@ from logging_utils import init_logger, logging_hook
 
 
 # Setup logging
-logger = logging.getLogger('airy-collector')
+logger = logging.getLogger('monitoring-agh-collector')
 logger.setLevel(logging.DEBUG)
 init_logger(logger)
 # sys.excepthook = logging_hook(logger)
 
 
-def load_stations(in_path, out_path, city='Kraków'):
+def load_stations_in_city(in_path, out_path, city='Kraków'):
     with open(in_path, 'r') as in_file:
         stations = [flatten_dict(s) for s in json.load(in_file)
                     if s['location']['city'] == city]
@@ -66,15 +66,15 @@ if __name__ == "__main__":
     with open(apath('config.json'), 'r') as config_file:
         global_config = json.load(config_file)
 
-    config = global_config['services']['airy']
-    should_save_stations = False
-    if not os.path.isfile(apath(config['stations'])):
-        should_save_stations = True
-        stations = load_stations(apath(config['stations-raw']),
-                                 apath(config['stations']))
-
     for service_name, config in global_config['services'].items():
-        logger.info('Gathering data for {}'.format(service_name))
+        logger.info('Gathering data from {}'.format(service_name))
+
+        should_save_stations = False
+        if not os.path.isfile(apath(config['stations'])):
+            should_save_stations = True
+            stations = load_stations_in_city(apath(config['stations-raw']),
+                                             apath(config['stations']),
+                                             config['city'])
 
         with open(apath(config['stations'])) as stations_file:
             stations = json.load(stations_file)
@@ -90,7 +90,7 @@ if __name__ == "__main__":
             connection = psycopg2.connect(**config['db-connection'])
             if should_save_stations:
                 for station in stations:
-                    template = 'INSERT INTO monitoring_agh_stations({cols}) VALUES({vals})'
+                    template = 'INSERT INTO ' + config['stations-table'] + '({cols}) VALUES({vals})'
                     save_in_db(connection, station, template)
                     logger.debug('Station [{}] has been saved in the DB'
                                  .format(station['id']))
@@ -98,19 +98,20 @@ if __name__ == "__main__":
             for station in stations:
                 token = revoke_token(
                     config['auth-refresh-endpoint'], refresh_token)
-                insert_template = 'INSERT INTO ' + config['table'] \
+                insert_template = 'INSERT INTO ' + config['observations-table'] \
                     + '({cols}) VALUES({vals})'
 
-                date_step = (config['date-to'] - config['date-since']) \
-                    // config['date-steps']
-                for start_date in range(config['date-since'],
-                                        config['date-to'],
+                date_step = (config['timestamp-to'] - config['timestamp-since']) \
+                    // config['timestamp-steps']
+                for start_date in range(config['timestamp-since'],
+                                        config['timestamp-to'],
                                         date_step):
                     params = [station[param] for param in config['url-params']]
                     params.extend([start_date, start_date + date_step])
                     url = endpoint.format(*params)
+
                     logger.debug('Connecting to {}'.format(url))
-                    for observation in get(url, config['schema'], token):
+                    for observation in get(url, None, token):
                         observation['station_id'] = station['id']
                         save_in_db(connection, transform_observation(
                             observation), insert_template)
