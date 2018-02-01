@@ -18,9 +18,9 @@ CREATE TABLE looko2_observations (
 \copy looko2_observations (date, hour, day, month, year, station_id, pm1, pm2_5, pm10, station_name) FROM 'looko2.csv' WITH HEADER DELIMITER ',' CSV;
 
 
-DROP TABLE stations;
+DROP TABLE looko2_stations;
 SELECT station_id as id, station_name
-INTO stations
+INTO looko2_stations
 FROM
 (
 	SELECT DISTINCT station_id, station_name, lower(station_name) as name
@@ -28,6 +28,7 @@ FROM
 	ORDER BY station_id
 ) AS krk_stations
 WHERE name LIKE '%krakow%'
+OR name LIKE '%kraków%'
 OR name LIKE '%krk%'
 OR name LIKE '%ruczaj%'
 OR name LIKE '%podhalanska%'
@@ -38,9 +39,8 @@ OR name ='poddebowiec'
 OR name ='ww_piaski_v3_atmo'
 ORDER BY station_name;
 
-
 DELETE FROM looko2_observations
 WHERE station_name NOT IN
 (
-	SELECT station_name FROM stations
+	SELECT station_name FROM looko2_stations
 );

@@ -62,13 +62,17 @@ def load_stations(in_path, out_path, city='Krakow'):
         station_ids = set({})
 
         airports = []
-        for a in neighbors['airport']['station']:
-            if (a['icao'] not in station_ids):
-                station_ids.add(a['icao'])
-                airport = dict([(key, a[key]) for key in airport_keys])
-                airport['type'] = 'icao'
-                airport['id'] = airport.pop('icao')
-                airports.append(airport)
+        # Historical data API seems to not work
+        # for airports IDs
+
+        # for a in neighbors['airport']['station']:
+        #     if (a['icao'] not in station_ids) \
+        #             and (a['city'] == city):
+        #         station_ids.add(a['icao'])
+        #         airport = dict([(key, a[key]) for key in airport_keys])
+        #         airport['type'] = 'icao'
+        #         airport['id'] = airport.pop('icao')
+        #         airports.append(airport)
 
         personal_stations = []
         for pws in neighbors['pws']['station']:
@@ -139,24 +143,17 @@ def save_in_db(connection, d, stat_template, cols=[]):
     connection.commit()
 
 
-def get(url, schema):
-    """
-    @type url: string
-    @param url: A complete URL to the API endpoint.
-    @type schema: dict
-    @param schema: A sample response used for finding
-        the way to traverse other responses based on
-        the structure of nested JSON objects.
-    """
-
-    logger.info('Connecting to: {}'.format(url))
-    with urllib.request.urlopen(url) as res:
-        json_string = str(res.read(), 'utf-8')
-        observation = json.loads(json_string)
-        observation = traverse_dict(observation, schema)
-        if len(observation) == 1:
-            _, observation = observation.popitem()
-        return flatten_dict(observation)
+def get_and_save(url, out_path):
+    logger.debug('Connecting to: {}'.format(url))
+    try:
+        with urllib.request.urlopen(url) as res:
+            json_string = str(res.read(), 'utf-8')
+            result = json.loads(json_string)
+            with open(out_path, 'w+') as out_file:
+                json.dump(result, out_file, indent=4)
+        logger.debug('Saved under {}'.format(out_path))
+    except Exception as e:
+        logger.error(e)
 
 
 def apath(rel_path):
@@ -176,8 +173,8 @@ if __name__ == '__main__':
     for service_name, config in global_config['services'].items():
         logger.info('Gathering data for {}'.format(service_name))
         endpoint = config['api-endpoint']
-        max_calls = config['max-calls']
         api_keys = config['api-keys']
+        max_calls = config['max-calls'] * len(api_keys)
         retry_period_s = config['retry-period-s'] + 1
         performed_calls = 0
         connection = None
@@ -201,27 +198,36 @@ if __name__ == '__main__':
                 with open(apath(config['stations-file'])) as stations_file:
                     stations = json.load(stations_file)['stations']
 
-            start_date = dt.strptime(config['date-start'], DATE_FORMAT)
-            end_date = dt.strptime(config['date-end'], DATE_FORMAT)
-            date = start_date
-            part_formatter = string.Formatter()
-            mapping = string.FormatDict(api_key='{api_key}', date='{date}')
-
             for station in stations:
-                params = [station[param] for param in config['url-params']]
-                key_idx = performed_calls % len(api_keys)
-                url = endpoint.format(*params, api_key=api_keys[key_idx])
-            #     observation = get(url, config['schema'])
-            #     save_in_db(connection, observation, insert_template)
-            #     performed_calls += 1
-            #     if performed_calls % max_calls == 0 \
-            #             and performed_calls >= max_calls:
-            #         logger.info(
-            #             'Waiting [{} s] to prevent max API calls exceedance'
-            #             .format(retry_period_s))
-            #         time.sleep(retry_period_s)
+                start_date = dt.strptime(config['date-start'], DATE_FORMAT)
+                end_date = dt.strptime(config['date-end'], DATE_FORMAT)
+                date = start_date
+                const_params = dict([(param, station[param])
+                                     for param in config['url-params']])
+                url_template = endpoint.format(**const_params)
+                target_dir = os.path.join(config['target-dir'], station['id'])
+                if not os.path.exists(target_dir):
+                    os.makedirs(target_dir)
+
                 while date != end_date:
+                    key_idx = performed_calls % len(api_keys)
+                    var_params = {
+                        'date': date.strftime(DATE_FORMAT).replace('-', ''),
+                        'api_key': api_keys[key_idx]
+                    }
+                    url = url_template.format(**var_params)
                     date = date + tdelta(days=1)
+                    get_and_save(url, os.path.join(
+                        target_dir, 'observation_' + var_params['date'] + '.json'))
+
+                    performed_calls += 1
+                    if performed_calls % max_calls == 0 \
+                            and performed_calls >= max_calls:
+                        logger.info(
+                            'Waiting [{} s] to prevent max API calls exceedance'
+                            .format(retry_period_s))
+                        time.sleep(retry_period_s)
         finally:
             if connection is not None:
                 connection.close()
+12045

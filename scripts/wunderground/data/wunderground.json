@@ -1,0 +1,2354 @@
+
+{
+  "response": {
+  "version":"0.1",
+  "termsofService":"http://www.wunderground.com/weather/api/d/terms.html",
+  "features": {
+  "history": 1
+  }
+	}
+		,
+	"history": {
+		"date": {
+		"pretty": "January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "00",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "January 9, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "00",
+		"tzname": "UTC"
+		},
+		"observations": [
+		{
+		"date": {
+		"pretty": "12:00 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "00",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:00 PM GMT on January 09, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "00",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.1", "tempi":"22.8","dewptm":"-11.5", "dewpti":"11.3","hum":"61","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1022.2", "pressurei":"30.19","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:10 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "10",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:10 PM GMT on January 09, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "10",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-11.6", "dewpti":"11.1","hum":"61","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1021.9", "pressurei":"30.18","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:20 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "20",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:20 PM GMT on January 09, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "20",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-11.8", "dewpti":"10.8","hum":"60","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1021.6", "pressurei":"30.17","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:30 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "30",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:30 PM GMT on January 09, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "30",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-12.0", "dewpti":"10.4","hum":"59","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1021.6", "pressurei":"30.17","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:40 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "40",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:40 PM GMT on January 09, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "40",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-11.9", "dewpti":"10.6","hum":"60","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1021.6", "pressurei":"30.17","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:01 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "01",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:01 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "01",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.4", "tempi":"22.3","dewptm":"-11.8", "dewpti":"10.8","hum":"61","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1021.6", "pressurei":"30.17","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:11 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "11",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:11 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "11",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-11.5", "dewpti":"11.3","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1021.2", "pressurei":"30.16","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:21 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "21",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:21 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "21",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-11.7", "dewpti":"11.0","hum":"61","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.9", "pressurei":"30.15","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:31 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "31",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:31 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "31",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-11.4", "dewpti":"11.5","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.9", "pressurei":"30.15","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:41 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "41",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:41 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "41",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-11.4", "dewpti":"11.5","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.9", "pressurei":"30.15","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:01 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "01",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:01 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "01",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-11.2", "dewpti":"11.9","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:11 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "11",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:11 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "11",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-11.5", "dewpti":"11.3","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:21 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "21",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:21 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "21",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-11.5", "dewpti":"11.3","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:31 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "31",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:31 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "31",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-11.5", "dewpti":"11.3","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:41 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "41",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:41 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "01",
+		"min": "41",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.4", "tempi":"22.3","dewptm":"-11.6", "dewpti":"11.2","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:01 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "01",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:01 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "01",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.5", "tempi":"22.1","dewptm":"-11.7", "dewpti":"11.0","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:21 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "21",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:21 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "21",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.6", "tempi":"21.9","dewptm":"-11.6", "dewpti":"11.2","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:31 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "31",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:31 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "31",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.7", "tempi":"21.7","dewptm":"-11.4", "dewpti":"11.4","hum":"64","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.5", "pressurei":"30.14","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:41 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "41",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:41 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "02",
+		"min": "41",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.7", "tempi":"21.7","dewptm":"-11.4", "dewpti":"11.4","hum":"64","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1020.2", "pressurei":"30.13","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:01 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "01",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:01 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "01",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.7", "tempi":"21.7","dewptm":"-11.3", "dewpti":"11.7","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:11 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "11",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:11 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "11",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.7", "tempi":"21.7","dewptm":"-11.3", "dewpti":"11.7","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:21 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "21",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:21 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "21",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.8", "tempi":"21.6","dewptm":"-11.4", "dewpti":"11.5","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:31 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "31",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:31 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "31",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.9", "tempi":"21.4","dewptm":"-11.4", "dewpti":"11.4","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:42 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "42",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:42 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "03",
+		"min": "42",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.9", "tempi":"21.4","dewptm":"-11.4", "dewpti":"11.4","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:02 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "02",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:02 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "02",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.3", "tempi":"20.7","dewptm":"-11.7", "dewpti":"11.0","hum":"66","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:12 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "12",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:12 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "12",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.4", "tempi":"20.5","dewptm":"-11.7", "dewpti":"10.9","hum":"66","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:22 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "22",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:22 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "22",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.6", "tempi":"20.1","dewptm":"-11.9", "dewpti":"10.5","hum":"66","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:32 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "32",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:32 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "32",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.8", "tempi":"19.8","dewptm":"-11.9", "dewpti":"10.5","hum":"67","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:42 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "42",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:42 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "04",
+		"min": "42",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.0", "tempi":"19.4","dewptm":"-12.1", "dewpti":"10.2","hum":"67","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:02 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "02",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:02 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "02",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.3", "tempi":"18.9","dewptm":"-12.2", "dewpti":"10.0","hum":"68","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:12 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "12",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:12 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "12",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.4", "tempi":"18.7","dewptm":"-12.2", "dewpti":"10.1","hum":"69","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:22 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "22",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:22 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "22",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.5", "tempi":"18.5","dewptm":"-12.2", "dewpti":"10.0","hum":"69","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:32 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "32",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:32 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "32",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.7", "tempi":"18.1","dewptm":"-12.4", "dewpti":"9.6","hum":"69","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:42 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "42",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:42 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "05",
+		"min": "42",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.7", "tempi":"18.1","dewptm":"-12.3", "dewpti":"9.9","hum":"70","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:03 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "03",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:03 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "03",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.9", "tempi":"17.8","dewptm":"-12.4", "dewpti":"9.6","hum":"70","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:13 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "13",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:13 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "13",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.9", "tempi":"17.8","dewptm":"-12.4", "dewpti":"9.6","hum":"70","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:23 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "23",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:23 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "23",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.0", "tempi":"17.6","dewptm":"-12.4", "dewpti":"9.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:33 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "33",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:33 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "33",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.0", "tempi":"17.6","dewptm":"-12.4", "dewpti":"9.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:43 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "43",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:43 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "06",
+		"min": "43",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.0", "tempi":"17.6","dewptm":"-12.4", "dewpti":"9.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:03 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "03",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:03 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "03",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.9", "tempi":"17.8","dewptm":"-12.1", "dewpti":"10.2","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:13 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "13",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:13 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "13",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.8", "tempi":"18.0","dewptm":"-12.0", "dewpti":"10.4","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:23 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "23",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:23 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "23",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.9", "tempi":"17.8","dewptm":"-12.1", "dewpti":"10.2","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:33 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "33",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:33 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "33",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.0", "tempi":"17.6","dewptm":"-12.4", "dewpti":"9.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:43 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "43",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:43 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "07",
+		"min": "43",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.1", "tempi":"17.4","dewptm":"-12.3", "dewpti":"9.9","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:04 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "04",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:04 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "04",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.2", "tempi":"17.2","dewptm":"-12.4", "dewpti":"9.7","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:24 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "24",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:24 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "24",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.9", "tempi":"17.8","dewptm":"-12.1", "dewpti":"10.2","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:34 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "34",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:34 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "34",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.8", "tempi":"18.0","dewptm":"-12.0", "dewpti":"10.4","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:44 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "44",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:44 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "08",
+		"min": "44",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.6", "tempi":"18.3","dewptm":"-11.8", "dewpti":"10.7","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:04 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "04",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:04 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "04",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.3", "tempi":"18.9","dewptm":"-11.5", "dewpti":"11.3","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:14 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "14",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:14 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "14",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.9", "tempi":"19.6","dewptm":"-11.1", "dewpti":"12.0","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:24 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "24",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:24 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "24",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.3", "tempi":"20.7","dewptm":"-10.7", "dewpti":"12.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:34 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "34",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:34 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "34",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.9", "tempi":"21.4","dewptm":"-10.7", "dewpti":"12.7","hum":"69","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:44 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "44",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:44 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "09",
+		"min": "44",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.5", "tempi":"22.1","dewptm":"-10.5", "dewpti":"13.1","hum":"68","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:04 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "04",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:04 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "04",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.6", "tempi":"23.7","dewptm":"-10.0", "dewpti":"14.0","hum":"66","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:25 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "25",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:25 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "25",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.1", "tempi":"24.6","dewptm":"-10.1", "dewpti":"13.8","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:35 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "35",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:35 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "35",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.2", "tempi":"24.4","dewptm":"-10.2", "dewpti":"13.6","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:45 AM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "45",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:45 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "10",
+		"min": "45",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.2", "tempi":"24.4","dewptm":"-10.2", "dewpti":"13.6","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:05 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "05",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:05 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "05",
+		"tzname": "UTC"
+		},
+		"tempm":"-3.9", "tempi":"25.0","dewptm":"-9.9", "dewpti":"14.1","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:15 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "15",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:15 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "15",
+		"tzname": "UTC"
+		},
+		"tempm":"-3.9", "tempi":"25.0","dewptm":"-10.2", "dewpti":"13.7","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:25 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "25",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:25 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "25",
+		"tzname": "UTC"
+		},
+		"tempm":"-3.9", "tempi":"25.0","dewptm":"-10.2", "dewpti":"13.7","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:35 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "35",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:35 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "35",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.0", "tempi":"24.8","dewptm":"-10.2", "dewpti":"13.6","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "12:45 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "45",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "11:45 AM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "11",
+		"min": "45",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.0", "tempi":"24.8","dewptm":"-10.2", "dewpti":"13.6","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:05 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "05",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:05 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "05",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.1", "tempi":"24.6","dewptm":"-10.3", "dewpti":"13.4","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:15 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "15",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:15 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "15",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.2", "tempi":"24.4","dewptm":"-10.4", "dewpti":"13.2","hum":"62","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:25 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "25",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:25 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "25",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.3", "tempi":"24.3","dewptm":"-10.3", "dewpti":"13.4","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "1:35 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "35",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "12:35 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "12",
+		"min": "35",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.3", "tempi":"24.3","dewptm":"-10.3", "dewpti":"13.4","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.2", "pressurei":"30.04","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:06 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "06",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:06 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "06",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.2", "tempi":"24.4","dewptm":"-10.2", "dewpti":"13.6","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.2", "pressurei":"30.04","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:16 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "16",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:16 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "16",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.2", "tempi":"24.4","dewptm":"-10.2", "dewpti":"13.6","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.2", "pressurei":"30.04","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:26 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "26",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:26 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "26",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.3", "tempi":"24.3","dewptm":"-10.3", "dewpti":"13.4","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.2", "pressurei":"30.04","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:36 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "36",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:36 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "36",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.4", "tempi":"24.1","dewptm":"-10.4", "dewpti":"13.2","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.2", "pressurei":"30.04","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "2:46 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "46",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "1:46 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "13",
+		"min": "46",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.5", "tempi":"23.9","dewptm":"-10.5", "dewpti":"13.1","hum":"63","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:06 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "06",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:06 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "06",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.8", "tempi":"23.4","dewptm":"-10.6", "dewpti":"12.9","hum":"64","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.2", "pressurei":"30.04","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:16 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "16",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:16 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "16",
+		"tzname": "UTC"
+		},
+		"tempm":"-4.9", "tempi":"23.2","dewptm":"-10.7", "dewpti":"12.7","hum":"64","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:26 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "26",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:26 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "26",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.0", "tempi":"23.0","dewptm":"-10.8", "dewpti":"12.6","hum":"64","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:36 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "36",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:36 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "36",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.2", "tempi":"22.6","dewptm":"-11.0", "dewpti":"12.2","hum":"64","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "3:46 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "46",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "2:46 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "14",
+		"min": "46",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.3", "tempi":"22.5","dewptm":"-10.9", "dewpti":"12.4","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:06 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "06",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:06 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "06",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.6", "tempi":"21.9","dewptm":"-11.2", "dewpti":"11.9","hum":"65","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:16 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "16",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:16 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "16",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.8", "tempi":"21.6","dewptm":"-11.2", "dewpti":"11.9","hum":"66","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:26 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "26",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:26 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "26",
+		"tzname": "UTC"
+		},
+		"tempm":"-5.9", "tempi":"21.4","dewptm":"-11.1", "dewpti":"12.1","hum":"67","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:36 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "36",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:36 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "36",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.0", "tempi":"21.2","dewptm":"-11.2", "dewpti":"11.9","hum":"67","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.5", "pressurei":"30.05","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "4:46 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "46",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "3:46 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "15",
+		"min": "46",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.2", "tempi":"20.8","dewptm":"-11.6", "dewpti":"11.2","hum":"66","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:16 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "16",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:16 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "16",
+		"tzname": "UTC"
+		},
+		"tempm":"-6.7", "tempi":"19.9","dewptm":"-11.8", "dewpti":"10.7","hum":"67","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:26 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "26",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:26 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "26",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.1", "tempi":"19.2","dewptm":"-11.9", "dewpti":"10.6","hum":"69","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:36 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "36",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:36 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "36",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.3", "tempi":"18.9","dewptm":"-12.1", "dewpti":"10.3","hum":"69","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1017.8", "pressurei":"30.06","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:47 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "47",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:47 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "47",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.4", "tempi":"18.7","dewptm":"-11.9", "dewpti":"10.5","hum":"70","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "5:57 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "57",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "4:57 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "16",
+		"min": "57",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.4", "tempi":"18.7","dewptm":"-11.9", "dewpti":"10.5","hum":"70","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:07 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "07",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:07 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "07",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.7", "tempi":"18.1","dewptm":"-12.3", "dewpti":"9.9","hum":"70","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.5", "pressurei":"30.08","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:17 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "17",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:17 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "17",
+		"tzname": "UTC"
+		},
+		"tempm":"-7.9", "tempi":"17.8","dewptm":"-12.3", "dewpti":"9.9","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.5", "pressurei":"30.08","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:27 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "27",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:27 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "27",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.0", "tempi":"17.6","dewptm":"-12.4", "dewpti":"9.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.5", "pressurei":"30.08","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:37 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "37",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:37 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "37",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.1", "tempi":"17.4","dewptm":"-12.4", "dewpti":"9.6","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.5", "pressurei":"30.08","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "6:44 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "44",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "5:44 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "17",
+		"min": "44",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.2", "tempi":"17.2","dewptm":"-12.6", "dewpti":"9.4","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:04 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "04",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:04 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "04",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.4", "tempi":"16.9","dewptm":"-12.6", "dewpti":"9.3","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.2", "pressurei":"30.07","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:14 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "14",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:14 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "14",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.6", "tempi":"16.5","dewptm":"-12.9", "dewpti":"8.7","hum":"71","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.5", "pressurei":"30.08","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:24 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "24",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:24 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "24",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.7", "tempi":"16.3","dewptm":"-12.9", "dewpti":"8.8","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:34 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "34",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:34 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "34",
+		"tzname": "UTC"
+		},
+		"tempm":"-8.9", "tempi":"16.0","dewptm":"-13.1", "dewpti":"8.5","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "7:44 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "44",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "6:44 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "18",
+		"min": "44",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.0", "tempi":"15.8","dewptm":"-13.2", "dewpti":"8.3","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:04 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "04",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:04 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "04",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.3", "tempi":"15.3","dewptm":"-13.4", "dewpti":"7.8","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.9", "pressurei":"30.12","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:14 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "14",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:14 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "14",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.4", "tempi":"15.1","dewptm":"-13.4", "dewpti":"7.9","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:24 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "24",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:24 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "24",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.5", "tempi":"14.9","dewptm":"-13.7", "dewpti":"7.4","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:34 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "34",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:34 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "34",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.6", "tempi":"14.7","dewptm":"-13.6", "dewpti":"7.6","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "8:44 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "44",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "7:44 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "19",
+		"min": "44",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.7", "tempi":"14.5","dewptm":"-13.5", "dewpti":"7.7","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1018.8", "pressurei":"30.09","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:15 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "15",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:15 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "15",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.9", "tempi":"14.2","dewptm":"-13.9", "dewpti":"7.0","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:25 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "25",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:25 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "25",
+		"tzname": "UTC"
+		},
+		"tempm":"-9.9", "tempi":"14.2","dewptm":"-13.9", "dewpti":"7.0","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:35 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "35",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:35 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "35",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.0", "tempi":"14.0","dewptm":"-13.9", "dewpti":"6.9","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "9:45 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "45",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "8:45 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "20",
+		"min": "45",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.1", "tempi":"13.8","dewptm":"-14.1", "dewpti":"6.7","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:05 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "05",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:05 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "05",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.2", "tempi":"13.6","dewptm":"-14.0", "dewpti":"6.8","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:15 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "15",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:15 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "15",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.3", "tempi":"13.5","dewptm":"-14.1", "dewpti":"6.6","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:25 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "25",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:25 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "25",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.4", "tempi":"13.3","dewptm":"-14.2", "dewpti":"6.5","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:35 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "35",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:35 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "35",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.4", "tempi":"13.3","dewptm":"-14.2", "dewpti":"6.5","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "10:45 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "45",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "9:45 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "21",
+		"min": "45",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.5", "tempi":"13.1","dewptm":"-14.3", "dewpti":"6.3","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:06 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "23",
+		"min": "06",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:06 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "06",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.4", "tempi":"13.3","dewptm":"-14.2", "dewpti":"6.5","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:16 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "23",
+		"min": "16",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:16 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "16",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.5", "tempi":"13.1","dewptm":"-14.3", "dewpti":"6.3","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.2", "pressurei":"30.10","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:26 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "23",
+		"min": "26",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:26 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "26",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.5", "tempi":"13.1","dewptm":"-14.3", "dewpti":"6.3","hum":"74","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:36 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "23",
+		"min": "36",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:36 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "36",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.6", "tempi":"12.9","dewptm":"-14.6", "dewpti":"5.8","hum":"73","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" },
+		{
+		"date": {
+		"pretty": "11:46 PM CET on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "23",
+		"min": "46",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "10:46 PM GMT on January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "22",
+		"min": "46",
+		"tzname": "UTC"
+		},
+		"tempm":"-10.8", "tempi":"12.6","dewptm":"-14.9", "dewpti":"5.2","hum":"72","wspdm":"-1608.8", "wspdi":"-999.9","wgustm":"-1607.4", "wgusti":"-999.0","wdird":"-9999","wdire":"North","pressurem":"1019.5", "pressurei":"30.11","windchillm":"-999", "windchilli":"-999","heatindexm":"-9999", "heatindexi":"-9999","precip_ratem":"-2539.7", "precip_ratei":"-99.99","precip_totalm":"-2539.7", "precip_totali":"-99.99","solarradiation":"","UV":"","softwaretype":"Netatmo" }
+		],
+		"dailysummary": [
+		{ "date": {
+		"pretty": "January 10, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "10",
+		"hour": "00",
+		"min": "00",
+		"tzname": "Europe/Warsaw"
+		},
+		"utcdate": {
+		"pretty": "January 9, 2017",
+		"year": "2017",
+		"mon": "01",
+		"mday": "09",
+		"hour": "23",
+		"min": "00",
+		"tzname": "UTC"
+		},
+		"meantempm":"-7.3", "meantempi":"18.8","meandewptm":"-11.9", "meandewpti":"10.6","meanwindspdm":"0.0", "meanwindspdi":"0.0","meanwdire":"North","meanwdird":"","humidity":"67","maxtempm":"-3.9", "maxtempi":"25.0","mintempm":"-10.8", "mintempi":"12.6","maxhumidity":"74","minhumidity":"59","maxdewptm":"-9.9", "maxdewpti":"14.1","mindewptm":"-14.9", "mindewpti":"5.2","maxpressurem":"1022.2", "maxpressurei":"30.19","minpressurem":"1017.2", "minpressurei":"30.04","maxwspdm":"0.0", "maxwspdi":"0.0","precipm":"0.0", "precipi":"0.00" }
+		]
+	}
+}

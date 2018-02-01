@@ -15,7 +15,7 @@ CREATE TABLE stations (
 -- =====================================
 
 select * from airly_stations;
-select * from airy_stations;
+select * from monitoring_agh_stations;
 select * from looko2_stations;
 
 -- =====================================
@@ -29,21 +29,28 @@ SELECT	'airly', 'airly_' || id::text, 'Kraków',
 	'airly', 'Airly_' || id
 FROM airly_stations;
 
+-- Be careful to skip the duplicates (Airly sensors)
 INSERT INTO stations(
 	source, id, address, city,
 	latitude, longitude,
 	manufacturer, uuid)
-SELECT	'airy', 'airy_' || id::text, location_address, location_city,
+SELECT	'agh', 'agh_' || id::text, location_address, location_city,
 	location_latitude, location_longitude,
 	manufacturer, uuid
-FROM airy_stations;
+FROM monitoring_agh_stations
+WHERE manufacturer <> 'Airly';
 
 INSERT INTO stations(
-	source, id, city,
+	source, id, address, city,
 	manufacturer, uuid)
-SELECT DISTINCT 'looko2', 'looko2_' || id::text, 'Kraków',
+SELECT 'looko2', 'looko2_' || id::text, station_name, 'Kraków',
 	'looko2', 'Looko2_' || id::text
-FROM looko2_stations;
+FROM looko2_stations AS s
+WHERE s.station_name IN
+(
+SELECT MIN(station_name) FROM looko2_stations
+GROUP BY id
+);
 
 CREATE INDEX ON stations USING HASH (id);
 
@@ -87,14 +94,18 @@ SELECT 'airly_' || station_id, utc_time, temperature, (pressure / 100.0), humidi
 FROM airly_observations
 ORDER BY utc_time;
 
+-- Note that timestamps are cast to ts in the UTC timezone
 INSERT INTO observations (
 	station_id, timestamp,
 	temperature, pressure, humidity,
 	pm1, pm2_5, pm10, co, no2, o3, so2, c6h6
 )
-SELECT 'airy_' || station_id, to_timestamp(measurementmillis / 1000), temperature, (pressure / 100.0), humidity,
+SELECT 'agh_' || station_id, to_timestamp(measurementmillis / 1000) AT time zone 'UTC', temperature, (pressure / 100.0), humidity,
 	pm1, pm2_5, pm10, co, no2, o3, so2, c6h6
-FROM airy_observations
+FROM monitoring_agh_observations AS o
+JOIN monitoring_agh_stations AS s
+ON o.station_id = s.id
+WHERE s.manufacturer <> 'Airly'
 ORDER BY measurementmillis;
 
 INSERT INTO observations (
@@ -104,7 +115,7 @@ INSERT INTO observations (
 SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
 	pm1, pm2_5, pm10
 FROM looko2_observations
-ORDER BY station_id, date, hour;
+ORDER BY date, hour, station_id;
 
 select * from pg_indexes where tablename = 'observations';
 CREATE INDEX ON observations(timestamp);
@@ -193,4 +204,8 @@ FROM meteo_observations) AS mo
 ON mo.time = o.timestamp
 );
 
-select * from combined_observations limit 10;
+SELECT * FROM combined_observations LIMIT 10;
+
+
+
+

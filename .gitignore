@@ -10,11 +10,9 @@ scripts/imgw-collector/links.txt
 **/config*.json
 **/*.secret
 **/*.csv*
-**/*.jpg*
-**/*.jpeg*
-**/*.png*
 **/*.Rhistory
 **/*diagram/**
 thesis/articles/
+**/observation*
 thesis/*.log
 thesis/*.swp

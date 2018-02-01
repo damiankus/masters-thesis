@@ -1,0 +1,16 @@
+*.aux
+*.bbl
+*.blg
+*.gz
+*.loa
+*.lof
+*.log
+*.lot
+*.mp
+*.mps
+*.out
+*.swp
+*.toc
+*-eps-converted-to.pdf
+*~
+

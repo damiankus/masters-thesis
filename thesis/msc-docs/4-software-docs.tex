@@ -1,0 +1,108 @@
+
+\chapter{Project documentation} \label{chap:docs}
+
+\newcommand{\uml}[2] {
+	\begin{figure}[H]
+		\centering
+		\caption{#1}
+		\begin{mpost}[mpsettings=input metauml;]
+			#2
+		\end{mpost}
+	\end{figure}
+}
+
+\bt
+
+\section{Some clever stuff} \label{sec:cuda}
+
+\bt
+
+\section{API components overview} \label{sec:api-overview}
+
+Nice UML no. 1...
+
+\uml{IsogeometricFEM class} {
+	Class.C("IsogeometricFEM") ()
+		("+ apply(pde: PDE, bcs: BoundaryConditions,
+			base: BsplineBase, solver: Solver, femConfig: FEMConfig)");
+	drawObject(C);
+}
+
+Nice UML no. 2...
+
+\uml{HAdaptiveIsogeometricFEM interface} {
+	Interface.I("HAdaptiveIsogeometricFEM")
+		("+ apply(pde: PDE, bcs: BoundaryConditions,
+			adaptationThreshold: Double, solver: Solver, femConfig: FEMConfig)");
+	classStereotypes.I("<<interface>>");
+	drawObject(I);
+}
+
+
+\section{Detailed API specification and class diagrams} \label{sec:api-detail}
+
+And another large UML...
+
+\uml{The overall class diagram} {
+	Class.IsogeometricFEM("IsogeometricFEM")
+		() ("+ apply(...)");
+
+	Class.PDE("PDE")
+		("+ lhsCoefs: Function[1..*]", "+ rhs: Function") ();
+	IsogeometricFEM.n = PDE.s + (60, -60);
+
+	Class.BoundaryConditions("BoundaryConditions")
+		("+ left: Double", "+ right: Double",
+		 "+ leftType: BoundaryType", "+ rightType: BoundaryType") ();
+	IsogeometricFEM.s = BoundaryConditions.n + (60, 60);
+
+	Interface.Base("Base")
+		("+ count(): Int",
+		 "+ eval(...): Double",
+		 "+ getSupport(no: Int): Range");
+	classStereotypes.Base("<<interface>>");
+	IsogeometricFEM.w = BsplineBase.e + (-150, 0);
+
+	AbstractClass.GriddedBase("GriddedBase") ()
+		("+ getGrid(): PointSequence",
+		 "+ getGridSpan(index: Int): IntRange",
+		 "+ getSupport(no: Int): Range");
+	Base.n = GriddedBase.s + (-80, -60);
+
+	Class.BsplineBase("BsplineBase") ()
+		("+ getGrid(): PointSequence",
+		 "+ getGridSpan(index: Int): IntRange",
+		 "+ getSupport(no: Int): Range");
+	Base.n = BsplineBase.s + (80, -60);
+
+	Interface.Solver("Solver")
+		("+ apply(...)");
+	classStereotypes.Solver("<<interface>>");
+	IsogeometricFEM.s = Solver.n + (-60, 60);
+
+	Class.GaussSolver("GaussSolver")
+		() ("+ apply(...)");
+	Solver.e = GaussSolver.w + (-60, 0);
+
+	Class.MultifrontalSolver("MultifrontalSolver")
+		() ("+ apply(...)");
+	Solver.s = MultifrontalSolver.n + (0, 60);
+
+
+	drawObjects(
+		IsogeometricFEM,
+		PDE, BoundaryConditions,
+		Base, GriddedBase, BsplineBase,
+		Solver, GaussSolver, MultifrontalSolver
+	);
+
+	link(dependency)(IsogeometricFEM.n -- PDE.s);
+	link(dependency)(IsogeometricFEM.n -- BsplineBase.s);
+	link(dependency)(IsogeometricFEM.s -- BoundaryConditions.n);
+	link(dependency)(IsogeometricFEM.s -- Solver.n);
+	link(realization)(GriddedBase.s -- Base.n);
+	link(realization)(BsplineBase.s -- Base.n);
+	link(realization)(GaussSolver.w -- Solver.e);
+	link(realization)(MultifrontalSolver.n -- Solver.s);
+}
+

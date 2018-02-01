@@ -1,0 +1,71 @@
+%&pdflatex
+
+\documentclass[12pt]{report}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath} % for implementation of the matrix environment
+\usepackage{blindtext}
+\usepackage{caption}
+\usepackage{color}
+\usepackage[pdftex]{graphicx} \graphicspath{{./plots/}}
+\usepackage{epstopdf} \epstopdfsetup{update} % only regenerate pdf files when eps file is newer
+\usepackage{float} % figure groups aka floats
+\usepackage{forest} % for MFS elimination tree diagram
+\usepackage[left=3.5cm, right=2.5cm]{geometry} % margins
+\usepackage[shellescape,latex]{gmp} % metapost for UMLs
+\usepackage[hidelinks]{hyperref} % ToC/LoA/LoF/LoT entries are links
+\usepackage{mathptmx} % Times New Roman like font
+\usepackage{pdfpages} % for inserting pdf as the initial pages
+\usepackage{setspace} \onehalfspacing % 1.5 line spacing
+\usepackage{subcaption}
+\usepackage{xfrac} % nice slanted fractions
+
+\captionsetup[figure]{labelfont={bf}, textfont={small}}
+\captionsetup[subfigure]{labelfont={bf}, textfont={small}}
+
+\newcommand{\bt}{\blindtext}
+\newcommand{\eps}{\varepsilon}
+%\newcommand{\rev}[1]{\textcolor{red}{#1}}
+\newcommand{\rev}[1]{#1}
+\newcommand{\T}[1]{\texttt{#1}}
+
+\algnewcommand\And{\,\textbf{and}\,}
+\algnewcommand\Or{\,\textbf{or}\,}
+\algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
+
+
+\begin{document}
+
+\includepdf[pages={-,{}}]{initial-pages.pdf} % `-' for all pages, `{}' for an empty page
+
+\tableofcontents
+
+\include{1-intro}
+\include{2-problem-formulation}
+\include{3-solution-methodology}
+\include{4-software-docs}
+\include{5-result-evaluation}
+\include{6-conclusions}
+
+\cleardoublepage % to ensure that the page reference is correct
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+
+\begingroup
+	\let \clearpage \relax % to suppress page break
+
+	\cleardoublepage
+	\addcontentsline{toc}{chapter}{\listalgorithmname}
+	\listofalgorithms
+\endgroup
+
+\nocite{*} % forces bibtex to include all citations, whether or not they were referred to in the paper
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{bib-style}
+\bibliography{bibliography}
+
+\end{document}
+
