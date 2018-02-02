@@ -2,6 +2,7 @@ require('RPostgreSQL')
 require('ggplot2')
 require('reshape')
 require('corrplot')
+require('magrittr')
 Sys.setenv(LANG = "en")
 
 get_normalized <- function (column) {
@@ -52,6 +53,15 @@ aggr_formatter_factory <- function (aggr_fun) {
   function (arg_name) {
     paste(toupper(aggr_fun), '(', arg_name, ') AS ', arg_name, sep='') 
   }
+}
+
+get_all <- function (query_args) {
+  paste("SELECT timestamp::date,",
+        query_args,
+        'FROM combined_observations AS o',
+        'JOIN stations AS s ON s.id = o.station_id',
+        "WHERE timestamp > '2016-12-31'",
+        'ORDER BY timestamp::date', sep = ' ')
 }
 
 get_grouped_by_day <- function (query_args) {
@@ -120,15 +130,27 @@ main <- function () {
   target_root_dir <- file.path(target_root_dir, 'combined')
   dir.create(target_root_dir)
   
-  # Set of fetched columns is same for all types of queries
-  query_args <- paste(formatter(c(pollutants, meteo_factors)), collapse=', ')
+  # Fetch all the data
+  target_dir <- target_root_dir
+  query_args <- paste(c(pollutants, meteo_factors), collapse=', ')
+  query <- get_all(query_args)
+  observations <- dbGetQuery(con, query)
   
+  # Create a corrplot for all the data
+  corr_path <- file.path(target_dir, 'corrplot-all-data.png')
+  plotCorrMat(observations, corr_path)
+  print('Complete rows')
+  print(nrow(observations %>% filter(complete.cases(.))))
+  
+  # The set of fetched columns is same for all types of queries
+  query_args <- paste(formatter(c(pollutants, meteo_factors)), collapse=', ')
+
   # Get mean observaions grouped by day for the whole year
   target_dir <- file.path(target_root_dir, 'global')
   dir.create(target_dir)
   query <- get_grouped_by_day(query_args)
   observations <- dbGetQuery(con, query)
-  corr_path <- file.path(target_dir, 'corrplot.png')
+  corr_path <- file.path(target_dir, 'corrplot-daily-avg.png')
   plotCorrMat(observations, corr_path)
   observations <- filter_empty_cols(observations)
   filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
@@ -138,21 +160,21 @@ main <- function () {
       plot_pollutant(observations, target_dir, pollutant, meteo)
     }
   }
-  
+
   # Get data for each period of day
   pods <- seq(0, 3)
   names(pods) <- c('night', 'morning', 'afternoon', 'evening')
   target_dir <- file.path(target_root_dir, 'periods_of_day')
   dir.create(target_dir)
-  
+
   for (period in names(pods)) {
     query <- get_same_period(query_args, pods[period])
     observations <- dbGetQuery(con, query)
     observations <- filter_empty_cols(observations)
     filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
-    corr_path <- file.path(target_dir, paste(period, 'corrplot.png', sep = '_'))
+    corr_path <- file.path(target_dir, paste(period, 'avg', 'corrplot.png', sep = '_'))
     plotCorrMat(observations, corr_path)
-    
+
     for (pollutant in filtered_pollutants) {
       pollutant_dir <- file.path(target_dir, pollutant)
       dir.create(pollutant_dir)
@@ -163,22 +185,22 @@ main <- function () {
       }
     }
   }
-  
+
   # Get data grouped by hour for a narrow interval with high pollution levels
   intervals <- rbind(c('2017-01-25', '2017-02-09'), c('2017-11-25', '2017-12-09'))
   target_dir <- file.path(target_root_dir, 'intervals')
   dir.create(target_dir)
-  
+
   plot_interval <- function (interval) {
     query <- get_grouped_by_hour(query_args, interval[1], interval[2])
     observations <- dbGetQuery(con, query)
     observations <- filter_empty_cols(observations)
     filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
-    interval_dir <- file.path(target_dir, paste(interval[1], interval[2], sep = '_')) 
+    interval_dir <- file.path(target_dir, paste(interval[1], interval[2], sep = '_'))
     dir.create(interval_dir)
     corr_path <- file.path(target_dir, paste(interval[1], 'corrplot.png', sep = '_'))
     plotCorrMat(observations, corr_path)
-    
+
     for (pollutant in filtered_pollutants) {
       for (meteo in meteo_factors) {
         plot_pollutant(observations, interval_dir, pollutant, meteo)
