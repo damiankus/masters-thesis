@@ -7,20 +7,11 @@ import json
 import logging
 import os.path
 import psycopg2
-import string
-import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
-
-
-class InvalidSchemaTypeException(Exception):
-    pass
-
-
-class MissingDictException(Exception):
-    pass
+from utils import save_in_db
 
 
 # Logger initiation is performed before imports
@@ -89,60 +80,6 @@ def load_stations(in_path, out_path, city='Krakow'):
             return stations
 
 
-def traverse_dict(d, schema):
-    result = None
-    if (type(d) == dict or type(d) == list) and type(d) != type(schema):
-        raise InvalidSchemaTypeException
-    if isinstance(schema, dict):
-        if d is None:
-            raise MissingDictException
-        result = {}
-        for key, item in schema.items():
-            result[key] = traverse_dict(d[key], item)
-    elif isinstance(schema, list):
-        if d is None:
-            raise MissingDictException
-        result = []
-        for idx, item in enumerate(schema):
-            result.append(traverse_dict(d[idx], item))
-    else:
-        result = d
-    return result
-
-
-def flatten_dict(d, key='', sep='_'):
-    result = {}
-    prefix = key + sep if (key != '') else ''
-    if isinstance(d, dict):
-        for child_key, item in d.items():
-            i = flatten_dict(item, prefix + child_key)
-            result.update(i)
-    elif isinstance(d, list):
-        if len(d) == 1:
-            result = flatten_dict(d[0], key)
-        else:
-            for idx, item in enumerate(d):
-                i = flatten_dict(item, prefix + str(idx))
-                result.update(i)
-    elif key != 'id':
-        # Delete ID attributes in order to
-        # prevent conflict while iinserting them
-        # into a database
-        result[key] = d
-    return result
-
-
-def save_in_db(connection, d, stat_template, cols=[]):
-    if len(cols) == 0:
-        cols = list(d.keys())
-    vals = [d[col] for col in cols]
-    statement = stat_template.format(
-        cols=','.join(cols), vals=','.join(['%s'] * len(cols)))
-    cursor = connection.cursor()
-    cursor.execute(statement, vals)
-    connection.commit()
-
-
 def get_and_save(url, out_path):
     logger.debug('Connecting to: {}'.format(url))
     try:
@@ -169,6 +106,13 @@ if __name__ == '__main__':
     init_logger(apath(global_config['log-file']))
     logger.debug(global_config['log-file'])
     DATE_FORMAT = '%Y-%m-%d'
+
+    log_separator = """
+    =====================================================================
+
+
+    =====================================================================
+    """
 
     for service_name, config in global_config['services'].items():
         logger.info('Gathering data for {}'.format(service_name))
@@ -227,7 +171,7 @@ if __name__ == '__main__':
                             'Waiting [{} s] to prevent max API calls exceedance'
                             .format(retry_period_s))
                         time.sleep(retry_period_s)
+            logger.debug(log_separator)
         finally:
             if connection is not None:
                 connection.close()
-12045

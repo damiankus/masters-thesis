@@ -140,73 +140,75 @@ main <- function () {
   corr_path <- file.path(target_dir, 'corrplot-all-data.png')
   plotCorrMat(observations, corr_path)
   print('Complete rows')
-  print(nrow(observations %>% filter(complete.cases(.))))
+  print(nrow(observations))
+  print(nrow(na.omit(observations)))
+  head(na.omit(observations))
   
-  # The set of fetched columns is same for all types of queries
-  query_args <- paste(formatter(c(pollutants, meteo_factors)), collapse=', ')
-
-  # Get mean observaions grouped by day for the whole year
-  target_dir <- file.path(target_root_dir, 'global')
-  dir.create(target_dir)
-  query <- get_grouped_by_day(query_args)
-  observations <- dbGetQuery(con, query)
-  corr_path <- file.path(target_dir, 'corrplot-daily-avg.png')
-  plotCorrMat(observations, corr_path)
-  observations <- filter_empty_cols(observations)
-  filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
-
-  for (pollutant in filtered_pollutants) {
-    for (meteo in meteo_factors) {
-      plot_pollutant(observations, target_dir, pollutant, meteo)
-    }
-  }
-
-  # Get data for each period of day
-  pods <- seq(0, 3)
-  names(pods) <- c('night', 'morning', 'afternoon', 'evening')
-  target_dir <- file.path(target_root_dir, 'periods_of_day')
-  dir.create(target_dir)
-
-  for (period in names(pods)) {
-    query <- get_same_period(query_args, pods[period])
-    observations <- dbGetQuery(con, query)
-    observations <- filter_empty_cols(observations)
-    filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
-    corr_path <- file.path(target_dir, paste(period, 'avg', 'corrplot.png', sep = '_'))
-    plotCorrMat(observations, corr_path)
-
-    for (pollutant in filtered_pollutants) {
-      pollutant_dir <- file.path(target_dir, pollutant)
-      dir.create(pollutant_dir)
-      for (meteo in meteo_factors) {
-        meteo_dir <- file.path(pollutant_dir, meteo)
-        dir.create(meteo_dir)
-        plot_pollutant(observations, meteo_dir, pollutant, meteo, period)
-      }
-    }
-  }
-
-  # Get data grouped by hour for a narrow interval with high pollution levels
-  intervals <- rbind(c('2017-01-25', '2017-02-09'), c('2017-11-25', '2017-12-09'))
-  target_dir <- file.path(target_root_dir, 'intervals')
-  dir.create(target_dir)
-
-  plot_interval <- function (interval) {
-    query <- get_grouped_by_hour(query_args, interval[1], interval[2])
-    observations <- dbGetQuery(con, query)
-    observations <- filter_empty_cols(observations)
-    filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
-    interval_dir <- file.path(target_dir, paste(interval[1], interval[2], sep = '_'))
-    dir.create(interval_dir)
-    corr_path <- file.path(target_dir, paste(interval[1], 'corrplot.png', sep = '_'))
-    plotCorrMat(observations, corr_path)
-
-    for (pollutant in filtered_pollutants) {
-      for (meteo in meteo_factors) {
-        plot_pollutant(observations, interval_dir, pollutant, meteo)
-      }
-    }
-  }
-  apply(intervals, 1, plot_interval)
+  # # The set of fetched columns is same for all types of queries
+  # query_args <- paste(formatter(c(pollutants, meteo_factors)), collapse=', ')
+  # 
+  # # Get mean observaions grouped by day for the whole year
+  # target_dir <- file.path(target_root_dir, 'global')
+  # dir.create(target_dir)
+  # query <- get_grouped_by_day(query_args)
+  # observations <- dbGetQuery(con, query)
+  # corr_path <- file.path(target_dir, 'corrplot-daily-avg.png')
+  # plotCorrMat(observations, corr_path)
+  # observations <- filter_empty_cols(observations)
+  # filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
+  # 
+  # for (pollutant in filtered_pollutants) {
+  #   for (meteo in meteo_factors) {
+  #     plot_pollutant(observations, target_dir, pollutant, meteo)
+  #   }
+  # }
+  # 
+  # # Get data for each period of day
+  # pods <- seq(0, 3)
+  # names(pods) <- c('night', 'morning', 'afternoon', 'evening')
+  # target_dir <- file.path(target_root_dir, 'periods_of_day')
+  # dir.create(target_dir)
+  # 
+  # for (period in names(pods)) {
+  #   query <- get_same_period(query_args, pods[period])
+  #   observations <- dbGetQuery(con, query)
+  #   observations <- filter_empty_cols(observations)
+  #   filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
+  #   corr_path <- file.path(target_dir, paste(period, 'avg', 'corrplot.png', sep = '_'))
+  #   plotCorrMat(observations, corr_path)
+  # 
+  #   for (pollutant in filtered_pollutants) {
+  #     pollutant_dir <- file.path(target_dir, pollutant)
+  #     dir.create(pollutant_dir)
+  #     for (meteo in meteo_factors) {
+  #       meteo_dir <- file.path(pollutant_dir, meteo)
+  #       dir.create(meteo_dir)
+  #       plot_pollutant(observations, meteo_dir, pollutant, meteo, period)
+  #     }
+  #   }
+  # }
+  # 
+  # # Get data grouped by hour for a narrow interval with high pollution levels
+  # intervals <- rbind(c('2017-01-25', '2017-02-09'), c('2017-11-25', '2017-12-09'))
+  # target_dir <- file.path(target_root_dir, 'intervals')
+  # dir.create(target_dir)
+  # 
+  # plot_interval <- function (interval) {
+  #   query <- get_grouped_by_hour(query_args, interval[1], interval[2])
+  #   observations <- dbGetQuery(con, query)
+  #   observations <- filter_empty_cols(observations)
+  #   filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
+  #   interval_dir <- file.path(target_dir, paste(interval[1], interval[2], sep = '_'))
+  #   dir.create(interval_dir)
+  #   corr_path <- file.path(target_dir, paste(interval[1], 'corrplot.png', sep = '_'))
+  #   plotCorrMat(observations, corr_path)
+  # 
+  #   for (pollutant in filtered_pollutants) {
+  #     for (meteo in meteo_factors) {
+  #       plot_pollutant(observations, interval_dir, pollutant, meteo)
+  #     }
+  #   }
+  # }
+  # apply(intervals, 1, plot_interval)
 }
 main()

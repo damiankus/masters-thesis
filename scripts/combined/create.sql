@@ -127,12 +127,6 @@ CLUSTER observations USING "observations_timestamp_idx";
 --
 -- ===================================
 
-SELECT * FROM observations AS o
-JOIN stations AS s ON s.id = o.station_id
-WHERE s.uuid = 'Airly_3'
-AND timestamp::date = '2017-03-01'
-AND timestamp > '2017-03-01 17:00:00';
-
 ALTER TABLE observations DROP COLUMN is_holiday;
 ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
 
