@@ -107,12 +107,10 @@ if __name__ == '__main__':
     logger.debug(global_config['log-file'])
     DATE_FORMAT = '%Y-%m-%d'
 
-    log_separator = """
-    =====================================================================
+    log_separator = """=====================================================================
 
 
-    =====================================================================
-    """
+    ====================================================================="""
 
     for service_name, config in global_config['services'].items():
         logger.info('Gathering data for {}'.format(service_name))
@@ -132,12 +130,6 @@ if __name__ == '__main__':
                 logger.debug('Parsing a sample response from API')
                 stations = load_stations(apath(config['response-file']),
                                          apath(config['stations-file']))['stations']
-                logger.debug('Saving stations in the DB [{}]'
-                             .format(config['stations-table']))
-                stat_template = 'INSERT INTO ' + config['stations-table'] \
-                    + '({cols}) VALUES({vals})'
-                for station in stations:
-                    save_in_db(connection, station, stat_template)
             else:
                 with open(apath(config['stations-file'])) as stations_file:
                     stations = json.load(stations_file)['stations']
@@ -171,6 +163,7 @@ if __name__ == '__main__':
                             'Waiting [{} s] to prevent max API calls exceedance'
                             .format(retry_period_s))
                         time.sleep(retry_period_s)
+
             logger.debug(log_separator)
         finally:
             if connection is not None:

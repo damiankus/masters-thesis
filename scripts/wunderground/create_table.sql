@@ -75,4 +75,7 @@ CREATE TABLE wunderground_observations (
 );
 
 SELECT * FROM wunderground_stations;
-SELECT * FROM wunderground_observations
+SELECT * FROM wunderground_observations WHERE station_id = 'IKRAKW81' LIMIT 1000;
+SELECT COUNT(*) FROM wunderground_observations WHERE wind_speed IS NOT NULL;
+SELECT COUNT(*) FROM wunderground_observations WHERE temperature IS NOT NULL;
+SELECT COUNT(*) FROM wunderground_observations WHERE pressure IS NOT NULL;

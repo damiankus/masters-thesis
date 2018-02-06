@@ -4,19 +4,20 @@ import argparse
 import glob
 import json
 import os
-import psycopg2
-from utils import exec_stat, save_in_db
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker
+from models import Station, Observation, SqlBase
 
 
 api_to_db_field = {
     'tempm': 'temperature',
     'hum': 'humidity',
-    'pressurem': 'pressure ',
-    'wspdm': 'wind_speed ',
-    'wdird': 'wind_dir_deg ',
+    'pressurem': 'pressure',
+    'wspdm': 'wind_speed',
+    'wdird': 'wind_dir_deg',
     'wdire': 'wind_dir_word',
-    'precip_totalm': 'precip_total ',
-    'precip_ratem': 'precip_rate ',
+    'precip_totalm': 'precip_total',
+    'precip_ratem': 'precip_rate',
     'solarradiation': 'solradiation'
 }
 
@@ -41,72 +42,48 @@ if __name__ == '__main__':
     with open('config.json', 'r') as config_file:
         global_config = json.load(config_file)
 
-    connection = None
-    try:
-        for service_name, config in global_config['services'].items():
-            connection = psycopg2.connect(**config['db-connection'])
+    for service_name, config in global_config['services'].items():
+        url = 'postgres://{user}:{password}@{host}:5432/{database}'
+        engine = create_engine(url.format(**config['db-connection']))
+        SqlBase.metadata.bind = engine
+        DbSession = sessionmaker()
+        DbSession.bind = engine
+        session = DbSession()
 
-            # Delete the old station table
-            print('Deleting the stations table')
-            del_stations_stat = 'DROP TABLE IF EXISTS ' \
-                + config['stations-table']
-            exec_stat(connection, del_stations_stat)
+        # Recreate all the necessary tables
+        Observation.__table__.drop(engine, checkfirst=True)
+        Station.__table__.drop(engine, checkfirst=True)
+        SqlBase.metadata.create_all(engine)
 
-            print('Creating stations table')
-            create_stations_stat = """
-                CREATE TABLE wunderground_stations (
-                    id CHAR(20) PRIMARY KEY,
-                    type CHAR(5),
-                    city CHAR(20),
-                    neighborhood CHAR(50),
-                    lat NUMERIC(9, 6),
-                    lon NUMERIC(9, 6)
-                );
-            """
-            exec_stat(connection, create_stations_stat)
+        for tbl in SqlBase.metadata.sorted_tables:
+            print('Created ' + str(tbl))
 
-            with open(config['stations-file']) as stations_file:
-                print('Saving stations in the DB')
-                stations = json.load(stations_file)['stations']
-                stat_template = 'INSERT INTO ' + config['stations-table'] \
-                    + '({cols}) VALUES({vals})'
-                for station in stations:
-                    save_in_db(connection, station, stat_template)
+        with open(config['stations-file']) as stations_file:
+            stations = [Station(**s) for s in
+                        json.load(stations_file)['stations']]
+            session.add_all(stations)
+            session.commit()
 
-        # Parse the responses and save them in the DB
-        del_obs_stat = 'DROP TABLE IF EXISTS ' + config['observations-table']
-        exec_stat(connection, del_obs_stat)
-        create_obs_stat = """
-            CREATE TABLE wunderground_observations (
-                ID SERIAL PRIMARY KEY,
-                station_id CHAR(20) REFERENCES wunderground_stations(id),
-                timestamp TIMESTAMP,
-                temperature NUMERIC(5, 3), -- tempm
-                humidity NUMERIC(6, 3), -- hum
-                pressure NUMERIC(7, 3), -- pressurem
-                wind_speed NUMERIC(7, 3), -- wspdm
-                wind_dir_deg NUMERIC(6, 3), -- wdird
-                wind_dir_word CHAR(25), -- wdire
-                precip_total NUMERIC(7, 3), -- precip_totalm
-                precip_rate NUMERIC(7, 3), -- precip_ratem
-                solradiation NUMERIC(6, 3) -- solarradiation
-            );
-        """
-        stat_template = 'INSERT INTO ' + config['observations-table'] \
-            + '({cols}) VALUES({vals})'
+    padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-9999']
+    timestamp_format = '{year}-{mon}-{mday} {hour}:{min}'
+    for dirpath in glob.glob(args['dir']):
+        station_id = dirpath.split(os.path.sep)[-1]
+        print('Saving data for station: ' + station_id)
 
-        for dirpath in glob.glob(args['dir']):
-            station_id = dirpath.split(os.path.sep)[-1]
-
-            for fpath in glob.glob(os.path.join(dirpath, '*')):
-                with open(fpath, 'r') as in_file:
-                    history = json.load(in_file)['history']
-                    dt = history['utcdate']
-                    date = '-'.join([dt['year'], dt['mon'], dt['mday']])
-
-                    for obs in history['observations']:
-                        record = map_keys(obs, api_to_db_field)
-
-    finally:
-        if connection:
-            connection.close()
+        for fpath in glob.glob(os.path.join(dirpath, '*')):
+            with open(fpath, 'r') as in_file:
+                observations = []
+                append = observations.append
+                for o in json.load(in_file)['history']['observations']:
+                    time = o['utcdate']
+                    time = time['hour'] + ':' + time['min']
+                    record = map_keys(o, api_to_db_field)
+                    for key, val in record.items():
+                        if val in padding_vals:
+                            record[key] = None
+                    record['station_id'] = station_id
+                    record['timestamp'] = timestamp_format.format(
+                        **o['utcdate'])
+                    append(Observation(**record))
+                session.add_all(observations)
+                session.commit()
