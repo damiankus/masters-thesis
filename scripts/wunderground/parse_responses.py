@@ -64,7 +64,7 @@ if __name__ == '__main__':
             session.add_all(stations)
             session.commit()
 
-    padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-9999']
+    padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
     timestamp_format = '{year}-{mon}-{mday} {hour}:{min}'
     for dirpath in glob.glob(args['dir']):
         station_id = dirpath.split(os.path.sep)[-1]
