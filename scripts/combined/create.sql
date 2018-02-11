@@ -1,5 +1,5 @@
-﻿DROP TABLE observations;
-DROP TABLE stations;
+﻿DROP TABLE IF EXISTS observations;
+DROP TABLE IF EXISTS stations;
 
 CREATE TABLE stations (
 	id CHAR(20) PRIMARY KEY,
@@ -82,7 +82,7 @@ CREATE TABLE observations (
 
 
 SELECT * FROM airly_observations ORDER BY temperature ASC LIMIT 1;
-SELECT pressure FROM airy_observations WHERE pressure > 0 LIMIT 100;
+SELECT pressure FROM monitoring_agh_observations WHERE pressure > 0 LIMIT 100;
 SELECT * FROM looko2_observations LIMIT 1;
 
 -- =====================================
@@ -194,15 +194,65 @@ SET day_of_week = EXTRACT(DOW FROM timestamp);
 
 DROP TABLE combined_observations;
 CREATE TABLE combined_observations AS (
-SELECT o.*, mo.avg_wind_speed, mo.avg_wind_dir
-FROM observations AS o
-INNER JOIN (SELECT time, sm_hour_avg AS avg_wind_speed, dm_hour_avg AS avg_wind_dir
-FROM meteo_observations) AS mo
-ON mo.time = o.timestamp
+	SELECT o.*, mo.avg_wind_speed, mo.avg_wind_dir
+	FROM observations AS o
+	INNER JOIN (SELECT time, sm_hour_avg AS avg_wind_speed, dm_hour_avg AS avg_wind_dir
+	FROM meteo_observations) AS mo
+	ON mo.time = o.timestamp
 );
 
-SELECT * FROM combined_observations LIMIT 10;
+-- ======================================================================
+-- METEO OBSERVATIONS
+-- ======================================================================
 
+DROP TABLE IF EXISTS meteo_observations;
+DROP TABLE IF EXISTS meteo_stations;
 
+CREATE TABLE meteo_stations (
+	id CHAR(20) PRIMARY KEY,
+        address CHAR(100),
+        city CHAR(20),
+        latitude NUMERIC(9, 6),
+        longitude NUMERIC(9, 6),
+        source CHAR(20)
+);
 
+INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
+VALUES('AGH_METEO', 'Akademia Górniczo-Hutnicza Wydział Fizyki i Informatyki Stosowanej ul. Reymonta 19, budynek D-10',
+'Kraków', 50.04, 19.57, 'agh');
 
+INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
+SELECT id, neighborhood, city, lat, lon, 'wunderground' 
+FROM wunderground_stations 
+ORDER BY id;
+
+DROP TABLE IF EXISTS meteo_observations;
+CREATE TABLE meteo_observations (
+	ID SERIAL PRIMARY KEY,
+	station_id CHAR(20) REFERENCES meteo_stations(id),
+	timestamp TIMESTAMP,
+	temperature NUMERIC(5, 3),
+	humidity NUMERIC(6, 3), 
+	pressure NUMERIC(7, 3), 
+	wind_speed NUMERIC(7, 3),
+	wind_dir_deg NUMERIC(6, 3),
+	wind_dir_word CHAR(25),
+	precip_total NUMERIC(7, 3),
+	precip_rate NUMERIC(7, 3),
+	solradiation NUMERIC(8, 3)
+);
+
+INSERT INTO meteo_observations(station_id, timestamp, temperature,
+ humidity, pressure, wind_speed, wind_dir_deg, 
+ precip_total, precip_rate, solradiation)
+SELECT station_id, timestamp, temperature,
+ humidity, pressure, wind_speed, wind_dir_deg, 
+ precip_total, precip_rate, solradiation
+FROM wunderground_observations
+GROUP BY EXTRACT
+ORDER BY station_id, timestamp;
+
+select station_id, date_trunc('hour', timestamp), AVG(temperature), STDDEV_POP(temperature), COUNT(temperature) from wunderground_observations 
+WHERE station_id = 'IKRAKOW16'
+GROUP BY 1, 2
+ORDER BY 2
