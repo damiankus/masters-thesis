@@ -28,14 +28,15 @@ class AirlyImporter:
             VALUES(%s, %s, %s)'
         self.save_from_csv(in_path, statement, lambda c, h: [c])
 
-    def preprocess_observations(self, cols, header):
+    def preprocess_observations(self, cols, header, rec_len=6):
         utc_time = cols[0]
+        print('Importing data for {}'.format(utc_time))
         observations = []
         append = observations.append
-        for i in range(1, len(cols) // 6, 6):
-            station_header = header[i:(i + 6)]
+        for i in range(1, len(cols) // rec_len, rec_len):
+            station_header = header[i:(i + rec_len)]
             station_id = station_header[0].split('_')[0]
-            observation = [utc_time, station_id] + cols[i:(i + 6)]
+            observation = [utc_time, station_id] + cols[i:(i + rec_len)]
             append([c if c != '' else None for c in observation])
         return observations
 
@@ -49,7 +50,7 @@ class AirlyImporter:
 
 if __name__ == '__main__':
     conn_params = {
-        'dbname': 'airly',
+        'dbname': 'pollution',
         'user': 'damian',
         'host': 'localhost',
         'password': 'pass'

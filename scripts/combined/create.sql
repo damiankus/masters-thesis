@@ -30,6 +30,9 @@ SELECT	'airly', 'airly_' || id::text, 'Kraków',
 FROM airly_stations;
 
 -- Be careful to skip the duplicates (Airly sensors)
+-- TODO: there are Airly stations in the AGH db that have no equivalents
+-- in the Airly db
+-- Include them (in which db?) or ignore them?
 INSERT INTO stations(
 	source, id, address, city,
 	latitude, longitude,

@@ -11,7 +11,6 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from utils import save_in_db
 
 
 # Logger initiation is performed before imports

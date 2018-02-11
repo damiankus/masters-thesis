@@ -1,5 +1,5 @@
-﻿DROP TABLE airly_observations;
-DROP TABLE airly_stations;
+﻿DROP TABLE IF EXISTS airly_observations;
+DROP TABLE IF EXISTS airly_stations;
 
 CREATE TABLE airly_stations (
     id INT PRIMARY KEY,
@@ -10,7 +10,7 @@ CREATE TABLE airly_stations (
 CREATE TABLE airly_observations (
     id SERIAL PRIMARY KEY,
     utc_time TIMESTAMP,
-    station_id INT NOT NULL REFERENCES stations(id),
+    station_id INT NOT NULL REFERENCES airly_stations(id),
     temperature INT,
     humidity INT,
     pressure INT,
