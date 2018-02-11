@@ -236,23 +236,60 @@ CREATE TABLE meteo_observations (
 	pressure NUMERIC(7, 3), 
 	wind_speed NUMERIC(7, 3),
 	wind_dir_deg NUMERIC(6, 3),
-	wind_dir_word CHAR(25),
 	precip_total NUMERIC(7, 3),
 	precip_rate NUMERIC(7, 3),
 	solradiation NUMERIC(8, 3)
 );
 
-INSERT INTO meteo_observations(station_id, timestamp, temperature,
- humidity, pressure, wind_speed, wind_dir_deg, 
- precip_total, precip_rate, solradiation)
-SELECT station_id, timestamp, temperature,
- humidity, pressure, wind_speed, wind_dir_deg, 
- precip_total, precip_rate, solradiation
-FROM wunderground_observations
-GROUP BY EXTRACT
-ORDER BY station_id, timestamp;
+/*
+AGH meteo records 
+dm_hour_avg	wind direction
+pa_hour_avg	pressure
+rc_hour_avg	precipitation
+ri_hour_avg	precipitation (intensity)
+sm_hour_avg	wind speed (average)
+ta_hour_avg	temperature
+ua_hour_avg	humidity
 
-select station_id, date_trunc('hour', timestamp), AVG(temperature), STDDEV_POP(temperature), COUNT(temperature) from wunderground_observations 
-WHERE station_id = 'IKRAKOW16'
+The TIME column is already a UTC timestamp
+*/
+
+INSERT INTO meteo_observations(station_id, timestamp, temperature,
+	 humidity, pressure, wind_speed, wind_dir_deg, 
+	 precip_total, precip_rate)
+SELECT 'AGH_METEO', time, ta_hour_avg, ua_hour_avg, pa_hour_avg,
+	sm_hour_avg, dm_hour_avg, rc_hour_avg,
+	ri_hour_avg
+FROM meteo_agh_observations
+ORDER BY time;
+select * from meteo_observations
+
+-- Wunderground records
+INSERT INTO meteo_observations(station_id, timestamp, temperature,
+	 humidity, pressure, wind_speed, wind_dir_deg, 
+	 precip_total, precip_rate, solradiation)
+SELECT station_id, date_trunc('hour', timestamp),
+	AVG(temperature), AVG(humidity), AVG(pressure), AVG(wind_speed),
+	AVG(wind_dir_deg), AVG(precip_total), AVG(precip_rate), AVG(solradiation)
+FROM wunderground_observations 
 GROUP BY 1, 2
-ORDER BY 2
+ORDER BY 1, 2;
+
+/*
+It is assumed that the hourly mean values
+are calculated for a period before the time stored in
+the record e.g. mean values for 12:00 are calculated based on
+measurements for 11:05, 11:30, 11:55
+Thus we need to add one hour (UPDATE query)
+*/
+UPDATE meteo_observations AS mo
+SET timestamp = timestamp + INTERVAL '1 hour'
+WHERE mo.station_id IN 
+(
+SELECT id
+FROM meteo_stations
+WHERE source = 'wunderground'
+);
+
+select * from meteo_observations 
+where timestamp = '2017-01-01 12:00:00'
