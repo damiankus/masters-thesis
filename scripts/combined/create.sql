@@ -122,7 +122,7 @@ SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
 FROM looko2_observations
 ORDER BY date, hour, station_id;
 
-select * from pg_indexes where tablename = 'observations';
+SELECT * FROM pg_indexes WHERE tablename = 'observations';
 CREATE INDEX ON observations(timestamp);
 CREATE INDEX ON observations(station_id);
 CLUSTER observations USING "observations_timestamp_idx";
@@ -266,6 +266,11 @@ AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
 
+SELECT * FROM pg_indexes WHERE tablename = 'meteo_observations';
+CREATE INDEX ON meteo_observations(timestamp);
+CREATE INDEX ON meteo_observations(station_id);
+CLUSTER meteo_observations USING "meteo_observations_timestamp_idx";
+
 /*
 A table storing complete records
 */
@@ -403,6 +408,11 @@ WHERE s1.id <> s2.id
 ORDER BY 1, 3, 2
 );
 
+SELECT * FROM pg_indexes WHERE tablename = 'meteo_distance';
+CREATE INDEX ON meteo_distance(id1);
+CREATE INDEX ON meteo_distance(id2);
+CLUSTER meteo_distance USING "meteo_distance_id1_idx";
+
 /*
 Similarly, calculate the distance between
 the stations measuring air quality.
@@ -424,6 +434,11 @@ WHERE s1.id <> s2.id
 ORDER BY 1, 3, 2
 );
 
+SELECT * FROM pg_indexes WHERE tablename = 'air_quality_distance';
+CREATE INDEX ON air_quality_distance(id1);
+CREATE INDEX ON air_quality_distance(id2);
+CLUSTER air_quality_distance USING "air_quality_distance_id1_idx";
+
 /*
 A function filling missing values by 
 copying them from the nearest meteo station
@@ -444,14 +459,14 @@ BEGIN
 		ON d.id1 = o.station_id
 		AND d.id2 = (
 			SELECT station_id
-			FROM meteo_observations AS mo
-			JOIN meteo_distance AS md
-			ON md.id1 = o.station_id
-			AND md.id2 = mo.station_id
-			WHERE mo.%s IS NOT NULL
+			FROM %s AS obs
+			JOIN %s AS dist
+			ON dist.id1 = o.station_id
+			AND dist.id2 = obs.station_id
+			WHERE obs.%s IS NOT NULL
 			LIMIT 1
 		)
-		JOIN (SELECT station_id, timestamp, %s FROM meteo_observations) AS m
+		JOIN (SELECT station_id, timestamp, %s FROM %s) AS m
 		ON m.station_id = d.id2
 		AND m.timestamp = o.timestamp
 		WHERE o.%s IS NULL';
@@ -459,17 +474,19 @@ BEGIN
         air_quality_cols := ARRAY['pm1', 'pm2_5', 'pm10'];
 	FOREACH col IN ARRAY air_quality_cols
 	LOOP
-		RAISE NOTICE '%', format(query, col, 'meteo_distance', col, col, col);
+		RAISE NOTICE '%', format(query, col, 'air_quality_distance', 'observations', 
+		 'air_quality_distance', col, col, 'observations', col);
 	END LOOP;
 	
         meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'precip_total',
 		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
-		RAISE NOTICE '%', format(query, col, 'meteo_distance', col, col, col);
+		RAISE NOTICE '%', format(query, col, 'meteo_distance', 'meteo_observations',
+		 'meteo_distance', col, col, 'meteo_observations', col);
 	END LOOP;
 END;
-$$  LANGUAGE plpgsql
+$$  LANGUAGE plpgsql;
 
 select fill_missing();
 select * from meteo_distance;
@@ -490,3 +507,21 @@ SET pressure = (SELECT m.pressure
 			LIMIT 1
 		)
 )
+
+SELECT o.*, m.station_id, m.pm1
+FROM observations AS o
+JOIN air_quality_distance AS d
+ON d.id1 = o.station_id
+AND d.id2 = (
+	SELECT station_id
+	FROM observations AS obs
+	JOIN air_quality_distance AS dist
+	ON dist.id1 = o.station_id
+	AND dist.id2 = obs.station_id
+	WHERE obs.pm1 IS NOT NULL
+	LIMIT 1
+)
+JOIN (SELECT station_id, timestamp, pm1 FROM observations) AS m
+ON m.station_id = d.id2
+AND m.timestamp = o.timestamp
+WHERE o.pm1 IS NULL
