@@ -127,82 +127,6 @@ CREATE INDEX ON observations(timestamp);
 CREATE INDEX ON observations(station_id);
 CLUSTER observations USING "observations_timestamp_idx";
 
-
--- ===================================
---
--- ===================================
-
-ALTER TABLE observations DROP COLUMN is_holiday;
-ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
-
-UPDATE observations 
-SET is_holiday = 1
-WHERE EXTRACT(DOW FROM timestamp) = 0 
-OR EXTRACT(DOW FROM timestamp) = 6	
-OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
-OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
-OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
-OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
-OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
-OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
-
--- ===================================
---
--- ===================================
-
-ALTER TABLE observations DROP COLUMN period_of_day;
-ALTER TABLE observations ADD COLUMN period_of_day INT;
-
-UPDATE observations 
-SET period_of_day = 0
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
-UPDATE observations 
-SET period_of_day = 1
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
-UPDATE observations 
-SET period_of_day = 2
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
-UPDATE observations 
-SET period_of_day = 3
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
-
--- ===================================
---
--- ===================================
-
-ALTER TABLE observations DROP COLUMN is_heating_season;
-ALTER TABLE observations ADD COLUMN is_heating_season BOOLEAN DEFAULT FALSE;
-UPDATE observations 
-SET is_heating_season = TRUE
-WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
-OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
-
--- ===================================
---
--- ===================================
-
-ALTER TABLE observations DROP COLUMN day_of_week;
-ALTER TABLE observations ADD COLUMN day_of_week INT;
-UPDATE observations 
-SET day_of_week = EXTRACT(DOW FROM timestamp);
-
--- ===================================
---
--- ===================================
-
-
-DROP TABLE combined_observations;
-CREATE TABLE combined_observations AS (
-	SELECT o.*, mo.avg_wind_speed, mo.avg_wind_dir
-	FROM observations AS o
-	INNER JOIN (SELECT time, sm_hour_avg AS avg_wind_speed, dm_hour_avg AS avg_wind_dir
-	FROM meteo_observations) AS mo
-	ON mo.time = o.timestamp
-);
-
 -- ======================================================================
 -- METEO OBSERVATIONS
 -- ======================================================================
@@ -362,16 +286,164 @@ For reference see: https://www.movable-type.co.uk/scripts/latlong.html
 
 DROP TABLE IF EXISTS meteo_distance;
 CREATE TABLE meteo_distance AS (
-SELECT m1.id AS id1, m2.id AS id2, 
+SELECT s1.id AS id1, s2.id AS id2, 
 	(ACOS(
-		SIN(radians(m1.latitude)) * SIN(radians(m2.latitude)) 
-		+ COS(radians(m1.latitude)) * COS(radians(m2.latitude)) 
-		* COS(radians(m1.longitude) - radians(m2.longitude))
+		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+		* COS(radians(s1.longitude) - radians(s2.longitude))
 	) * 6371000) AS dist,
-	m1.latitude AS latitude1, m1.longitude AS longitude1,
-	m2.latitude AS latitude2, m2.longitude AS longitude2
-FROM meteo_stations AS m1
-CROSS JOIN meteo_stations AS m2
-WHERE m1.id <> m2.id
+	s1.latitude AS latitude1, s1.longitude AS longitude1,
+	s2.latitude AS latitude2, s2.longitude AS longitude2
+FROM stations AS s1
+CROSS JOIN meteo_stations AS s2
+WHERE s1.id <> s2.id
 ORDER BY 1, 3, 2
 );
+
+/*
+Similarly, calculate the distance between
+the stations measuring air quality.
+*/
+
+DROP TABLE IF EXISTS pollution_distance;
+CREATE TABLE pollution_distance AS (
+SELECT s1.id AS id1, s2.id AS id2, 
+	(ACOS(
+		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+		* COS(radians(s1.longitude) - radians(s2.longitude))
+	) * 6371000) AS dist,
+	s1.latitude AS latitude1, s1.longitude AS longitude1,
+	s2.latitude AS latitude2, s2.longitude AS longitude2
+FROM stations AS s1
+CROSS JOIN stations AS s2
+WHERE s1.id <> s2.id
+ORDER BY 1, 3, 2
+);
+
+/*
+A table storing complete records
+*/
+
+DROP TABLE IF EXISTS complete_data;
+CREATE TABLE complete_data (
+	id SERIAL PRIMARY KEY,
+	station_id CHAR(20) REFERENCES stations(id),
+	timestamp TIMESTAMP,
+	pm1 NUMERIC(22, 15),
+	pm2_5 NUMERIC(22, 15),
+	pm10 NUMERIC(22, 15),
+	co NUMERIC(22, 15),
+	no2 NUMERIC(22, 15), 
+	o3 NUMERIC(22, 15), 
+	so2 NUMERIC(22, 15), 
+	c6h6 NUMERIC(22, 15),
+	wind_speed NUMERIC(7, 3),
+	wind_dir_deg NUMERIC(6, 3),
+	precip_total NUMERIC(7, 3),
+	precip_rate NUMERIC(7, 3),
+	solradiation NUMERIC(8, 3),
+	temperature NUMERIC(6, 3),
+	humidity NUMERIC(6, 3), 
+	pressure NUMERIC(7, 3)
+);
+
+INSERT INTO complete_data(station_id, timestamp, pm1, pm2_5, pm10,
+	co, no2, o3, so2, c6h6, temperature, humidity, pressure)
+SELECT station_id, timestamp, pm1, pm2_5, pm10,
+	co, no2, o3, so2, c6h6, temperature, humidity, pressure
+FROM observations
+ORDER BY station_id, timestamp;
+
+-- ===================================
+--
+-- ===================================
+
+ALTER TABLE complete_data DROP COLUMN is_holiday;
+ALTER TABLE complete_data ADD COLUMN is_holiday INT DEFAULT 0;
+
+UPDATE complete_data 
+SET is_holiday = 1
+WHERE EXTRACT(DOW FROM timestamp) = 0 
+OR EXTRACT(DOW FROM timestamp) = 6	
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
+OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
+
+-- ===================================
+--
+-- ===================================
+
+ALTER TABLE complete_data DROP COLUMN period_of_day;
+ALTER TABLE complete_data ADD COLUMN period_of_day INT;
+
+UPDATE complete_data 
+SET period_of_day = 0
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
+UPDATE complete_data 
+SET period_of_day = 1
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
+UPDATE complete_data 
+SET period_of_day = 2
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
+UPDATE complete_data
+SET period_of_day = 3
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
+
+-- ===================================
+--
+-- ===================================
+
+ALTER TABLE complete_data DROP COLUMN is_heating_season;
+ALTER TABLE complete_data ADD COLUMN is_heating_season BOOLEAN DEFAULT FALSE;
+UPDATE complete_data 
+SET is_heating_season = TRUE
+WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
+OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
+
+-- ===================================
+--
+-- ===================================
+
+ALTER TABLE complete_data DROP COLUMN day_of_week;
+ALTER TABLE complete_data ADD COLUMN day_of_week INT;
+UPDATE complete_data 
+SET day_of_week = EXTRACT(DOW FROM timestamp);
+
+-- ===================================
+--
+-- ===================================
+
+
+/*
+Function filling missing values by 
+copying them from the nearest meteo station
+containing the desired value
+*/
+
+SELECT o.*, m.station_id, m.temperature
+FROM observations AS o
+JOIN meteo_distance AS d
+ON d.id1 = o.station_id
+AND d.id2 = (
+	SELECT station_id
+	FROM meteo_observations AS mo
+	JOIN meteo_distance AS md
+	ON md.id1 = o.station_id
+	AND md.id2 = mo.station_id
+	WHERE mo.temperature IS NOT NULL
+	LIMIT 1
+)
+JOIN (SELECT station_id, timestamp, temperature FROM meteo_observations) AS m
+ON m.station_id = d.id2
+AND m.timestamp = o.timestamp
+WHERE o.station_id = 'looko2_5CCF7FC128EC'
+AND o.temperature IS NULL;
+
+select * from meteo_distance;
