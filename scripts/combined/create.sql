@@ -267,61 +267,6 @@ AND precip_rate IS NULL
 AND solradiation IS NULL;
 
 /*
-Find the distances between stations 
-in order to specify the order of seeking
-for a value to fill the missing column 
-in the original record
-
-The distance column contains an approximated
-distance between stations (in kilometers)
-found by applting the formula of the
-Spherical Law of Cosines:
-
-distance = ACOS( SIN(lat1)*SIN(lat2) + COS(lat1)*COS(lat2)*COS(lon2-lon1) ) * 6371000
-Value 6371000 is the Earth's radius in meters.
-The formula assumes that the lat and lon values are expressed in RADIANS!
-
-For reference see: https://www.movable-type.co.uk/scripts/latlong.html
-*/
-
-DROP TABLE IF EXISTS meteo_distance;
-CREATE TABLE meteo_distance AS (
-SELECT s1.id AS id1, s2.id AS id2, 
-	(ACOS(
-		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
-		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-		* COS(radians(s1.longitude) - radians(s2.longitude))
-	) * 6371000) AS dist,
-	s1.latitude AS latitude1, s1.longitude AS longitude1,
-	s2.latitude AS latitude2, s2.longitude AS longitude2
-FROM stations AS s1
-CROSS JOIN meteo_stations AS s2
-WHERE s1.id <> s2.id
-ORDER BY 1, 3, 2
-);
-
-/*
-Similarly, calculate the distance between
-the stations measuring air quality.
-*/
-
-DROP TABLE IF EXISTS pollution_distance;
-CREATE TABLE pollution_distance AS (
-SELECT s1.id AS id1, s2.id AS id2, 
-	(ACOS(
-		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
-		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-		* COS(radians(s1.longitude) - radians(s2.longitude))
-	) * 6371000) AS dist,
-	s1.latitude AS latitude1, s1.longitude AS longitude1,
-	s2.latitude AS latitude2, s2.longitude AS longitude2
-FROM stations AS s1
-CROSS JOIN stations AS s2
-WHERE s1.id <> s2.id
-ORDER BY 1, 3, 2
-);
-
-/*
 A table storing complete records
 */
 
@@ -333,11 +278,13 @@ CREATE TABLE complete_data (
 	pm1 NUMERIC(22, 15),
 	pm2_5 NUMERIC(22, 15),
 	pm10 NUMERIC(22, 15),
+/*
 	co NUMERIC(22, 15),
 	no2 NUMERIC(22, 15), 
 	o3 NUMERIC(22, 15), 
 	so2 NUMERIC(22, 15), 
 	c6h6 NUMERIC(22, 15),
+*/
 	wind_speed NUMERIC(7, 3),
 	wind_dir_deg NUMERIC(6, 3),
 	precip_total NUMERIC(7, 3),
@@ -349,9 +296,11 @@ CREATE TABLE complete_data (
 );
 
 INSERT INTO complete_data(station_id, timestamp, pm1, pm2_5, pm10,
-	co, no2, o3, so2, c6h6, temperature, humidity, pressure)
+	-- co, no2, o3, so2, c6h6,
+	temperature, humidity, pressure)
 SELECT station_id, timestamp, pm1, pm2_5, pm10,
-	co, no2, o3, so2, c6h6, temperature, humidity, pressure
+	-- co, no2, o3, so2, c6h6,
+	 temperature, humidity, pressure
 FROM observations
 ORDER BY station_id, timestamp;
 
@@ -420,30 +369,124 @@ SET day_of_week = EXTRACT(DOW FROM timestamp);
 --
 -- ===================================
 
+/*
+Find the distances between stations 
+in order to specify the order of seeking
+for a value to fill the missing column 
+in the original record
+
+The distance column contains an approximated
+distance between stations (in kilometers)
+found by applting the formula of the
+Spherical Law of Cosines:
+
+distance = ACOS( SIN(lat1)*SIN(lat2) + COS(lat1)*COS(lat2)*COS(lon2-lon1) ) * 6371000
+Value 6371000 is the Earth's radius in meters.
+The formula assumes that the lat and lon values are expressed in RADIANS!
+
+For reference see: https://www.movable-type.co.uk/scripts/latlong.html
+*/
+
+DROP TABLE IF EXISTS meteo_distance;
+CREATE TABLE meteo_distance AS (
+SELECT s1.id AS id1, s2.id AS id2, 
+	(ACOS(
+		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+		* COS(radians(s1.longitude) - radians(s2.longitude))
+	) * 6371000) AS dist,
+	s1.latitude AS latitude1, s1.longitude AS longitude1,
+	s2.latitude AS latitude2, s2.longitude AS longitude2
+FROM stations AS s1
+CROSS JOIN meteo_stations AS s2
+WHERE s1.id <> s2.id
+ORDER BY 1, 3, 2
+);
 
 /*
-Function filling missing values by 
+Similarly, calculate the distance between
+the stations measuring air quality.
+*/
+
+DROP TABLE IF EXISTS air_quality_distance;
+CREATE TABLE air_quality_distance AS (
+SELECT s1.id AS id1, s2.id AS id2, 
+	(ACOS(
+		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+		* COS(radians(s1.longitude) - radians(s2.longitude))
+	) * 6371000) AS dist,
+	s1.latitude AS latitude1, s1.longitude AS longitude1,
+	s2.latitude AS latitude2, s2.longitude AS longitude2
+FROM stations AS s1
+CROSS JOIN stations AS s2
+WHERE s1.id <> s2.id
+ORDER BY 1, 3, 2
+);
+
+/*
+A function filling missing values by 
 copying them from the nearest meteo station
 containing the desired value
 */
 
-SELECT o.*, m.station_id, m.temperature
-FROM observations AS o
-JOIN meteo_distance AS d
-ON d.id1 = o.station_id
-AND d.id2 = (
-	SELECT station_id
-	FROM meteo_observations AS mo
-	JOIN meteo_distance AS md
-	ON md.id1 = o.station_id
-	AND md.id2 = mo.station_id
-	WHERE mo.temperature IS NOT NULL
-	LIMIT 1
-)
-JOIN (SELECT station_id, timestamp, temperature FROM meteo_observations) AS m
-ON m.station_id = d.id2
-AND m.timestamp = o.timestamp
-WHERE o.station_id = 'looko2_5CCF7FC128EC'
-AND o.temperature IS NULL;
+CREATE OR REPLACE FUNCTION fill_missing()
+RETURNS VOID AS $$
+DECLARE
+	meteo_cols text[];
+	air_quality_cols text[];
+	col text;
+	query text;
+BEGIN
+	query := 'SELECT o.*, m.station_id, m.%s
+		FROM observations AS o
+		JOIN %s AS d
+		ON d.id1 = o.station_id
+		AND d.id2 = (
+			SELECT station_id
+			FROM meteo_observations AS mo
+			JOIN meteo_distance AS md
+			ON md.id1 = o.station_id
+			AND md.id2 = mo.station_id
+			WHERE mo.%s IS NOT NULL
+			LIMIT 1
+		)
+		JOIN (SELECT station_id, timestamp, %s FROM meteo_observations) AS m
+		ON m.station_id = d.id2
+		AND m.timestamp = o.timestamp
+		WHERE o.%s IS NULL';
+		
+        air_quality_cols := ARRAY['pm1', 'pm2_5', 'pm10'];
+	FOREACH col IN ARRAY air_quality_cols
+	LOOP
+		RAISE NOTICE '%', format(query, col, 'meteo_distance', col, col, col);
+	END LOOP;
+	
+        meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'precip_total',
+		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
+	FOREACH col IN ARRAY meteo_cols
+	LOOP
+		RAISE NOTICE '%', format(query, col, 'meteo_distance', col, col, col);
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql
 
+select fill_missing();
 select * from meteo_distance;
+
+UPDATE complete_data AS cd
+SET pressure = (SELECT m.pressure
+		FROM meteo_distance AS d
+		JOIN (SELECT station_id, timestamp, pressure FROM meteo_observations) AS m
+		ON m.station_id = d.id2 AND m.timestamp = cd.timestamp
+		WHERE d.id1 = cd.station_id
+		AND d.id2 = (
+			SELECT obs.station_id
+			FROM meteo_observations AS obs
+			JOIN meteo_distance AS md
+			ON md.id1 = cd.station_id
+			AND md.id2 = obs.station_id
+			WHERE obs.pressure IS NOT NULL
+			LIMIT 1
+		)
+)
