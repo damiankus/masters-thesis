@@ -41,7 +41,8 @@ SELECT	'agh', 'agh_' || id::text, location_address, location_city,
 	location_latitude, location_longitude,
 	manufacturer, uuid
 FROM monitoring_agh_stations
-WHERE manufacturer <> 'Airly';
+WHERE manufacturer <> 'Airly'
+ORDER BY id;
 
 INSERT INTO stations(
 	source, id, address, city,
@@ -53,7 +54,8 @@ WHERE s.station_name IN
 (
 SELECT MIN(station_name) FROM looko2_stations
 GROUP BY id
-);
+)
+ORDER BY s.id;
 
 CREATE INDEX ON stations USING HASH (id);
 
@@ -217,9 +219,19 @@ CREATE TABLE meteo_stations (
         source CHAR(20)
 );
 
+/*
+Be careful while specifying the latitude and longitude
+According to: http://meteo.ftj.agh.edu.pl/meteo/
+the AGH meteo station is located at 50° 04' N 19° 57' E.
+That's approximately: 50.066667 °N, 19.95 °E
+
+A tool for casting degrees and minutes to a float number
+https://stevemorse.org/nearest/distance.php
+*/
+
 INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
-VALUES('AGH_METEO', 'Akademia Górniczo-Hutnicza Wydział Fizyki i Informatyki Stosowanej ul. Reymonta 19, budynek D-10',
-'Kraków', 50.04, 19.57, 'agh');
+VALUES('agh_meteo', 'Akademia Górniczo-Hutnicza Wydział Fizyki i Informatyki Stosowanej ul. Reymonta 19, budynek D-10',
+'Kraków', 50.066667, 19.95, 'agh');
 
 INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
 SELECT id, neighborhood, city, lat, lon, 'wunderground' 
@@ -231,7 +243,7 @@ CREATE TABLE meteo_observations (
 	ID SERIAL PRIMARY KEY,
 	station_id CHAR(20) REFERENCES meteo_stations(id),
 	timestamp TIMESTAMP,
-	temperature NUMERIC(5, 3),
+	temperature NUMERIC(6, 3),
 	humidity NUMERIC(6, 3), 
 	pressure NUMERIC(7, 3), 
 	wind_speed NUMERIC(7, 3),
@@ -257,12 +269,11 @@ The TIME column is already a UTC timestamp
 INSERT INTO meteo_observations(station_id, timestamp, temperature,
 	 humidity, pressure, wind_speed, wind_dir_deg, 
 	 precip_total, precip_rate)
-SELECT 'AGH_METEO', time, ta_hour_avg, ua_hour_avg, pa_hour_avg,
+SELECT 'agh_meteo', time, ta_hour_avg, ua_hour_avg, pa_hour_avg,
 	sm_hour_avg, dm_hour_avg, rc_hour_avg,
 	ri_hour_avg
 FROM meteo_agh_observations
 ORDER BY time;
-select * from meteo_observations
 
 -- Wunderground records
 INSERT INTO meteo_observations(station_id, timestamp, temperature,
@@ -291,5 +302,76 @@ FROM meteo_stations
 WHERE source = 'wunderground'
 );
 
-select * from meteo_observations 
-where timestamp = '2017-01-01 12:00:00'
+/*
+Copy meteo data from observations in order to make
+filling missing values easier
+*/
+
+INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
+SELECT DISTINCT s.id, s.address, s.city, s.latitude, s.longitude, s.source
+FROM observations AS o
+JOIN stations AS s ON s.id = o.station_id
+WHERE temperature IS NOT NULL 
+OR pressure IS NOT NULL
+OR humidity IS NOT NULL
+ORDER BY s.id;
+
+INSERT INTO meteo_observations(station_id, timestamp, temperature,
+	 humidity, pressure)
+SELECT o.station_id, o.timestamp, o.temperature,
+	o.humidity, o.pressure
+FROM observations AS o
+WHERE temperature IS NOT NULL 
+OR pressure IS NOT NULL
+OR humidity IS NOT NULL
+ORDER BY station_id, timestamp;
+
+/*
+Each day at 10 p.m. the AGH station 
+saves an empty record (probably because of
+the maintanance) which should be removed.
+*/
+
+DELETE FROM meteo_observations 
+WHERE temperature IS NULL
+AND humidity IS NULL
+AND pressure IS NULL
+AND wind_speed IS NULL
+AND wind_dir_deg IS NULL
+AND precip_total IS NULL
+AND precip_rate IS NULL
+AND solradiation IS NULL;
+
+/*
+Find the distances between stations 
+in order to specify the order of seeking
+for a value to fill the missing column 
+in the original record
+
+The distance column contains an approximated
+distance between stations (in kilometers)
+found by applting the formula of the
+Spherical Law of Cosines:
+
+distance = ACOS( SIN(lat1)*SIN(lat2) + COS(lat1)*COS(lat2)*COS(lon2-lon1) ) * 6371000
+Value 6371000 is the Earth's radius in meters.
+The formula assumes that the lat and lon values are expressed in RADIANS!
+
+For reference see: https://www.movable-type.co.uk/scripts/latlong.html
+*/
+
+DROP TABLE IF EXISTS meteo_distance;
+CREATE TABLE meteo_distance AS (
+SELECT m1.id AS id1, m2.id AS id2, 
+	(ACOS(
+		SIN(radians(m1.latitude)) * SIN(radians(m2.latitude)) 
+		+ COS(radians(m1.latitude)) * COS(radians(m2.latitude)) 
+		* COS(radians(m1.longitude) - radians(m2.longitude))
+	) * 6371000) AS dist,
+	m1.latitude AS latitude1, m1.longitude AS longitude1,
+	m2.latitude AS latitude2, m2.longitude AS longitude2
+FROM meteo_stations AS m1
+CROSS JOIN meteo_stations AS m2
+WHERE m1.id <> m2.id
+ORDER BY 1, 3, 2
+);
