@@ -474,8 +474,9 @@ DECLARE
 	air_quality_cols text[];
 	col text;
 	query text;
+	query_template text;
 BEGIN
-	query := '
+	query_template := '
 		UPDATE complete_data AS cd
 		SET %s = (
 			SELECT obs.%s
@@ -486,25 +487,33 @@ BEGIN
 			WHERE obs.timestamp = cd.timestamp
 			AND obs.%s IS NOT NULL
 			LIMIT 1
-	) WHERE %s IS NOT NULL';
+	) WHERE %s IS NULL';
 		
         air_quality_cols := ARRAY['pm1', 'pm2_5', 'pm10'];
 	FOREACH col IN ARRAY air_quality_cols
 	LOOP	
-		RAISE NOTICE 'Filling missing % values', col;
-		EXECUTE format(query, col, col, 'observations', 
+		query := format(query_template, col, col, 'observations', 
 		 'air_quality_distance', col, col);
+		 
+		RAISE NOTICE 'Filling missing % values', col;
+		RAISE NOTICE '%', query;
+		EXECUTE query;
 	END LOOP;
 	
         meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'precip_total',
 		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
-		RAISE NOTICE 'Filling missing % values', col;
-		EXECUTE format(query, col, col, 'meteo_observations',
+		query := format(query_template, col, col, 'meteo_observations',
 		 'meteo_distance', col, col);
+		 
+		RAISE NOTICE 'Filling missing % values', col;
+		RAISE NOTICE '%', query;
+		EXECUTE query;
 	END LOOP;
 END;
 $$  LANGUAGE plpgsql;
 
-select fill_missing();
+SELECT fill_missing();
+SELECT count(*) FROM complete_data WHERE wind_speed IS NULL;
+SELECT * FROM complete_data LIMIT 5000;
