@@ -445,6 +445,28 @@ copying them from the nearest meteo station
 containing the desired value
 */
 
+/*
+Backup SELECT query
+
+SELECT o.*, m.station_id, m.%s
+FROM observations AS o
+JOIN %s AS d
+ON d.id1 = o.station_id
+AND d.id2 = (
+	SELECT station_id
+	FROM %s AS obs
+	JOIN %s AS dist
+	ON dist.id1 = o.station_id
+	AND dist.id2 = obs.station_id
+	WHERE obs.%s IS NOT NULL
+	LIMIT 1
+)
+JOIN (SELECT station_id, timestamp, %s FROM %s) AS m
+ON m.station_id = d.id2
+AND m.timestamp = o.timestamp
+WHERE o.%s IS NULL		
+*/
+
 CREATE OR REPLACE FUNCTION fill_missing()
 RETURNS VOID AS $$
 DECLARE
@@ -453,75 +475,36 @@ DECLARE
 	col text;
 	query text;
 BEGIN
-	query := 'SELECT o.*, m.station_id, m.%s
-		FROM observations AS o
-		JOIN %s AS d
-		ON d.id1 = o.station_id
-		AND d.id2 = (
-			SELECT station_id
+	query := '
+		UPDATE complete_data AS cd
+		SET %s = (
+			SELECT obs.%s
 			FROM %s AS obs
 			JOIN %s AS dist
-			ON dist.id1 = o.station_id
+			ON dist.id1 = cd.station_id
 			AND dist.id2 = obs.station_id
-			WHERE obs.%s IS NOT NULL
+			WHERE obs.timestamp = cd.timestamp
+			AND obs.%s IS NOT NULL
 			LIMIT 1
-		)
-		JOIN (SELECT station_id, timestamp, %s FROM %s) AS m
-		ON m.station_id = d.id2
-		AND m.timestamp = o.timestamp
-		WHERE o.%s IS NULL';
+	) WHERE %s IS NOT NULL';
 		
         air_quality_cols := ARRAY['pm1', 'pm2_5', 'pm10'];
 	FOREACH col IN ARRAY air_quality_cols
-	LOOP
-		RAISE NOTICE '%', format(query, col, 'air_quality_distance', 'observations', 
-		 'air_quality_distance', col, col, 'observations', col);
+	LOOP	
+		RAISE NOTICE 'Filling missing % values', col;
+		EXECUTE format(query, col, col, 'observations', 
+		 'air_quality_distance', col, col);
 	END LOOP;
 	
         meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'precip_total',
 		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
-		RAISE NOTICE '%', format(query, col, 'meteo_distance', 'meteo_observations',
-		 'meteo_distance', col, col, 'meteo_observations', col);
+		RAISE NOTICE 'Filling missing % values', col;
+		EXECUTE format(query, col, col, 'meteo_observations',
+		 'meteo_distance', col, col);
 	END LOOP;
 END;
 $$  LANGUAGE plpgsql;
 
 select fill_missing();
-select * from meteo_distance;
-
-UPDATE complete_data AS cd
-SET pressure = (SELECT m.pressure
-		FROM meteo_distance AS d
-		JOIN (SELECT station_id, timestamp, pressure FROM meteo_observations) AS m
-		ON m.station_id = d.id2 AND m.timestamp = cd.timestamp
-		WHERE d.id1 = cd.station_id
-		AND d.id2 = (
-			SELECT obs.station_id
-			FROM meteo_observations AS obs
-			JOIN meteo_distance AS md
-			ON md.id1 = cd.station_id
-			AND md.id2 = obs.station_id
-			WHERE obs.pressure IS NOT NULL
-			LIMIT 1
-		)
-)
-
-SELECT o.*, m.station_id, m.pm1
-FROM observations AS o
-JOIN air_quality_distance AS d
-ON d.id1 = o.station_id
-AND d.id2 = (
-	SELECT station_id
-	FROM observations AS obs
-	JOIN air_quality_distance AS dist
-	ON dist.id1 = o.station_id
-	AND dist.id2 = obs.station_id
-	WHERE obs.pm1 IS NOT NULL
-	LIMIT 1
-)
-JOIN (SELECT station_id, timestamp, pm1 FROM observations) AS m
-ON m.station_id = d.id2
-AND m.timestamp = o.timestamp
-WHERE o.pm1 IS NULL
