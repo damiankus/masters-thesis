@@ -1,0 +1,67 @@
+== Sposób pomiaru Airly ==
+Informacja okazała się niepotwierdzona. Osoba, o której była mowa podczas prezentacji PP nie twierdziła, że
+sensory Airly mierzą tylko jeden typ PM, sugerowała tylko, że tak to wygląda, biorąc pod uwagę wykresy PM1, PM2.5 i PM10.
+
+
+== Zasada działania czujników Airly i LookO2 ==
+Czujniki obu producentów mierzą poziom zanieczyszczeń PM z użyciem fotometru laserowego. Cytując informację podaną na
+stronie [https://airly.eu/pl/jak-dzialaja-czujniki-jakosci-powietrza/ Airly]:
+"
+Urządzenie wykonuje pomiar tłumienia światła laserowego rozproszonego na badanej próbce pod kątem 90º,
+następnie zasysa powietrze do komory pomiarowej i w krótkim czasie wyświetla dane na ekranie urządzenia
+"
+Wygląda na to, że stacje [http://sklep.looko2.com/pl/p/Czujnik-SMOGU-Looko2v3-przezroczysty/165 LookO2] działają na podobnej zasadzie (też wykorzystują światło laserowe):
+"
+Nasze urządzenie wykorzystuje laserowy pomiar stężenia pyłów PM1, PM2.5 i PM10
+"
+
+== Integracja danych ==
+W minionym tygodniu LookO2 udostępniło token dostępowy do API, co pozwoliło na przypisanie
+do stacji współrzędnych geograficznych (z wyjątkiem 3 stacji, dla których taka informacja nie
+była dostępna). Raporty LookO2 umieszczane w [http://api.looko2.com/Archives/ archiwum] na stronie internetowej producenta.
+Raporty zawierają dodatkowo pomiary wykonywane przez 6 stacji należących do WIOŚ w Krakowie. Nazwy tych stacji wskazują na to,
+że częściowo pokrywają się one ze stacjami GIOŚ dostępnymi przez API systemu monitoringu AGH, więc prawdopodobnie można by je
+usunąć z bazy danych.
+
+Na podstawie współrzędnych stacji wyznaczono przybliżoną odległość między stacjami mierzącymi jakość powietrza i meteo.
+Na tej podstawie uzupełniono brakujące rekordy, przy czym uzupełniona wartość pochodzi z najbliższej stacji, która posiada
+odczyt dla danego dnia i godziny.
+
+== Modele regresji ==
+Prace poświęcone zastosowaniu regresji w prognozowaniu poziomu zanieczyszczenia powietrza
+(dostęp do prac wymaga zalogowania do bazy źródeł BG AGH):
+
+
+Comment on regression analysis of air quality data
+"reduced major axis regression, rather than standard linear regression"
+https://www-1sciencedirect-1com-1000027wr088d.wbg2.bg.agh.edu.pl/science/article/pii/S1352231000005276
+
+Bilbao 2006
+https://www-1sciencedirect-1com-1000027wr088d.wbg2.bg.agh.edu.pl/science/article/pii/S1364815204003056
+
+MLR, Ateny, Helsinki 2010
+https://www-1sciencedirect-1com-1000027wr088d.wbg2.bg.agh.edu.pl/science/article/pii/S0048969711000064
+
+MLR, Ateny 2012
+https://www.hindawi.com/journals/amete/2012/894714/
+
+Multivariate Polynomial Regression India 2012
+https://www-1sciencedirect-1com-1000027wr088d.wbg2.bg.agh.edu.pl/science/article/pii/S0048969712004809
+
+Quantile Regression Model, 2012
+http://www.ipcbee.com/vol37/003-ICEAE2012-A00006.pdf
+
+Bogota 2014
+https://www-1sciencedirect-1com-1000027wr088d.wbg2.bg.agh.edu.pl/science/article/pii/S1352231014001113
+
+Non-linear Regression 2014
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4172787/
+
+Porównanie modeli statystycznych dla PM10 2014
+http://www.aaqr.org/article/detail/AAQR-13-07-OA-0259
+
+Spain, Gijon 2014
+https://www-1sciencedirect-1com-1000027wr088d.wbg2.bg.agh.edu.pl/science/article/pii/S0096300314003440
+
+Przegląd metod modelowania poziomu zanieczyszczeń powietrza 2016
+https://www.intechopen.com/books/air-quality-measurement-and-modeling/particulate-matter-sampling-techniques-and-data-modelling-methods
