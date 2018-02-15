@@ -313,7 +313,7 @@ ORDER BY station_id, timestamp;
 --
 -- ===================================
 
-ALTER TABLE complete_data DROP COLUMN is_holiday;
+ALTER TABLE complete_data DROP COLUMN IF EXISTS is_holiday;
 ALTER TABLE complete_data ADD COLUMN is_holiday INT DEFAULT 0;
 
 UPDATE complete_data 
@@ -331,10 +331,8 @@ OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
 OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
 
 -- ===================================
---
--- ===================================
 
-ALTER TABLE complete_data DROP COLUMN period_of_day;
+ALTER TABLE complete_data DROP COLUMN IF EXISTS period_of_day;
 ALTER TABLE complete_data ADD COLUMN period_of_day INT;
 
 UPDATE complete_data 
@@ -351,27 +349,191 @@ SET period_of_day = 3
 WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
 
 -- ===================================
---
--- ===================================
 
-ALTER TABLE complete_data DROP COLUMN is_heating_season;
-ALTER TABLE complete_data ADD COLUMN is_heating_season BOOLEAN DEFAULT FALSE;
+ALTER TABLE complete_data DROP COLUMN IF EXISTS is_heating_season;
+ALTER TABLE complete_data ADD COLUMN is_heating_season smallint DEFAULT 0;
 UPDATE complete_data 
-SET is_heating_season = TRUE
+SET is_heating_season = 1
 WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
 OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
 
 -- ===================================
---
--- ===================================
 
-ALTER TABLE complete_data DROP COLUMN day_of_week;
+ALTER TABLE complete_data DROP COLUMN IF EXISTS cont_date;
 ALTER TABLE complete_data ADD COLUMN day_of_week INT;
 UPDATE complete_data 
 SET day_of_week = EXTRACT(DOW FROM timestamp);
 
 -- ===================================
---
+
+-- Transform the date to a continuous value
+
+ALTER TABLE complete_data DROP COLUMN IF EXISTS cont_date;
+ALTER TABLE complete_data ADD COLUMN cont_date FLOAT;
+UPDATE complete_data 
+SET cont_date = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365) + 0.5;
+
+-- Transform the hour of day to a continuous value
+
+ALTER TABLE complete_data DROP COLUMN IF EXISTS cont_hour;
+ALTER TABLE complete_data ADD COLUMN cont_hour FLOAT;
+UPDATE complete_data 
+SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
+
+-- ===================================
+
+ALTER TABLE complete_data DROP COLUMN IF EXISTS wind_dir;
+ALTER TABLE complete_data ADD COLUMN wind_dir FLOAT;
+UPDATE complete_data 
+SET wind_dir = -0.5 * COS(2 * PI() * wind_dir_deg / 360) + 0.5;
+
+-- ===================================
+
+-- Indexes on complete_data
+
+SELECT * FROM pg_indexes WHERE tablename = 'complete_data';
+CREATE INDEX ON complete_data(timestamp);
+CREATE INDEX ON complete_data(station_id);
+CLUSTER complete_data USING "complete_data_timestamp_idx";
+
+-- Add time-lagged PM level values
+
+/* 
+There might be duplicated rows for the same station and timestamp
+(not sure why)
+*/
+
+DELETE FROM complete_data cd
+WHERE (SELECT COUNT(*) FROM complete_data
+WHERE station_id = cd.station_id
+AND timestamp = cd.timestamp) > 1;
+
+DROP FUNCTION IF EXISTS add_time_lagged(TEXT, INT, INT, INT);
+CREATE OR REPLACE FUNCTION add_time_lagged(colname TEXT, start_idx INT, end_idx INT, step INT)
+RETURNS VOID AS $$
+DECLARE
+	lag INT;
+	lagged_colname TEXT;
+	query TEXT;
+	drop_temp TEXT;
+	create_temp TEXT;
+	update_temp TEXT;
+BEGIN
+	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
+	update_temp := '
+		UPDATE complete_data AS cd
+		SET %s = (
+			SELECT %s FROM complete_data
+			WHERE timestamp = cd.timestamp - INTERVAL ''%s hours''
+			AND station_id = cd.station_id
+		)';
+	FOR lag IN start_idx..end_idx BY step
+	LOOP	
+		lagged_colname := colname || '_' || lag;		
+		RAISE NOTICE 'Creating a time-lagged column %', lagged_colname;
+		query := format(drop_temp, lagged_colname);
+		EXECUTE query;
+		query := format(create_temp, lagged_colname);
+		EXECUTE query;
+		query := format(update_temp, lagged_colname, colname, lag);
+		EXECUTE query;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+-- Drop time-lagged columns
+
+DROP FUNCTION IF EXISTS drop_time_lagged(TEXT, INT, INT, INT);
+CREATE OR REPLACE FUNCTION drop_time_lagged(colname TEXT, start_idx INT, end_idx INT, step INT)
+RETURNS VOID AS $$
+DECLARE
+	lag INT;
+	lagged_colname TEXT;
+	query TEXT;
+	query_template TEXT;
+BEGIN
+	query_template := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	FOR lag IN start_idx..end_idx BY step
+	LOOP	
+		lagged_colname := colname || '_' || lag;
+		query := format(query_template, lagged_colname);
+		
+		RAISE NOTICE 'Dropping a time-lagged column %', lagged_colname;
+		RAISE NOTICE '%', query;
+		EXECUTE query;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT add_time_lagged('pm2_5', 1, 12, 1);
+SELECT add_time_lagged('pm2_5', 16, 36, 4);
+SELECT drop_time_lagged('pm2_5', 1, 12, 1);
+SELECT drop_time_lagged('pm2_5', 16, 36, 4);
+
+-- ===================================
+
+/*
+Removing outliers
+*/
+
+UPDATE complete_data 
+SET pm1 = NULL
+WHERE pm1 < 0;
+
+UPDATE complete_data 
+SET pm2_5 = NULL
+WHERE pm2_5 < 0;
+
+UPDATE complete_data 
+SET pm10 = NULL
+WHERE pm10 < 0;
+
+-- Air quality stations
+
+UPDATE complete_data 
+SET temperature = NULL
+WHERE temperature < -25
+OR temperature > 40;
+
+UPDATE complete_data 
+SET humidity = NULL
+WHERE humidity > 100;
+
+UPDATE complete_data 
+SET pressure = NULL
+WHERE pressure < 900.0;
+
+-- Meteo stations
+
+UPDATE meteo_observations  
+SET temperature = NULL
+WHERE temperature < -25
+OR temperature > 40;
+
+UPDATE meteo_observations 
+SET humidity = NULL
+WHERE humidity > 100;
+
+UPDATE meteo_observations 
+SET pressure = NULL
+WHERE pressure < 900.0;
+
+SELECT EXTRACT(MONTH FROM timestamp), period_of_day, MIN(temperature), MAX(temperature), AVG(temperature), STDDEV_POP(temperature) 
+FROM complete_data
+GROUP BY 1, period_of_day
+ORDER BY 1, period_of_day;
+
+SELECT MIN(temperature), MAX(temperature),
+	MIN(pressure), MAX(pressure),
+	MIN(humidity), MAX(humidity)
+FROM complete_data;
+
+SELECT MIN(temperature), MAX(temperature),
+	MIN(pressure), MAX(pressure),
+	MIN(humidity), MAX(humidity)
+FROM meteo_observations;
+
 -- ===================================
 
 /*
@@ -515,5 +677,4 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT fill_missing();
-SELECT count(*) FROM complete_data WHERE wind_speed IS NULL;
-SELECT * FROM complete_data LIMIT 5000;
+SELECT count(*) FROM complete_data WHERE pm2_5 IS NULL;

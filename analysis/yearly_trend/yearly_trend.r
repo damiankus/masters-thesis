@@ -30,7 +30,7 @@ save_lineplot <- function (df, factor, plot_path) {
 
 mkdir <- function (path) {
   if (!dir.exists(path)) {
-    dir.create(path, showWarnings = FALSE)
+    dir.create(path, showWarnings = TRUE)
   }
 }
 
@@ -45,27 +45,24 @@ main <- function () {
   rm(passwd)
   on.exit(dbDisconnect(con))
   
-  dbExistsTable(con, 'stations')
-  stations <- dbGetQuery(con, 'SELECT * FROM stations')[,c('id', 'address')]
-  
-  target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir, 'trend')
-  mkdir(target_root_dir)
   
   # Fetch all observations
-  target_dir <- file.path(target_root_dir, 'summary')
-  mkdir(target_dir)
-  obs_table <- 'wunderground_observations'
-  stations_table <- 'wunderground_stations'
+  table_name <- 'meteo_observations'
   query = paste('SELECT * FROM',
-                 obs_table,
-                'AS o',
+                 table_name,
                  sep = ' ')
   obs <- dbGetQuery(con, query)
-  obs[,'date'] <- factor(as.Date(obs$date))
+  obs[,'date'] <- factor(as.Date(obs$timestamp))
   obs[,'month'] <- as.numeric(format(as.Date(obs$date), '%m'))
   factors <- c('temperature', 'pressure', 'humidity', 'wind_speed',
                'precip_total', 'precip_rate', 'solradiation')
+  
+  target_root_dir <- getwd()
+  mkdir(target_root_dir)
+  target_root_dir <- file.path(target_root_dir, strsplit(table_name, '_')[[1]][1])
+  mkdir(target_root_dir)
+  target_dir <- file.path(target_root_dir, 'summary')
+  mkdir(target_dir)
   
   for (factor in factors) {
     target_dir <- file.path(target_root_dir, factor)
@@ -85,10 +82,10 @@ main <- function () {
   target_dir <- file.path(target_root_dir, 'summary')    
   mkdir(target_dir)
   for (factor in factors) {
-    stats <- aggregate(obs[,factor], by = list(obs$full_hour), FUN = stat_fun, na.rm = TRUE)
-    write.csv(stats, file.path(target_dir, paste(factor, '_hourly.csv')))
-    stats <- aggregate(obs[,factor], by = list(obs$date), FUN = stat_fun, na.rm = TRUE)
-    write.csv(stats, file.path(target_dir, paste(factor, '_daily.csv')))
+    # stats <- aggregate(obs[,factor], by = list(obs$full_hour), FUN = stat_fun, na.rm = TRUE)
+    # write.csv(stats, file.path(target_dir, paste(factor, '_hourly.csv')))
+    # stats <- aggregate(obs[,factor], by = list(obs$date), FUN = stat_fun, na.rm = TRUE)
+    # write.csv(stats, file.path(target_dir, paste(factor, '_daily.csv')))
     
     stats <- as.data.frame(
       aggregate(obs[,factor], by = list(obs$date), FUN = mean, na.rm = TRUE))
