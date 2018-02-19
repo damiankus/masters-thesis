@@ -42,12 +42,11 @@ main <- function () {
   # Fetch all observations
   target_dir <- target_root_dir
   table <- 'complete_data'
-  response_vars <- c('pm2_5')
-  explanatory_vars <- c() 
-  # c('temperature', 'pressure', 'humidity', 'precip_total', 'precip_rate', 'wind_speed', 'wind_dir', 'cont_date')
-  explanatory_vars <- c(explanatory_vars, paste('pm2_5_', seq(1, 12), sep = ''))
-  explanatory_vars <- c(explanatory_vars, paste('pm2_5_', seq(16, 36, 4), sep = ''))
-  # 'wind_speed', 'precip_total', 'precip_rate', 'solradiation')
+  response_vars <- c('pm2_5', 'pm2_5_plus_12')
+  
+  explanatory_vars <- c('temperature', 'pressure', 'humidity', 'precip_total', 'precip_rate', 'wind_speed', 'wind_dir', 'cont_date')
+  explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(1, 12), sep = '_'))
+  explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(16, 36, 4), sep = '_'))
   query = paste('SELECT',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
                 'FROM', table, sep = ' ')

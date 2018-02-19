@@ -1,4 +1,5 @@
-﻿DROP TABLE IF EXISTS observations;
+﻿DROP TABLE IF EXISTS complete_data;
+DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS stations;
 
 CREATE TABLE stations (
@@ -14,9 +15,9 @@ CREATE TABLE stations (
 
 -- =====================================
 
-select * from airly_stations;
-select * from monitoring_agh_stations;
-select * from looko2_stations;
+-- select * from airly_stations;
+-- select * from monitoring_agh_stations;
+-- select * from looko2_stations;
 
 -- =====================================
 
@@ -27,7 +28,8 @@ INSERT INTO stations(
 SELECT	'airly', 'airly_' || id::text, 'Kraków',
 	lattitude, longitude,
 	'airly', 'Airly_' || id
-FROM airly_stations;
+FROM airly_stations
+ORDER BY id;
 
 -- Be careful to skip the duplicates (Airly sensors)
 -- TODO: there are Airly stations in the AGH db that have no equivalents
@@ -57,7 +59,7 @@ GROUP BY id
 )
 ORDER BY s.id;
 
-CREATE INDEX ON stations USING HASH (id);
+CREATE INDEX ON stations(id);
 
 -- ===================================
 --
@@ -83,9 +85,9 @@ CREATE TABLE observations (
 -- =====================================
 
 
-SELECT * FROM airly_observations ORDER BY temperature ASC LIMIT 1;
-SELECT pressure FROM monitoring_agh_observations WHERE pressure > 0 LIMIT 100;
-SELECT * FROM looko2_observations LIMIT 1;
+-- SELECT * FROM airly_observations ORDER BY temperature ASC LIMIT 1;
+-- SELECT pressure FROM monitoring_agh_observations WHERE pressure > 0 LIMIT 100;
+-- SELECT * FROM looko2_observations LIMIT 1;
 
 -- =====================================
 
@@ -97,7 +99,7 @@ INSERT INTO observations (
 SELECT 'airly_' || station_id, utc_time, temperature, (pressure / 100.0), humidity,
 	pm1, pm2_5, pm10
 FROM airly_observations
-ORDER BY utc_time;
+ORDER BY station_id, utc_time;
 
 -- Note that timestamps are cast to ts in the UTC timezone
 INSERT INTO observations (
@@ -111,7 +113,7 @@ FROM monitoring_agh_observations AS o
 JOIN monitoring_agh_stations AS s
 ON o.station_id = s.id
 WHERE s.manufacturer <> 'Airly'
-ORDER BY measurementmillis;
+ORDER BY station_id, measurementmillis;
 
 INSERT INTO observations (
 	station_id, timestamp,
@@ -120,9 +122,9 @@ INSERT INTO observations (
 SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
 	pm1, pm2_5, pm10
 FROM looko2_observations
-ORDER BY date, hour, station_id;
+ORDER BY station_id, date, hour;
 
-SELECT * FROM pg_indexes WHERE tablename = 'observations';
+-- SELECT * FROM pg_indexes WHERE tablename = 'observations';
 CREATE INDEX ON observations(timestamp);
 CREATE INDEX ON observations(station_id);
 CLUSTER observations USING "observations_timestamp_idx";
@@ -266,7 +268,7 @@ AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
 
-SELECT * FROM pg_indexes WHERE tablename = 'meteo_observations';
+-- SELECT * FROM pg_indexes WHERE tablename = 'meteo_observations';
 CREATE INDEX ON meteo_observations(timestamp);
 CREATE INDEX ON meteo_observations(station_id);
 CLUSTER meteo_observations USING "meteo_observations_timestamp_idx";
@@ -388,106 +390,47 @@ UPDATE complete_data
 SET wind_dir = -0.5 * COS(2 * PI() * wind_dir_deg / 360) + 0.5;
 
 -- ===================================
-
 -- Indexes on complete_data
 
 SELECT * FROM pg_indexes WHERE tablename = 'complete_data';
+DROP INDEX IF EXISTS complete_data_timestamp_idx;
+DROP INDEX IF EXISTS complete_data_station_id_idx;
 CREATE INDEX ON complete_data(timestamp);
 CREATE INDEX ON complete_data(station_id);
+CLUSTER complete_data USING "complete_data_station_id_idx";
 CLUSTER complete_data USING "complete_data_timestamp_idx";
-
--- Add time-lagged PM level values
 
 /* 
 There might be duplicated rows for the same station and timestamp
 (not sure why)
 */
 
-DELETE FROM complete_data cd
-WHERE (SELECT COUNT(*) FROM complete_data
-WHERE station_id = cd.station_id
-AND timestamp = cd.timestamp) > 1;
-
-DROP FUNCTION IF EXISTS add_time_lagged(TEXT, INT, INT, INT);
-CREATE OR REPLACE FUNCTION add_time_lagged(colname TEXT, start_idx INT, end_idx INT, step INT)
-RETURNS VOID AS $$
-DECLARE
-	lag INT;
-	lagged_colname TEXT;
-	query TEXT;
-	drop_temp TEXT;
-	create_temp TEXT;
-	update_temp TEXT;
-BEGIN
-	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
-	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
-	update_temp := '
-		UPDATE complete_data AS cd
-		SET %s = (
-			SELECT %s FROM complete_data
-			WHERE timestamp = cd.timestamp - INTERVAL ''%s hours''
-			AND station_id = cd.station_id
-		)';
-	FOR lag IN start_idx..end_idx BY step
-	LOOP	
-		lagged_colname := colname || '_' || lag;		
-		RAISE NOTICE 'Creating a time-lagged column %', lagged_colname;
-		query := format(drop_temp, lagged_colname);
-		EXECUTE query;
-		query := format(create_temp, lagged_colname);
-		EXECUTE query;
-		query := format(update_temp, lagged_colname, colname, lag);
-		EXECUTE query;
-	END LOOP;
-END;
-$$  LANGUAGE plpgsql;
-
--- Drop time-lagged columns
-
-DROP FUNCTION IF EXISTS drop_time_lagged(TEXT, INT, INT, INT);
-CREATE OR REPLACE FUNCTION drop_time_lagged(colname TEXT, start_idx INT, end_idx INT, step INT)
-RETURNS VOID AS $$
-DECLARE
-	lag INT;
-	lagged_colname TEXT;
-	query TEXT;
-	query_template TEXT;
-BEGIN
-	query_template := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
-	FOR lag IN start_idx..end_idx BY step
-	LOOP	
-		lagged_colname := colname || '_' || lag;
-		query := format(query_template, lagged_colname);
-		
-		RAISE NOTICE 'Dropping a time-lagged column %', lagged_colname;
-		RAISE NOTICE '%', query;
-		EXECUTE query;
-	END LOOP;
-END;
-$$  LANGUAGE plpgsql;
-
-SELECT add_time_lagged('pm2_5', 1, 12, 1);
-SELECT add_time_lagged('pm2_5', 16, 36, 4);
-SELECT drop_time_lagged('pm2_5', 1, 12, 1);
-SELECT drop_time_lagged('pm2_5', 16, 36, 4);
+DELETE FROM complete_data
+WHERE id IN (
+SELECT MIN(id)
+FROM complete_data
+GROUP BY station_id, timestamp
+HAVING COUNT(*) > 1
+);
 
 -- ===================================
-
-/*
-Removing outliers
-*/
+-- Removing invalid measurements
+-- ===================================
 
 UPDATE complete_data 
 SET pm1 = NULL
-WHERE pm1 < 0;
+WHERE pm1 < 0
+OR pm1 = 0 AND (pm2_5 <> 0 OR pm10 <> 0);
 
 UPDATE complete_data 
 SET pm2_5 = NULL
-WHERE pm2_5 < 0;
+WHERE pm2_5 < 0
+OR pm2_5 = 0 AND (pm1 <> 0 OR pm10 <> 0);
 
 UPDATE complete_data 
 SET pm10 = NULL
-WHERE pm10 < 0;
+WHERE pm10 < 0
+OR pm10 = 0 AND (pm1 <> 0 OR pm2_5 <> 0);
 
 -- Air quality stations
 
@@ -519,6 +462,7 @@ UPDATE meteo_observations
 SET pressure = NULL
 WHERE pressure < 900.0;
 
+/*
 SELECT EXTRACT(MONTH FROM timestamp), period_of_day, MIN(temperature), MAX(temperature), AVG(temperature), STDDEV_POP(temperature) 
 FROM complete_data
 GROUP BY 1, period_of_day
@@ -533,6 +477,7 @@ SELECT MIN(temperature), MAX(temperature),
 	MIN(pressure), MAX(pressure),
 	MIN(humidity), MAX(humidity)
 FROM meteo_observations;
+*/
 
 -- ===================================
 
@@ -570,7 +515,7 @@ WHERE s1.id <> s2.id
 ORDER BY 1, 3, 2
 );
 
-SELECT * FROM pg_indexes WHERE tablename = 'meteo_distance';
+-- SELECT * FROM pg_indexes WHERE tablename = 'meteo_distance';
 CREATE INDEX ON meteo_distance(id1);
 CREATE INDEX ON meteo_distance(id2);
 CLUSTER meteo_distance USING "meteo_distance_id1_idx";
@@ -596,7 +541,7 @@ WHERE s1.id <> s2.id
 ORDER BY 1, 3, 2
 );
 
-SELECT * FROM pg_indexes WHERE tablename = 'air_quality_distance';
+-- SELECT * FROM pg_indexes WHERE tablename = 'air_quality_distance';
 CREATE INDEX ON air_quality_distance(id1);
 CREATE INDEX ON air_quality_distance(id2);
 CLUSTER air_quality_distance USING "air_quality_distance_id1_idx";
@@ -677,4 +622,141 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT fill_missing();
-SELECT count(*) FROM complete_data WHERE pm2_5 IS NULL;
+-- SELECT count(*) FROM complete_data WHERE pm2_5_12 IS NULL;
+
+-- ===================================
+-- Adding time-lagged PM level values
+-- ===================================
+
+DROP FUNCTION IF EXISTS add_time_lagged(TEXT, INT, INT, INT);
+CREATE OR REPLACE FUNCTION add_time_lagged(colname TEXT, start_idx INT, end_idx INT, step INT)
+RETURNS VOID AS $$
+DECLARE
+	lag INT;
+	lagged_colname TEXT;
+	query TEXT;
+	drop_temp TEXT;
+	create_temp TEXT;
+	update_temp TEXT;
+BEGIN
+	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
+	update_temp := '
+		UPDATE complete_data AS cd
+		SET %s = cd_%s.%s
+		FROM complete_data AS cd_%s
+		WHERE cd_%s.timestamp = cd.timestamp - INTERVAL ''%s hours''
+		AND cd_%s.station_id = cd.station_id';
+	FOR lag IN start_idx..end_idx BY step
+	LOOP	
+		lagged_colname := colname || '_minus_' || lag;		
+		RAISE NOTICE 'Creating a time-lagged column %', lagged_colname;
+		query := format(drop_temp, lagged_colname);
+		EXECUTE query;
+		query := format(create_temp, lagged_colname);
+		EXECUTE query;
+		query := format(update_temp, lagged_colname, lag, colname, lag, lag, lag, lag);
+		EXECUTE query;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+-- ===================================
+-- Dropping time-lagged columns
+-- ===================================
+
+DROP FUNCTION IF EXISTS drop_time_lagged(TEXT, INT, INT, INT);
+CREATE OR REPLACE FUNCTION drop_time_lagged(colname TEXT, start_idx INT, end_idx INT, step INT)
+RETURNS VOID AS $$
+DECLARE
+	lag INT;
+	lagged_colname TEXT;
+	query TEXT;
+	query_template TEXT;
+BEGIN
+	query_template := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	FOR lag IN start_idx..end_idx BY step
+	LOOP	
+		lagged_colname := colname || '_minus_' || lag;
+		query := format(query_template, lagged_colname);
+		
+		RAISE NOTICE 'Dropping a time-lagged column %', lagged_colname;
+		RAISE NOTICE '%', query;
+		EXECUTE query;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+-- SELECT add_time_lagged('pm2_5', 1, 12, 1);
+-- SELECT add_time_lagged('pm2_5', 16, 36, 4);
+-- SELECT drop_time_lagged('pm2_5', 1, 12, 1);
+-- SELECT drop_time_lagged('pm2_5', 16, 36, 4);
+
+-- ===================================
+-- Adding future PM level values
+-- ===================================
+
+DROP FUNCTION IF EXISTS add_future_vals(TEXT, INT[]);
+CREATE OR REPLACE FUNCTION add_future_vals(colname TEXT, time_deltas INT[])
+RETURNS VOID AS $$
+DECLARE
+	lag INT;
+	lagged_colname TEXT;
+	query TEXT;
+	drop_temp TEXT;
+	create_temp TEXT;
+	update_temp TEXT;
+BEGIN
+	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
+	update_temp := '
+		UPDATE complete_data AS cd
+		SET %s = cd_%s.%s
+		FROM complete_data AS cd_%s
+		WHERE cd_%s.timestamp = cd.timestamp + INTERVAL ''%s hours''
+		AND cd_%s.station_id = cd.station_id';
+		
+	FOREACH lag IN ARRAY time_deltas
+	LOOP	
+		lagged_colname := colname || '_plus_' || lag;		
+		RAISE NOTICE 'Creating a time-lagged column %', lagged_colname;
+		query := format(drop_temp, lagged_colname);
+		EXECUTE query;
+		query := format(create_temp, lagged_colname);
+		EXECUTE query;
+		query := format(update_temp, lagged_colname, lag, colname, lag, lag, lag, lag);
+		EXECUTE query;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+-- ===================================
+-- Dropping time-lagged columns
+-- ===================================
+
+DROP FUNCTION IF EXISTS drop_future_vals(TEXT, INT[]);
+CREATE OR REPLACE FUNCTION drop_future_vals(colname TEXT, time_deltas INT[])
+RETURNS VOID AS $$
+DECLARE
+	lag INT;
+	lagged_colname TEXT;
+	query TEXT;
+	query_template TEXT;
+BEGIN
+	query_template := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	FOREACH lag IN ARRAY time_deltas
+	LOOP	
+		lagged_colname := colname || '_plus_' || lag;
+		query := format(query_template, lagged_colname);
+		
+		RAISE NOTICE 'Dropping a time-lagged column %', lagged_colname;
+		RAISE NOTICE '%', query;
+		EXECUTE query;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
+-- SELECT drop_future_vals('pm2_5', ARRAY[12, 24]);
+
+-- SELECT * from complete_data limit 10;
