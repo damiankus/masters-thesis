@@ -127,7 +127,7 @@ ORDER BY station_id, date, hour;
 -- SELECT * FROM pg_indexes WHERE tablename = 'observations';
 CREATE INDEX ON observations(timestamp);
 CREATE INDEX ON observations(station_id);
-CLUSTER observations USING "observations_timestamp_idx";
+-- CLUSTER observations USING "observations_timestamp_idx";
 
 -- ======================================================================
 -- METEO OBSERVATIONS
@@ -397,8 +397,8 @@ DROP INDEX IF EXISTS complete_data_timestamp_idx;
 DROP INDEX IF EXISTS complete_data_station_id_idx;
 CREATE INDEX ON complete_data(timestamp);
 CREATE INDEX ON complete_data(station_id);
-CLUSTER complete_data USING "complete_data_station_id_idx";
-CLUSTER complete_data USING "complete_data_timestamp_idx";
+-- CLUSTER complete_data USING "complete_data_station_id_idx";
+-- CLUSTER complete_data USING "complete_data_timestamp_idx";
 
 /* 
 There might be duplicated rows for the same station and timestamp
@@ -607,7 +607,7 @@ BEGIN
 		EXECUTE query;
 	END LOOP;
 	
-        meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'precip_total',
+        meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'wind_dir_deg' 'precip_total',
 		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
@@ -706,6 +706,7 @@ DECLARE
 	drop_temp TEXT;
 	create_temp TEXT;
 	update_temp TEXT;
+	fill_temp TEXT;
 BEGIN
 	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
 	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
@@ -760,3 +761,27 @@ SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
 -- SELECT drop_future_vals('pm2_5', ARRAY[12, 24]);
 
 -- SELECT * from complete_data limit 10;
+
+UPDATE complete_data AS cd
+SET pm2_5_plus_12 = (
+	SELECT obs.pm2_5
+	FROM observations AS obs
+	JOIN air_quality_distance AS dist
+	ON dist.id1 = cd.station_id
+	AND dist.id2 = obs.station_id
+	WHERE obs.timestamp = cd.timestamp + INTERVAL '12 hours'
+	AND obs.pm2_5 IS NOT NULL
+	LIMIT 1
+) WHERE pm2_5_plus_12 IS NULL;
+
+UPDATE complete_data AS cd
+SET pm2_5_plus_24 = (
+	SELECT obs.pm2_5
+	FROM observations AS obs
+	JOIN air_quality_distance AS dist
+	ON dist.id1 = cd.station_id
+	AND dist.id2 = obs.station_id
+	WHERE obs.timestamp = cd.timestamp + INTERVAL '24 hours'
+	AND obs.pm2_5 IS NOT NULL
+	LIMIT 1
+) WHERE pm2_5_plus_24 IS NULL;
