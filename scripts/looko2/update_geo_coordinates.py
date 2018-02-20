@@ -49,7 +49,7 @@ if __name__ == '__main__':
         update_stat = 'UPDATE ' + config['stations-table'] + \
             """
             SET latitude = {Lat}, longitude = {Lon}
-            WHERE id = 'looko2_{Device}'
+            WHERE id = '{Device}'
             """
         for s in stations:
             stat = update_stat.format(**s)

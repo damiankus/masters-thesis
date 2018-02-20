@@ -8,10 +8,11 @@ logger = init_logger('file-merger')
 
 
 class FileMerger:
-    def __init__(self, dir_path, target_path='merged.txt'):
+    def __init__(self, dir_path, target_path='merged.txt', skip_headers=True):
         self.dir_path = dir_path
         self.target_path = target_path
         self.ext = self.target_path.split('.')[-1]
+        self.skip_headers = skip_headers
 
     def merge(self):
         with open(self.target_path, 'w') as output_file:
@@ -23,7 +24,7 @@ class FileMerger:
                 if filepath != self.target_path:
                     logger.info('Appending file {}'.format(filepath))
                     with open(filepath, 'r') as input_file:
-                        if not is_first:
+                        if not is_first and self.skip_headers:
                             # skip the header line
                             next(input_file)
                         else:
@@ -39,6 +40,8 @@ if __name__ == '__main__':
         containing files', required=True)
     parser.add_argument('--out', '-o', help='Path to the target file',
                         required=True)
+    parser.add_argument('--header', action='store_true',
+                        help='Do the merged files have headers to skip?')
     args = vars(parser.parse_args())
-    merger = FileMerger(args['dir'], args['out'])
+    merger = FileMerger(args['dir'], args['out'], args['header'])
     merger.merge()

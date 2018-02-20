@@ -61,6 +61,9 @@ ORDER BY s.id;
 
 CREATE INDEX ON stations(id);
 
+-- Fill the geographical coordinates 
+-- of LookO2 stations using the update_geo_coordinates.py script!
+
 -- ===================================
 --
 -- ===================================
@@ -157,7 +160,7 @@ https://stevemorse.org/nearest/distance.php
 
 INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
 VALUES('agh_meteo', 'Akademia Górniczo-Hutnicza Wydział Fizyki i Informatyki Stosowanej ul. Reymonta 19, budynek D-10',
-'Kraków', 50.066667, 19.95, 'agh');
+'Kraków', 50.066667, 19.95, 'agh_meteo');
 
 INSERT INTO meteo_stations (id, address, city, latitude, longitude, source)
 SELECT id, neighborhood, city, lat, lon, 'wunderground' 
@@ -387,7 +390,7 @@ SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5
 ALTER TABLE complete_data DROP COLUMN IF EXISTS wind_dir;
 ALTER TABLE complete_data ADD COLUMN wind_dir FLOAT;
 UPDATE complete_data 
-SET wind_dir = -0.5 * COS(2 * PI() * wind_dir_deg / 360) + 0.5;
+SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
 
 -- ===================================
 -- Indexes on complete_data
@@ -445,7 +448,8 @@ WHERE humidity > 100;
 
 UPDATE complete_data 
 SET pressure = NULL
-WHERE pressure < 900.0;
+WHERE pressure < 900
+OR PRESSURE > 1050;
 
 -- Meteo stations
 
@@ -460,7 +464,8 @@ WHERE humidity > 100;
 
 UPDATE meteo_observations 
 SET pressure = NULL
-WHERE pressure < 900.0;
+WHERE pressure < 900
+OR pressure > 1050;
 
 /*
 SELECT EXTRACT(MONTH FROM timestamp), period_of_day, MIN(temperature), MAX(temperature), AVG(temperature), STDDEV_POP(temperature) 
@@ -607,7 +612,7 @@ BEGIN
 		EXECUTE query;
 	END LOOP;
 	
-        meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'wind_dir_deg' 'precip_total',
+        meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'wind_dir', 'precip_total',
 		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
@@ -687,10 +692,10 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
--- SELECT add_time_lagged('pm2_5', 1, 12, 1);
--- SELECT add_time_lagged('pm2_5', 16, 36, 4);
--- SELECT drop_time_lagged('pm2_5', 1, 12, 1);
--- SELECT drop_time_lagged('pm2_5', 16, 36, 4);
+ SELECT add_time_lagged('pm2_5', 1, 12, 1);
+ SELECT add_time_lagged('pm2_5', 16, 36, 4);
+ SELECT drop_time_lagged('pm2_5', 1, 12, 1);
+ SELECT drop_time_lagged('pm2_5', 16, 36, 4);
 
 -- ===================================
 -- Adding future PM level values

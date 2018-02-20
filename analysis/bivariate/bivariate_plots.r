@@ -36,17 +36,17 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir, 'bivariate')
+  target_root_dir <- file.path(target_root_dir, 'filled_missing')
   mkdir(target_root_dir)
   
   # Fetch all observations
   target_dir <- target_root_dir
   table <- 'complete_data'
-  response_vars <- c('pm2_5', 'pm2_5_plus_12')
+  response_vars <- c('pm2_5_plus_12', 'pm2_5_plus_24')
   
   explanatory_vars <- c('temperature', 'pressure', 'humidity', 'precip_total', 'precip_rate', 'wind_speed', 'wind_dir', 'cont_date')
-  explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(1, 12), sep = '_'))
-  explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(16, 36, 4), sep = '_'))
+  # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(1, 12), sep = '_'))
+  # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(16, 36, 4), sep = '_'))
   query = paste('SELECT',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
                 'FROM', table, sep = ' ')

@@ -118,14 +118,16 @@ main <- function () {
   
   dbExistsTable(con, 'stations')
   stations <- dbGetQuery(con, 'SELECT * FROM stations')[,c('id', 'address')]
-  pollutants <- c('pm2_5')
+  pollutants <- c('pm2_5', 'pm2_5_plus_12', 'pm2_5_plus_24')
   # c('pm1', 'pm2_5', 'pm10', 'co', 'no2', 'o3', 'so2', 'c6h6')
-  meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'period_of_day', 'is_heating_season', 'wind_speed', 'wind_dir', 'cont_date', 'cont_hour')
+  meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'period_of_day',
+                     'is_heating_season', 'wind_speed', 'wind_dir', 
+                     'precip_total', 'precip_rate', 'solradiation', 'cont_date', 'cont_hour')
   # c('temperature', 'pressure', 'humidity', 'is_holiday', 'wind_speed', 'wind_dir')
   
   target_root_dir <- getwd()
   formatter <- aggr_formatter_factory('AVG')
-  target_root_dir <- file.path(target_root_dir, 'combined')
+  target_root_dir <- file.path(target_root_dir, 'filled_missing')
   dir.create(target_root_dir)
   table_name <- 'complete_data'
   
@@ -159,7 +161,7 @@ main <- function () {
   #     plot_pollutant(observations, target_dir, pollutant, meteo)
   #   }
   # }
-
+  # 
   # # Get data for each period of day
   # pods <- seq(0, 3)
   # names(pods) <- c('night', 'morning', 'afternoon', 'evening')

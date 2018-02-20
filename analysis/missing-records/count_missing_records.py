@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     sources = config['sources']
     factors = config['factors']
-    header = ['Source', 'Theoretical total', 'Actual total']
+    header = ['Source', 'Theoretical total', 'Missing', 'Missing %']
     tab_rows = [header]
     for factor in factors:
         f = factor.replace('_', '.')
@@ -111,7 +111,10 @@ if __name__ == '__main__':
             theoretical_total = 24 * 365 * stations_count
             total_count = int(execute(
                 conn, count_total_stat, [s])[0][0])
-            tab_row = [s, theoretical_total, total_count]
+            missing_count = theoretical_total - total_count
+            missing_ratio = missing_count / float(theoretical_total) * 100
+            tab_row = [s, theoretical_total, missing_count, \
+                       '{0:.2f}'.format(missing_ratio)]
 
             for f in factors:
                 missing_count = count_missing(conn, s, f)
