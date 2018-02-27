@@ -1,4 +1,4 @@
-﻿DROP TABLE IF EXISTS complete_data;
+﻿DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS stations;
 
@@ -13,11 +13,7 @@ CREATE TABLE stations (
         uuid CHAR(20)
 );
 
--- =====================================
-
--- select * from airly_stations;
--- select * from monitoring_agh_stations;
--- select * from looko2_stations;
+select * from stations;
 
 -- =====================================
 
@@ -47,9 +43,10 @@ WHERE manufacturer <> 'Airly'
 ORDER BY id;
 
 INSERT INTO stations(
-	source, id, address, city,
+	source, id, address, city, latitude, longitude,
 	manufacturer, uuid)
 SELECT 'looko2', 'looko2_' || id::text, station_name, 'Kraków',
+	latitude, longitude,
 	'looko2', 'Looko2_' || id::text
 FROM looko2_stations AS s
 WHERE s.station_name IN
@@ -57,6 +54,8 @@ WHERE s.station_name IN
 SELECT MIN(station_name) FROM looko2_stations
 GROUP BY id
 )
+AND latitude IS NOT NULL
+AND longitude IS NOT NULL
 ORDER BY s.id;
 
 CREATE INDEX ON stations(id);
@@ -68,29 +67,34 @@ CREATE INDEX ON stations(id);
 --
 -- ===================================
 
+/*
+A table storing complete records
+*/
+
+DROP TABLE IF EXISTS observations;
 CREATE TABLE observations (
 	id SERIAL PRIMARY KEY,
 	station_id CHAR(20) REFERENCES stations(id),
 	timestamp TIMESTAMP,
-	temperature NUMERIC(22, 15),
-	pressure NUMERIC(22, 15),	
-	humidity NUMERIC(22, 15),
 	pm1 NUMERIC(22, 15),
 	pm2_5 NUMERIC(22, 15),
 	pm10 NUMERIC(22, 15),
+/*
 	co NUMERIC(22, 15),
 	no2 NUMERIC(22, 15), 
 	o3 NUMERIC(22, 15), 
 	so2 NUMERIC(22, 15), 
-	c6h6 NUMERIC(22, 15)
+	c6h6 NUMERIC(22, 15),
+*/
+	wind_speed NUMERIC(7, 3),
+	wind_dir_deg NUMERIC(6, 3),
+	precip_total NUMERIC(7, 3),
+	precip_rate NUMERIC(7, 3),
+	solradiation NUMERIC(8, 3),
+	temperature NUMERIC(6, 3),
+	humidity NUMERIC(6, 3), 
+	pressure NUMERIC(7, 3)
 );
-
--- =====================================
-
-
--- SELECT * FROM airly_observations ORDER BY temperature ASC LIMIT 1;
--- SELECT pressure FROM monitoring_agh_observations WHERE pressure > 0 LIMIT 100;
--- SELECT * FROM looko2_observations LIMIT 1;
 
 -- =====================================
 
@@ -108,10 +112,11 @@ ORDER BY station_id, utc_time;
 INSERT INTO observations (
 	station_id, timestamp,
 	temperature, pressure, humidity,
-	pm1, pm2_5, pm10, co, no2, o3, so2, c6h6
+	pm1, pm2_5, pm10
 )
-SELECT 'agh_' || station_id, to_timestamp(measurementmillis / 1000) AT time zone 'UTC', temperature, (pressure / 100.0), humidity,
-	pm1, pm2_5, pm10, co, no2, o3, so2, c6h6
+SELECT 'agh_' || station_id, to_timestamp(measurementmillis / 1000) AT time zone 'UTC',
+	temperature, (pressure / 100.0), humidity,
+	pm1, pm2_5, pm10
 FROM monitoring_agh_observations AS o
 JOIN monitoring_agh_stations AS s
 ON o.station_id = s.id
@@ -125,12 +130,186 @@ INSERT INTO observations (
 SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
 	pm1, pm2_5, pm10
 FROM looko2_observations
+JOIN stations AS s 
+ON s.id = 'looko2_' || station_id
 ORDER BY station_id, date, hour;
 
--- SELECT * FROM pg_indexes WHERE tablename = 'observations';
+/* 
+There might be duplicated rows for the same station and timestamp
+(not sure why)
+*/
+
+DELETE FROM observations
+WHERE id IN (
+SELECT MIN(id)
+FROM observations
+GROUP BY station_id, timestamp
+HAVING COUNT(*) > 1
+);
+
+SELECT * FROM observations
+WHERE pm1 = 0
+AND pm2_5 = 0
+AND pm10 = 0;
+
+-- ===================================
+-- Removing invalid and missing measurements
+-- ===================================
+
+/*
+It is assumed that the PMx levels should never
+be equal exactly 0.00. LookO2 data seems to use
+this value as an equivalent of an empty measurement
+*/
+
+UPDATE observations 
+SET pm1 = NULL
+WHERE pm1 <= 0;
+
+UPDATE observations 
+SET pm2_5 = NULL
+WHERE pm2_5 <= 0;
+
+UPDATE observations 
+SET pm10 = NULL
+WHERE pm10 <= 0;
+
+-- Air quality stations
+
+UPDATE observations 
+SET temperature = NULL
+WHERE temperature < -25
+OR temperature > 40;
+
+UPDATE observations 
+SET humidity = NULL
+WHERE humidity > 100;
+
+UPDATE observations 
+SET pressure = NULL
+WHERE pressure < 900
+OR PRESSURE > 1050;
+
+-- Deleting empty records
+
+DELETE FROM observations
+WHERE pm1 IS NULL
+AND pm2_5 IS NULL
+AND pm10 IS NULL
+AND temperature IS NULL
+AND humidity IS NULL
+AND pressure IS NULL
+AND wind_dir_deg IS NULL
+AND precip_total IS NULL
+AND precip_rate IS NULL
+AND solradiation IS NULL;
+
+-- ===================================
+-- Creating auxilliary variables
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS is_holiday;
+ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
+
+UPDATE observations 
+SET is_holiday = 1
+WHERE EXTRACT(DOW FROM timestamp) = 0 
+OR EXTRACT(DOW FROM timestamp) = 6	
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
+OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS period_of_day;
+ALTER TABLE observations ADD COLUMN period_of_day INT;
+
+UPDATE observations 
+SET period_of_day = 0
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
+UPDATE observations 
+SET period_of_day = 1
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
+UPDATE observations 
+SET period_of_day = 2
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
+UPDATE observations
+SET period_of_day = 3
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS is_heating_season;
+ALTER TABLE observations ADD COLUMN is_heating_season smallint DEFAULT 0;
+UPDATE observations 
+SET is_heating_season = 1
+WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
+OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS cont_date;
+ALTER TABLE observations ADD COLUMN day_of_week INT;
+UPDATE observations 
+SET day_of_week = EXTRACT(DOW FROM timestamp);
+
+-- ===================================
+
+-- Transform the date to a continuous value
+
+ALTER TABLE observations DROP COLUMN IF EXISTS cont_date;
+ALTER TABLE observations ADD COLUMN cont_date FLOAT;
+UPDATE observations 
+SET cont_date = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365) + 0.5;
+
+-- Transform the hour of day to a continuous value
+
+ALTER TABLE observations DROP COLUMN IF EXISTS cont_hour;
+ALTER TABLE observations ADD COLUMN cont_hour FLOAT;
+UPDATE observations 
+SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir;
+ALTER TABLE observations ADD COLUMN wind_dir FLOAT;
+UPDATE observations 
+SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
+
+-- ===================================
+-- Indexes on observations
+
+SELECT * FROM pg_indexes WHERE tablename = 'observations';
+DROP INDEX IF EXISTS observations_timestamp_idx;
+DROP INDEX IF EXISTS observations_station_id_idx;
 CREATE INDEX ON observations(timestamp);
 CREATE INDEX ON observations(station_id);
+-- CLUSTER observations USING "observations_station_id_idx";
 -- CLUSTER observations USING "observations_timestamp_idx";
+
+
+/*
+SELECT date_trunc('day', timestamp) AS date, MIN(temperature), MAX(temperature), AVG(temperature), STDDEV_POP(temperature) 
+FROM observations
+GROUP BY 1
+ORDER BY 1;
+
+SELECT MIN(temperature), MAX(temperature),
+	MIN(pressure), MAX(pressure),
+	MIN(humidity), MAX(humidity)
+FROM observations;
+
+SELECT MIN(temperature), MAX(temperature),
+	MIN(pressure), MAX(pressure),
+	MIN(humidity), MAX(humidity)
+FROM meteo_observations;
+*/
 
 -- ======================================================================
 -- METEO OBSERVATIONS
@@ -175,8 +354,9 @@ CREATE TABLE meteo_observations (
 	temperature NUMERIC(6, 3),
 	humidity NUMERIC(6, 3), 
 	pressure NUMERIC(7, 3), 
-	wind_speed NUMERIC(7, 3),
+	wind_speed NUMERIC(7, 3), -- m/s!
 	wind_dir_deg NUMERIC(6, 3),
+	wind_dir NUMERIC(4, 3),
 	precip_total NUMERIC(7, 3),
 	precip_rate NUMERIC(7, 3),
 	solradiation NUMERIC(8, 3)
@@ -205,11 +385,12 @@ FROM meteo_agh_observations
 ORDER BY time;
 
 -- Wunderground records
+-- Note that we cast the wind speed from kpm to mps! (1 kpm ~ 0.278 m/s)
 INSERT INTO meteo_observations(station_id, timestamp, temperature,
 	 humidity, pressure, wind_speed, wind_dir_deg, 
 	 precip_total, precip_rate, solradiation)
 SELECT station_id, date_trunc('hour', timestamp),
-	AVG(temperature), AVG(humidity), AVG(pressure), AVG(wind_speed),
+	AVG(temperature), AVG(humidity), AVG(pressure), 0.278 * AVG(wind_speed),
 	AVG(wind_dir_deg), AVG(precip_total), AVG(precip_rate), AVG(solradiation)
 FROM wunderground_observations 
 GROUP BY 1, 2
@@ -256,12 +437,32 @@ OR humidity IS NOT NULL
 ORDER BY station_id, timestamp;
 
 /*
-Each day at 10 p.m. the AGH station 
+Deleting invalid measurements
+*/
+
+UPDATE meteo_observations  
+SET temperature = NULL
+WHERE temperature < -25
+OR temperature > 40;
+
+UPDATE meteo_observations 
+SET humidity = NULL
+WHERE humidity < 0
+OR humidity > 100;
+
+UPDATE meteo_observations 
+SET pressure = NULL
+WHERE pressure < 950
+OR pressure > 1050;
+
+/*
+Deleting empty records
+Note: Each day at 10 p.m. the AGH station 
 saves an empty record (probably because of
 the maintanance) which should be removed.
 */
 
-DELETE FROM meteo_observations 
+DELETE FROM meteo_observations
 WHERE temperature IS NULL
 AND humidity IS NULL
 AND pressure IS NULL
@@ -271,220 +472,13 @@ AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
 
+UPDATE meteo_observations 
+SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
+
 -- SELECT * FROM pg_indexes WHERE tablename = 'meteo_observations';
 CREATE INDEX ON meteo_observations(timestamp);
 CREATE INDEX ON meteo_observations(station_id);
 CLUSTER meteo_observations USING "meteo_observations_timestamp_idx";
-
-/*
-A table storing complete records
-*/
-
-DROP TABLE IF EXISTS complete_data;
-CREATE TABLE complete_data (
-	id SERIAL PRIMARY KEY,
-	station_id CHAR(20) REFERENCES stations(id),
-	timestamp TIMESTAMP,
-	pm1 NUMERIC(22, 15),
-	pm2_5 NUMERIC(22, 15),
-	pm10 NUMERIC(22, 15),
-/*
-	co NUMERIC(22, 15),
-	no2 NUMERIC(22, 15), 
-	o3 NUMERIC(22, 15), 
-	so2 NUMERIC(22, 15), 
-	c6h6 NUMERIC(22, 15),
-*/
-	wind_speed NUMERIC(7, 3),
-	wind_dir_deg NUMERIC(6, 3),
-	precip_total NUMERIC(7, 3),
-	precip_rate NUMERIC(7, 3),
-	solradiation NUMERIC(8, 3),
-	temperature NUMERIC(6, 3),
-	humidity NUMERIC(6, 3), 
-	pressure NUMERIC(7, 3)
-);
-
-INSERT INTO complete_data(station_id, timestamp, pm1, pm2_5, pm10,
-	-- co, no2, o3, so2, c6h6,
-	temperature, humidity, pressure)
-SELECT station_id, timestamp, pm1, pm2_5, pm10,
-	-- co, no2, o3, so2, c6h6,
-	 temperature, humidity, pressure
-FROM observations
-ORDER BY station_id, timestamp;
-
--- ===================================
---
--- ===================================
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS is_holiday;
-ALTER TABLE complete_data ADD COLUMN is_holiday INT DEFAULT 0;
-
-UPDATE complete_data 
-SET is_holiday = 1
-WHERE EXTRACT(DOW FROM timestamp) = 0 
-OR EXTRACT(DOW FROM timestamp) = 6	
-OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
-OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
-OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
-OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
-OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
-OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
-
--- ===================================
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS period_of_day;
-ALTER TABLE complete_data ADD COLUMN period_of_day INT;
-
-UPDATE complete_data 
-SET period_of_day = 0
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
-UPDATE complete_data 
-SET period_of_day = 1
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
-UPDATE complete_data 
-SET period_of_day = 2
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
-UPDATE complete_data
-SET period_of_day = 3
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
-
--- ===================================
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS is_heating_season;
-ALTER TABLE complete_data ADD COLUMN is_heating_season smallint DEFAULT 0;
-UPDATE complete_data 
-SET is_heating_season = 1
-WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
-OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
-
--- ===================================
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS cont_date;
-ALTER TABLE complete_data ADD COLUMN day_of_week INT;
-UPDATE complete_data 
-SET day_of_week = EXTRACT(DOW FROM timestamp);
-
--- ===================================
-
--- Transform the date to a continuous value
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS cont_date;
-ALTER TABLE complete_data ADD COLUMN cont_date FLOAT;
-UPDATE complete_data 
-SET cont_date = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365) + 0.5;
-
--- Transform the hour of day to a continuous value
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS cont_hour;
-ALTER TABLE complete_data ADD COLUMN cont_hour FLOAT;
-UPDATE complete_data 
-SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
-
--- ===================================
-
-ALTER TABLE complete_data DROP COLUMN IF EXISTS wind_dir;
-ALTER TABLE complete_data ADD COLUMN wind_dir FLOAT;
-UPDATE complete_data 
-SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
-
--- ===================================
--- Indexes on complete_data
-
-SELECT * FROM pg_indexes WHERE tablename = 'complete_data';
-DROP INDEX IF EXISTS complete_data_timestamp_idx;
-DROP INDEX IF EXISTS complete_data_station_id_idx;
-CREATE INDEX ON complete_data(timestamp);
-CREATE INDEX ON complete_data(station_id);
--- CLUSTER complete_data USING "complete_data_station_id_idx";
--- CLUSTER complete_data USING "complete_data_timestamp_idx";
-
-/* 
-There might be duplicated rows for the same station and timestamp
-(not sure why)
-*/
-
-DELETE FROM complete_data
-WHERE id IN (
-SELECT MIN(id)
-FROM complete_data
-GROUP BY station_id, timestamp
-HAVING COUNT(*) > 1
-);
-
--- ===================================
--- Removing invalid measurements
--- ===================================
-
-UPDATE complete_data 
-SET pm1 = NULL
-WHERE pm1 < 0
-OR pm1 = 0 AND (pm2_5 <> 0 OR pm10 <> 0);
-
-UPDATE complete_data 
-SET pm2_5 = NULL
-WHERE pm2_5 < 0
-OR pm2_5 = 0 AND (pm1 <> 0 OR pm10 <> 0);
-
-UPDATE complete_data 
-SET pm10 = NULL
-WHERE pm10 < 0
-OR pm10 = 0 AND (pm1 <> 0 OR pm2_5 <> 0);
-
--- Air quality stations
-
-UPDATE complete_data 
-SET temperature = NULL
-WHERE temperature < -25
-OR temperature > 40;
-
-UPDATE complete_data 
-SET humidity = NULL
-WHERE humidity > 100;
-
-UPDATE complete_data 
-SET pressure = NULL
-WHERE pressure < 900
-OR PRESSURE > 1050;
-
--- Meteo stations
-
-UPDATE meteo_observations  
-SET temperature = NULL
-WHERE temperature < -25
-OR temperature > 40;
-
-UPDATE meteo_observations 
-SET humidity = NULL
-WHERE humidity > 100;
-
-UPDATE meteo_observations 
-SET pressure = NULL
-WHERE pressure < 900
-OR pressure > 1050;
-
-/*
-SELECT EXTRACT(MONTH FROM timestamp), period_of_day, MIN(temperature), MAX(temperature), AVG(temperature), STDDEV_POP(temperature) 
-FROM complete_data
-GROUP BY 1, period_of_day
-ORDER BY 1, period_of_day;
-
-SELECT MIN(temperature), MAX(temperature),
-	MIN(pressure), MAX(pressure),
-	MIN(humidity), MAX(humidity)
-FROM complete_data;
-
-SELECT MIN(temperature), MAX(temperature),
-	MIN(pressure), MAX(pressure),
-	MIN(humidity), MAX(humidity)
-FROM meteo_observations;
-*/
-
--- ===================================
 
 /*
 Find the distances between stations 
@@ -557,28 +551,6 @@ copying them from the nearest meteo station
 containing the desired value
 */
 
-/*
-Backup SELECT query
-
-SELECT o.*, m.station_id, m.%s
-FROM observations AS o
-JOIN %s AS d
-ON d.id1 = o.station_id
-AND d.id2 = (
-	SELECT station_id
-	FROM %s AS obs
-	JOIN %s AS dist
-	ON dist.id1 = o.station_id
-	AND dist.id2 = obs.station_id
-	WHERE obs.%s IS NOT NULL
-	LIMIT 1
-)
-JOIN (SELECT station_id, timestamp, %s FROM %s) AS m
-ON m.station_id = d.id2
-AND m.timestamp = o.timestamp
-WHERE o.%s IS NULL		
-*/
-
 CREATE OR REPLACE FUNCTION fill_missing()
 RETURNS VOID AS $$
 DECLARE
@@ -589,14 +561,14 @@ DECLARE
 	query_template text;
 BEGIN
 	query_template := '
-		UPDATE complete_data AS cd
+		UPDATE observations AS upd_obs
 		SET %s = (
 			SELECT obs.%s
 			FROM %s AS obs
 			JOIN %s AS dist
-			ON dist.id1 = cd.station_id
+			ON dist.id1 = upd_obs.station_id
 			AND dist.id2 = obs.station_id
-			WHERE obs.timestamp = cd.timestamp
+			WHERE obs.timestamp = upd_obs.timestamp
 			AND obs.%s IS NOT NULL
 			LIMIT 1
 	) WHERE %s IS NULL';
@@ -627,7 +599,7 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT fill_missing();
--- SELECT count(*) FROM complete_data WHERE pm2_5_12 IS NULL;
+-- SELECT count(*) FROM observations WHERE pm2_5_12 IS NULL;
 
 -- ===================================
 -- Adding time-lagged PM level values
@@ -644,14 +616,14 @@ DECLARE
 	create_temp TEXT;
 	update_temp TEXT;
 BEGIN
-	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
-	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
+	drop_temp := 'ALTER TABLE observations DROP COLUMN IF EXISTS %s';
+	create_temp := 'ALTER TABLE observations ADD COLUMN %s NUMERIC(22, 15)';
 	update_temp := '
-		UPDATE complete_data AS cd
-		SET %s = cd_%s.%s
-		FROM complete_data AS cd_%s
-		WHERE cd_%s.timestamp = cd.timestamp - INTERVAL ''%s hours''
-		AND cd_%s.station_id = cd.station_id';
+		UPDATE observations AS upd_obs
+		SET %s = upd_obs_%s.%s
+		FROM observations AS upd_obs_%s
+		WHERE upd_obs_%s.timestamp = upd_obs.timestamp - INTERVAL ''%s hours''
+		AND upd_obs_%s.station_id = upd_obs.station_id';
 	FOR lag IN start_idx..end_idx BY step
 	LOOP	
 		lagged_colname := colname || '_minus_' || lag;		
@@ -679,7 +651,7 @@ DECLARE
 	query TEXT;
 	query_template TEXT;
 BEGIN
-	query_template := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	query_template := 'ALTER TABLE observations DROP COLUMN IF EXISTS %s';
 	FOR lag IN start_idx..end_idx BY step
 	LOOP	
 		lagged_colname := colname || '_minus_' || lag;
@@ -692,11 +664,14 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
- SELECT add_time_lagged('pm2_5', 1, 12, 1);
- SELECT add_time_lagged('pm2_5', 16, 36, 4);
- SELECT drop_time_lagged('pm2_5', 1, 12, 1);
- SELECT drop_time_lagged('pm2_5', 16, 36, 4);
+ SELECT add_time_lagged('pm2_5', 4, 36, 4);
+ SELECT drop_time_lagged('pm2_5', 4, 36, 4);
 
+/*
+ SELECT add_time_lagged('pm2_5', 1, 36, 4);
+ SELECT drop_time_lagged('pm2_5', 1, 36, 4);
+ */
+ 
 -- ===================================
 -- Adding future PM level values
 -- ===================================
@@ -713,14 +688,14 @@ DECLARE
 	update_temp TEXT;
 	fill_temp TEXT;
 BEGIN
-	drop_temp := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
-	create_temp := 'ALTER TABLE complete_data ADD COLUMN %s NUMERIC(22, 15)';
+	drop_temp := 'ALTER TABLE observations DROP COLUMN IF EXISTS %s';
+	create_temp := 'ALTER TABLE observations ADD COLUMN %s NUMERIC(22, 15)';
 	update_temp := '
-		UPDATE complete_data AS cd
-		SET %s = cd_%s.%s
-		FROM complete_data AS cd_%s
-		WHERE cd_%s.timestamp = cd.timestamp + INTERVAL ''%s hours''
-		AND cd_%s.station_id = cd.station_id';
+		UPDATE observations AS upd_obs
+		SET %s = upd_obs_%s.%s
+		FROM observations AS upd_obs_%s
+		WHERE upd_obs_%s.timestamp = upd_obs.timestamp + INTERVAL ''%s hours''
+		AND upd_obs_%s.station_id = upd_obs.station_id';
 		
 	FOREACH lag IN ARRAY time_deltas
 	LOOP	
@@ -749,7 +724,7 @@ DECLARE
 	query TEXT;
 	query_template TEXT;
 BEGIN
-	query_template := 'ALTER TABLE complete_data DROP COLUMN IF EXISTS %s';
+	query_template := 'ALTER TABLE observations DROP COLUMN IF EXISTS %s';
 	FOREACH lag IN ARRAY time_deltas
 	LOOP	
 		lagged_colname := colname || '_plus_' || lag;
@@ -765,28 +740,28 @@ $$  LANGUAGE plpgsql;
 SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
 -- SELECT drop_future_vals('pm2_5', ARRAY[12, 24]);
 
--- SELECT * from complete_data limit 10;
+-- SELECT * from observations limit 10;
 
-UPDATE complete_data AS cd
+UPDATE observations AS upd_obs
 SET pm2_5_plus_12 = (
 	SELECT obs.pm2_5
 	FROM observations AS obs
 	JOIN air_quality_distance AS dist
-	ON dist.id1 = cd.station_id
+	ON dist.id1 = upd_obs.station_id
 	AND dist.id2 = obs.station_id
-	WHERE obs.timestamp = cd.timestamp + INTERVAL '12 hours'
+	WHERE obs.timestamp = upd_obs.timestamp + INTERVAL '12 hours'
 	AND obs.pm2_5 IS NOT NULL
 	LIMIT 1
 ) WHERE pm2_5_plus_12 IS NULL;
 
-UPDATE complete_data AS cd
+UPDATE observations AS upd_obs
 SET pm2_5_plus_24 = (
 	SELECT obs.pm2_5
 	FROM observations AS obs
 	JOIN air_quality_distance AS dist
-	ON dist.id1 = cd.station_id
+	ON dist.id1 = upd_obs.station_id
 	AND dist.id2 = obs.station_id
-	WHERE obs.timestamp = cd.timestamp + INTERVAL '24 hours'
+	WHERE obs.timestamp = upd_obs.timestamp + INTERVAL '24 hours'
 	AND obs.pm2_5 IS NOT NULL
 	LIMIT 1
 ) WHERE pm2_5_plus_24 IS NULL;

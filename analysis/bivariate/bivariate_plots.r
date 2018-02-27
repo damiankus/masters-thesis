@@ -13,12 +13,58 @@ mkdir <- function (path) {
     dir.create(path, showWarnings = FALSE)
   }
 }
+units <- function (var) {
+  switch(var,
+         temperature = '°C',
+         humidity = '%',
+         pressure = 'hPa',
+         wind_speed = 'm/s',
+         wind_dir_deg = '°',
+         precip_total = 'mm',
+         precip_rate = 'mm/h',
+         {
+           if (grepl('^pm', var)) {
+             'μg/m³'
+           } else {
+             ''
+           }
+         })
+}
+
+pretty_var <- function (var) {
+  switch(var,
+         pm1 = 'PM1', pm2_5 = 'PM2.5', pm10 = 'PM10', solradiation = 'Solar irradiance', wind_speed = 'wind speed',
+         wind_dir = 'wind direction', wind_dir_deg = 'wind direction',
+         {
+           delim <- ' '
+           join_str <- ' ' 
+           if (grepl('plus', var)) {
+             delim <- '_plus_'
+             join_str <- '+'
+           } else if (grepl('minus', var)) {
+             delim <- '_minus_'
+             join_str <- '-'
+           }     
+           split_var <- strsplit(var, delim)[[1]]
+           pvar <- split_var[1]
+           if (length(split_var) > 1) {
+             pvar <- pretty_var(pvar)
+             pvar <- paste(pvar, 'at t', join_str, split_var[2], 'h', sep = ' ')
+           }
+           pvar
+         })
+}
 
 save_scatter_plot <- function (df, res_var, expl_var, plot_path) {
+  pretty_res <- pretty_var(res_var)
+  pretty_expl <- pretty_var(expl_var)
   scatter_plot <- ggplot(data = df, aes_string(x = expl_var, y = res_var)) +
     geom_point() +
-    xlab(cap(expl_var)) +
-    ylab(cap(res_var)) +
+    ggtitle(paste('Relation between', pretty_res, 'and', pretty_expl, sep = ' ')) +
+    xlab(cap(
+      paste(pretty_expl, '[', units(expl_var),']', sep = ' '))) +
+    ylab(cap(
+      paste(pretty_res, '[', units(res_var),']', sep = ' '))) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
@@ -36,17 +82,17 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir, 'filled_missing')
+  target_root_dir <- file.path(target_root_dir, 'original_data')
   mkdir(target_root_dir)
   
   # Fetch all observations
   target_dir <- target_root_dir
-  table <- 'complete_data'
-  response_vars <- c('pm2_5_plus_12', 'pm2_5_plus_24')
+  table <- 'observations'
+  response_vars <- c('pm2_5', 'pm2_5_plus_12', 'pm2_5_plus_24')
+  # response_vars <- c('pm2_5', 'pm2_5_plus_12', 'pm2_5_plus_24')
   
-  explanatory_vars <- c('temperature', 'pressure', 'humidity', 'precip_total', 'precip_rate', 'wind_speed', 'wind_dir', 'cont_date')
-  # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(1, 12), sep = '_'))
-  # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(16, 36, 4), sep = '_'))
+  explanatory_vars <- c('pm2_5', 'temperature', 'pressure', 'humidity', 'precip_total', 'precip_rate', 'wind_speed', 'wind_dir', 'wind_dir_deg', 'cont_date')
+  # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(4, 36, 4), sep = '_'))
   query = paste('SELECT',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
                 'FROM', table, sep = ' ')

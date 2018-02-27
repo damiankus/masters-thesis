@@ -95,7 +95,7 @@ get_same_period <- function (query_args, period, table) {
 get_grouped_by_hour <- function (query_args, start_time, end_time, table) {
   paste("SELECT timestamp, ",
         query_args,
-        ' FROM complete_data AS o ',
+        ' FROM ', table , ' AS o ',
         'JOIN stations AS s ON s.id = o.station_id ',
         "WHERE timestamp > ",
         "'", start_time, "'",
@@ -121,15 +121,16 @@ main <- function () {
   pollutants <- c('pm2_5', 'pm2_5_plus_12', 'pm2_5_plus_24')
   # c('pm1', 'pm2_5', 'pm10', 'co', 'no2', 'o3', 'so2', 'c6h6')
   meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'period_of_day',
-                     'is_heating_season', 'wind_speed', 'wind_dir', 
+                     'is_heating_season', 'wind_speed', 'wind_dir',
                      'precip_total', 'precip_rate', 'solradiation', 'cont_date', 'cont_hour')
-  # c('temperature', 'pressure', 'humidity', 'is_holiday', 'wind_speed', 'wind_dir')
+  meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'wind_speed', 'wind_dir')
+  # meteo_factors <- c()
   
   target_root_dir <- getwd()
   formatter <- aggr_formatter_factory('AVG')
-  target_root_dir <- file.path(target_root_dir, 'filled_missing')
+  target_root_dir <- file.path(target_root_dir, 'original')
   dir.create(target_root_dir)
-  table_name <- 'complete_data'
+  table_name <- 'observations'
   
   # Fetch all data
   target_dir <- target_root_dir
@@ -143,25 +144,26 @@ main <- function () {
   print(paste('# of observation records:', nrow(observations), sep = ' '))
   print(paste('# of records after omiiting missing values:', nrow(na.omit(observations)), sep = ' '))
   
-  # # The set of fetched columns is same for all types of queries
-  # query_args <- paste(formatter(c(pollutants, meteo_factors)), collapse=', ')
-  # 
-  # # Get mean observaions grouped by day for the whole year
-  # target_dir <- file.path(target_root_dir, 'global')
-  # dir.create(target_dir)
-  # query <- get_grouped_by_day(query_args, table = table_name)
-  # observations <- dbGetQuery(con, query)
-  # corr_path <- file.path(target_dir, 'corrplot-daily-avg.png')
-  # plotCorrMat(observations, corr_path)
-  # observations <- filter_empty_cols(observations)
-  # filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
-  # 
-  # for (pollutant in filtered_pollutants) {
-  #   for (meteo in meteo_factors) {
-  #     plot_pollutant(observations, target_dir, pollutant, meteo)
-  #   }
-  # }
-  # 
+  # The set of fetched columns is same for all types of queries
+  query_args <- paste(formatter(c(pollutants, meteo_factors)), collapse=', ')
+
+  # Get mean observaions grouped by day for the whole year
+  target_dir <- file.path(target_root_dir, 'global')
+  dir.create(target_dir)
+  query <- get_grouped_by_day(query_args, table = table_name)
+  observations <- dbGetQuery(con, query)
+  corr_path <- file.path(target_dir, 'corrplot-daily-avg.png')
+  plotCorrMat(observations, corr_path)
+  observations <- filter_empty_cols(observations)
+  filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
+  filtered_meteo <- meteo_factors[meteo_factors %in% colnames(observations)]
+
+  for (pollutant in filtered_pollutants) {
+    for (meteo in filtered_meteo) {
+      plot_pollutant(observations, target_dir, pollutant, meteo)
+    }
+  }
+
   # # Get data for each period of day
   # pods <- seq(0, 3)
   # names(pods) <- c('night', 'morning', 'afternoon', 'evening')
@@ -197,13 +199,14 @@ main <- function () {
   #   observations <- dbGetQuery(con, query)
   #   observations <- filter_empty_cols(observations)
   #   filtered_pollutants <- pollutants[pollutants %in% colnames(observations)]
+  #   filtered_meteo <- meteo_factors[meteo_factors %in% colnames(observations)]
   #   interval_dir <- file.path(target_dir, paste(interval[1], interval[2], sep = '_'))
   #   dir.create(interval_dir)
   #   corr_path <- file.path(target_dir, paste(interval[1], 'corrplot.png', sep = '_'))
   #   plotCorrMat(observations, corr_path)
   # 
   #   for (pollutant in filtered_pollutants) {
-  #     for (meteo in meteo_factors) {
+  #     for (meteo in filtered_meteo) {
   #       plot_pollutant(observations, interval_dir, pollutant, meteo)
   #     }
   #   }

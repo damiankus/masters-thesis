@@ -91,10 +91,10 @@ if __name__ == '__main__':
 
     sources = config['sources']
     factors = config['factors']
-    header = ['Source', 'Theoretical total', 'Missing', 'Missing %']
+    header = ['Source', 'Total', 'Theoretical total', 'Missing', 'Missing %']
     tab_rows = [header]
     for factor in factors:
-        f = factor.replace('_', '.')
+        f = factor.replace('_', ' ')
         header += [f, f + ' %']
 
     count_stations_stat, count_total_stat = count_stats_factory(config)
@@ -113,7 +113,7 @@ if __name__ == '__main__':
                 conn, count_total_stat, [s])[0][0])
             missing_count = theoretical_total - total_count
             missing_ratio = missing_count / float(theoretical_total) * 100
-            tab_row = [s, theoretical_total, missing_count, \
+            tab_row = [s, total_count, theoretical_total, missing_count,
                        '{0:.2f}'.format(missing_ratio)]
 
             for f in factors:

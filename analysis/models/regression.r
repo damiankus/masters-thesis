@@ -2,7 +2,6 @@ require('RPostgreSQL')
 require('ggplot2')
 require('reshape')
 require('caTools')
-library('lubridate')
 Sys.setenv(LANG = "en")
 
 cap <- function (s) {
@@ -19,9 +18,9 @@ mkdir <- function (path) {
 # Based on http://r-statistics.co/Linear-Regression.html
 
 save_comparison_plot <- function (df, res_var, plot_path) {
-  line_plot <- ggplot(data = df) +
-    geom_line(aes(x = date, y = actual), color = 'red') +
-    geom_line(aes(x = date, y = predicted), color = 'blue') +
+  melted <- melt(df, id = 'date')
+  line_plot <- ggplot(data = melted, aes(x = date, y = value, colour = variable)) +
+    geom_line() +
     xlab('Date') +
     ylab(cap(res_var)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
@@ -57,10 +56,11 @@ main <- function () {
   # Fetch all observations
   target_dir <- target_root_dir
   table <- 'complete_data'
-  response_vars <- c('pm2_5_plus_12', 'pm2_5_plus_24')
+  response_vars <- c('pm2_5_plus_24')
   explanatory_vars <- c('pm2_5', 'temperature', 'pressure', 'humidity',
-                        'precip_rate', 'wind_speed',
-                        'wind_dir', 'cont_date')
+                        'precip_rate', 'precip_total', 'wind_speed',
+                        'wind_dir', 'cont_date',
+                        'is_heating_season')
   query = paste('SELECT timestamp, ',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
                 'FROM', table, sep = ' ')
@@ -72,24 +72,27 @@ main <- function () {
   # training_set <- subset(obs, sample == TRUE)
   # test_set <- subset(obs, sample == FALSE)
   
-  which_test <- which(format(obs$timestamp, '%m') %in% c('02'))
+  which_test <- which(format(obs$timestamp, '%m') %in% c('02', '03'))
   test_set <- obs[which_test,]
   training_set <- obs[-which_test,]
   
   expl_formula <- paste(explanatory_vars, collapse = ' + ')
-  t_offset <- 12 * 60 * 60
   
   for (res_var in response_vars) {
-    mlr <- lm(as.formula(
+    fit <- lm(as.formula(
       paste(res_var, '~', expl_formula, sep = ' ')),
       data = training_set)
-    print(summary(mlr))
-    print(head(compared))
-    print(cor_accuracy)
-    pred_vals <- predict(mlr, test_set)
-    compared <- data.frame(cbind(actual = test_set$pm2_5_plus_12, predicted = pred_vals))
+    pred_vals <- predict(fit, test_set)
+    compared <- data.frame(cbind(actual = test_set[,res_var], predicted = pred_vals))
     cor_accuracy <- cor(compared, use = 'complete.obs')
+    lag <- tail(strsplit(res_var, '_')[[1]], n = 1)
+    t_offset <- strtoi(lag, base = 10) * 60 * 60
     compared[,'date'] <- test_set$timestamp + t_offset
+    
+    print(summary(fit))
+    print(cor_accuracy)
+    print(head(compared))
+    
     target_dir <- file.path(target_root_dir, res_var)
     mkdir(target_dir)
     plot_path <- file.path(target_dir, paste(res_var, '_prediction.png', sep = ''))
@@ -97,7 +100,6 @@ main <- function () {
     plot_path <- file.path(target_dir, paste(res_var, '_prediction_bivariate.png', sep = ''))
     save_scatter_plot(compared, res_var, plot_path = plot_path)
   }
-  
 }
 main()
 
