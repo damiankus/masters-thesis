@@ -180,7 +180,7 @@ WHERE humidity > 100;
 
 UPDATE observations 
 SET pressure = NULL
-WHERE pressure < 900
+WHERE pressure < 970
 OR PRESSURE > 1050;
 
 UPDATE observations 
@@ -453,7 +453,7 @@ WHERE humidity > 100;
 
 UPDATE meteo_observations 
 SET pressure = NULL
-WHERE pressure < 900
+WHERE pressure < 970
 OR PRESSURE > 1050;
 
 UPDATE meteo_observations 
@@ -684,6 +684,7 @@ BEGIN
 			AND dist.id2 = obs.station_id
 			WHERE obs.timestamp = upd_obs.timestamp
 			AND obs.%s IS NOT NULL
+			ORDER BY dist.dist
 			LIMIT 1
 	) WHERE %s IS NULL';
 		
@@ -850,6 +851,9 @@ BEGIN
 	END LOOP;
 END;
 $$  LANGUAGE plpgsql;
+
+select MIN(pressure) from meteo_observations;
+
 
 SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
 -- SELECT drop_future_vals('pm2_5', ARRAY[12, 24]);
