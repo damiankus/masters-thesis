@@ -13,8 +13,6 @@ CREATE TABLE stations (
         uuid CHAR(20)
 );
 
-select * from stations;
-
 -- =====================================
 
 INSERT INTO stations(
@@ -147,18 +145,13 @@ GROUP BY station_id, timestamp
 HAVING COUNT(*) > 1
 );
 
-SELECT * FROM observations
-WHERE pm1 = 0
-AND pm2_5 = 0
-AND pm10 = 0;
-
 -- ===================================
 -- Removing invalid and missing measurements
 -- ===================================
 
 /*
 It is assumed that the PMx levels should never
-be equal exactly 0.00. LookO2 data seems to use
+be equal exactly to 0.00. LookO2 data seems to use
 this value as an equivalent of an empty measurement
 */
 
@@ -173,6 +166,27 @@ WHERE pm2_5 <= 0;
 UPDATE observations 
 SET pm10 = NULL
 WHERE pm10 <= 0;
+
+-- Air quality stations
+
+UPDATE observations 
+SET temperature = NULL
+WHERE temperature < -25
+OR temperature > 40;
+
+UPDATE observations 
+SET humidity = NULL
+WHERE humidity > 100;
+
+UPDATE observations 
+SET pressure = NULL
+WHERE pressure < 900
+OR PRESSURE > 1050;
+
+UPDATE observations 
+SET humidity = NULL
+WHERE humidity <= 0
+OR humidity > 100;
 
 -- Deleting empty records
 
@@ -424,6 +438,76 @@ ORDER BY station_id, timestamp;
 Deleting outliers
 */
 
+/*
+Additional outlier elimination for specific factors
+*/
+
+UPDATE meteo_observations 
+SET temperature = NULL
+WHERE temperature < -25
+OR temperature > 40;
+
+UPDATE meteo_observations 
+SET humidity = NULL
+WHERE humidity > 100;
+
+UPDATE meteo_observations 
+SET pressure = NULL
+WHERE pressure < 900
+OR PRESSURE > 1050;
+
+UPDATE meteo_observations 
+SET humidity = NULL
+WHERE humidity <= 0
+OR humidity > 100;
+
+-- Deleting outliers based on the percentile thresholds
+
+DROP FUNCTION IF EXISTS delete_percentile_outliers(text, text, real, real);
+CREATE OR REPLACE FUNCTION delete_percentile_outliers(
+	tabname text, colname text, lower_threshold real, upper_threshold real)
+RETURNS VOID AS $$
+DECLARE
+	query text;
+	temp_table_query text;
+BEGIN
+	DROP TABLE IF EXISTS thresholds;
+	temp_table_query := format('
+	CREATE TEMP TABLE thresholds AS(
+	SELECT timestamp,
+	percentile_cont(%1$s) WITHIN GROUP (ORDER BY %3$s) AS lower,
+	percentile_cont(%2$s) WITHIN GROUP (ORDER BY %3$s) AS upper
+	FROM %4$s
+	GROUP BY timestamp
+	)', lower_threshold, upper_threshold, colname, tabname);
+
+	RAISE NOTICE '%', temp_table_query;
+	EXECUTE temp_table_query;
+	CREATE INDEX ON thresholds(timestamp);
+	
+	query := format('
+	UPDATE %1$s
+	SET %2$s = NULL
+	WHERE id IN (
+		SELECT obs.id
+		FROM %1$s as obs
+		JOIN thresholds AS th ON th.timestamp = obs.timestamp
+		WHERE obs.%2$s < th.lower
+		OR obs.%2$s > th.upper
+	)', tabname, colname);
+	
+	RAISE NOTICE 'Deleting outlier values from column %', colname;
+	RAISE NOTICE '%', query;
+	EXECUTE query;
+	DROP TABLE thresholds;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0.001, 0.96);
+SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0.001, 0.98);
+
+-- Deleting outliers based on the measurements from a reference station (AGH)
+
 DROP FUNCTION IF EXISTS delete_ref_station_outliers(text, text, text, real);
 CREATE OR REPLACE FUNCTION delete_ref_station_outliers(
 	tabname text, colname text, ref_station text, stddev_threshold real)
@@ -467,17 +551,22 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT delete_ref_station_outliers('meteo_observations', 'temperature', 'agh_meteo', 3.0);
-SELECT delete_ref_station_outliers('meteo_observations', 'pressure', 'agh_meteo', 6.0);
+SELECT delete_ref_station_outliers('meteo_observations', 'temperature', 'agh_meteo', 3);
+SELECT delete_ref_station_outliers('meteo_observations', 'pressure', 'agh_meteo', 6);
 
-/*
-Additional outlier elimination for specific factors
-*/
+UPDATE observations AS obs
+SET temperature = NULL
+FROM meteo_observations AS met
+WHERE met.station_id = obs.station_id
+AND met.timestamp = obs.timestamp
+AND met.temperature IS NULL;
 
-UPDATE meteo_observations 
-SET humidity = NULL
-WHERE humidity < 0
-OR humidity > 100;
+UPDATE observations AS obs
+SET pressure = NULL
+FROM meteo_observations AS met
+WHERE met.station_id = obs.station_id
+AND met.timestamp = obs.timestamp
+AND met.pressure IS NULL;
 
 /*
 Deleting empty records
@@ -569,8 +658,6 @@ ORDER BY 1, 3, 2
 CREATE INDEX ON air_quality_distance(id1);
 CREATE INDEX ON air_quality_distance(id2);
 CLUSTER air_quality_distance USING "air_quality_distance_id1_idx";
-
-select * from air_quality_distance
 
 /*
 A function filling missing values by 

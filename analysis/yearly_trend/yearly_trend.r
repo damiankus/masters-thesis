@@ -79,7 +79,7 @@ save_histogram <- function (df, factor, plot_path) {
   
   fact_col <- df[,factor] 
   bw <- 2 * IQR(fact_col, na.rm = TRUE) / length(fact_col) ^ 0.33
-  outlier_thresholds <- quantile(fact_col, c(.001, .968), na.rm = TRUE)
+  outlier_thresholds <- quantile(fact_col, c(.001, .98), na.rm = TRUE)
   
   plot <- ggplot(data = df, aes_string(fact_col)) +
     geom_histogram(colour = 'white', fill = 'blue', binwidth = bw) +
@@ -139,8 +139,8 @@ main <- function () {
     for (month in seq(1, 12)) {
       which <- obs[obs$month == month,]
       plot_name <- paste(factor, '_', month, '.png', sep = '')
-      # plot_path <- file.path(target_dir, plot_name)
-      # save_boxplot(which, factor, plot_path)
+      plot_path <- file.path(target_dir, plot_name)
+      save_boxplot(which, factor, plot_path)
       plot_name <- paste('histogram', plot_name, sep = '_')
       plot_path <- file.path(target_dir, plot_name)
       save_histogram(which, factor, plot_path)

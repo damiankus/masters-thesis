@@ -82,7 +82,7 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir, 'original_data')
+  target_root_dir <- file.path(target_root_dir, 'removed_outliers')
   mkdir(target_root_dir)
   
   # Fetch all observations
