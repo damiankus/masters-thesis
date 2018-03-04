@@ -79,9 +79,12 @@ save_histogram <- function (df, factor, plot_path) {
   
   fact_col <- df[,factor] 
   bw <- 2 * IQR(fact_col, na.rm = TRUE) / length(fact_col) ^ 0.33
+  outlier_thresholds <- quantile(fact_col, c(.001, .968), na.rm = TRUE)
   
   plot <- ggplot(data = df, aes_string(fact_col)) +
     geom_histogram(colour = 'white', fill = 'blue', binwidth = bw) +
+    geom_vline(xintercept = outlier_thresholds[1]) +
+    geom_vline(xintercept = outlier_thresholds[2]) +
     xlab(cap(
       paste(pretty_var(factor), '[', units(factor), ']', sep = ' '))) +
     ylab('Frequency')
@@ -108,13 +111,13 @@ main <- function () {
   
   
   # Fetch all observations
-  table_name <- 'observations'
-  factors <- c('pm1', 'pm2_5', 'pm10', 'temperature',
-               'humidity', 'pressure')
-  
-  # table_name <- 'meteo_observations'
-  # factors <- c('temperature', 'pressure', 'humidity', 'wind_speed',
-  #              'precip_total', 'precip_rate', 'solradiation')
+  # table_name <- 'observations'
+  # factors <- c('pm1', 'pm2_5', 'pm10', 'temperature',
+  #              'humidity', 'pressure')
+  # 
+  table_name <- 'meteo_observations'
+  factors <- c('temperature', 'pressure', 'humidity', 'wind_speed',
+               'precip_total', 'precip_rate', 'solradiation')
   query = paste('SELECT * FROM',
                  table_name,
                  sep = ' ')
@@ -134,34 +137,34 @@ main <- function () {
     mkdir(target_dir)
     
     for (month in seq(1, 12)) {
-      plot_name <- paste(factor, '_', month, '.png', sep = '')
-      plot_path <- file.path(target_dir, plot_name)
       which <- obs[obs$month == month,]
-      save_boxplot(which, factor, plot_path)
+      plot_name <- paste(factor, '_', month, '.png', sep = '')
+      # plot_path <- file.path(target_dir, plot_name)
+      # save_boxplot(which, factor, plot_path)
       plot_name <- paste('histogram', plot_name, sep = '_')
       plot_path <- file.path(target_dir, plot_name)
       save_histogram(which, factor, plot_path)
     }
   }
   
-  stat_fun <- function (x, na.rm) {
-    c(avg = mean(x, na.rm = na.rm), std = sd(x, na.rm = na.rm), samples = length(x))
-  }
-
-  target_dir <- file.path(target_root_dir, 'summary')    
-  mkdir(target_dir)
-  for (factor in factors) {
-    # stats <- aggregate(obs[,factor], by = list(obs$full_hour), FUN = stat_fun, na.rm = TRUE)
-    # write.csv(stats, file.path(target_dir, paste(factor, '_hourly.csv')))
-    # stats <- aggregate(obs[,factor], by = list(obs$date), FUN = stat_fun, na.rm = TRUE)
-    # write.csv(stats, file.path(target_dir, paste(factor, '_daily.csv')))
-    
-    stats <- as.data.frame(
-      aggregate(obs[,factor], by = list(obs$date), FUN = mean, na.rm = TRUE))
-    names(stats) <- c('date', factor)
-    stats[,'date'] <- as.Date(stats$date)
-    plot_path <- file.path(target_dir, paste(factor, '_yearly_trend.png', sep = ''))
-    save_lineplot(stats, factor, plot_path)
-  }
+  # stat_fun <- function (x, na.rm) {
+  #   c(avg = mean(x, na.rm = na.rm), std = sd(x, na.rm = na.rm), samples = length(x))
+  # }
+  # 
+  # target_dir <- file.path(target_root_dir, 'summary')
+  # mkdir(target_dir)
+  # for (factor in factors) {
+  #   # stats <- aggregate(obs[,factor], by = list(obs$full_hour), FUN = stat_fun, na.rm = TRUE)
+  #   # write.csv(stats, file.path(target_dir, paste(factor, '_hourly.csv')))
+  #   # stats <- aggregate(obs[,factor], by = list(obs$date), FUN = stat_fun, na.rm = TRUE)
+  #   # write.csv(stats, file.path(target_dir, paste(factor, '_daily.csv')))
+  # 
+  #   stats <- as.data.frame(
+  #     aggregate(obs[,factor], by = list(obs$date), FUN = mean, na.rm = TRUE))
+  #   names(stats) <- c('date', factor)
+  #   stats[,'date'] <- as.Date(stats$date)
+  #   plot_path <- file.path(target_dir, paste(factor, '_yearly_trend.png', sep = ''))
+  #   save_lineplot(stats, factor, plot_path)
+  # }
 }
 main()

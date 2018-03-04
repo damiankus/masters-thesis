@@ -174,22 +174,6 @@ UPDATE observations
 SET pm10 = NULL
 WHERE pm10 <= 0;
 
--- Air quality stations
-
-UPDATE observations 
-SET temperature = NULL
-WHERE temperature < -25
-OR temperature > 40;
-
-UPDATE observations 
-SET humidity = NULL
-WHERE humidity > 100;
-
-UPDATE observations 
-SET pressure = NULL
-WHERE pressure < 900
-OR PRESSURE > 1050;
-
 -- Deleting empty records
 
 DELETE FROM observations
@@ -254,7 +238,7 @@ OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
 
 -- ===================================
 
-ALTER TABLE observations DROP COLUMN IF EXISTS cont_date;
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week;
 ALTER TABLE observations ADD COLUMN day_of_week INT;
 UPDATE observations 
 SET day_of_week = EXTRACT(DOW FROM timestamp);
@@ -437,23 +421,63 @@ OR humidity IS NOT NULL
 ORDER BY station_id, timestamp;
 
 /*
-Deleting invalid measurements
+Deleting outliers
 */
 
-UPDATE meteo_observations  
-SET temperature = NULL
-WHERE temperature < -25
-OR temperature > 40;
+DROP FUNCTION IF EXISTS delete_ref_station_outliers(text, text, text, real);
+CREATE OR REPLACE FUNCTION delete_ref_station_outliers(
+	tabname text, colname text, ref_station text, stddev_threshold real)
+RETURNS VOID AS $$
+DECLARE
+	query text;
+	temp_table_query text;
+BEGIN
+	DROP TABLE IF EXISTS stddevs;
+	temp_table_query := format('
+	CREATE TEMP TABLE stddevs AS(
+	SELECT timestamp, STDDEV_POP(%1$s) AS stddev
+	FROM %2$s
+	GROUP BY timestamp
+	)
+	', colname, tabname);
+
+	RAISE NOTICE '%', temp_table_query;
+	EXECUTE temp_table_query;
+	CREATE INDEX ON stddevs(timestamp);
+	
+	query := format('
+	UPDATE %1$s
+	SET %2$s = NULL
+	WHERE id IN (
+		SELECT obs.id
+		FROM %1$s as obs
+		JOIN (
+			SELECT timestamp, %2$s FROM %1$s
+			WHERE station_id = ''%3$s'')
+		AS ref_station
+		ON obs.timestamp = ref_station.timestamp
+		JOIN stddevs ON stddevs.timestamp = obs.timestamp
+		WHERE ABS(obs.%2$s - ref_station.%2$s) > %4$s * stddev
+	)', tabname, colname, ref_station, stddev_threshold::text);
+	
+	RAISE NOTICE 'Deleting outlier values from column %', colname;
+	RAISE NOTICE '%', query;
+	EXECUTE query;
+	DROP TABLE stddevs;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT delete_ref_station_outliers('meteo_observations', 'temperature', 'agh_meteo', 3.0);
+SELECT delete_ref_station_outliers('meteo_observations', 'pressure', 'agh_meteo', 6.0);
+
+/*
+Additional outlier elimination for specific factors
+*/
 
 UPDATE meteo_observations 
 SET humidity = NULL
 WHERE humidity < 0
 OR humidity > 100;
-
-UPDATE meteo_observations 
-SET pressure = NULL
-WHERE pressure < 950
-OR pressure > 1050;
 
 /*
 Deleting empty records
@@ -472,6 +496,7 @@ AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
 
+-- Transforming wind direction measurements into continuous-valued representations
 UPDATE meteo_observations 
 SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
 
@@ -544,6 +569,8 @@ ORDER BY 1, 3, 2
 CREATE INDEX ON air_quality_distance(id1);
 CREATE INDEX ON air_quality_distance(id2);
 CLUSTER air_quality_distance USING "air_quality_distance_id1_idx";
+
+select * from air_quality_distance
 
 /*
 A function filling missing values by 

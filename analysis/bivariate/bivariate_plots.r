@@ -34,7 +34,7 @@ units <- function (var) {
 pretty_var <- function (var) {
   switch(var,
          pm1 = 'PM1', pm2_5 = 'PM2.5', pm10 = 'PM10', solradiation = 'Solar irradiance', wind_speed = 'wind speed',
-         wind_dir = 'wind direction', wind_dir_deg = 'wind direction',
+         wind_dir = 'wind direction', wind_dir_deg = 'wind direction', cont_date = 'date (normalized)',
          {
            delim <- ' '
            join_str <- ' ' 
@@ -61,10 +61,10 @@ save_scatter_plot <- function (df, res_var, expl_var, plot_path) {
   scatter_plot <- ggplot(data = df, aes_string(x = expl_var, y = res_var)) +
     geom_point() +
     ggtitle(paste('Relation between', pretty_res, 'and', pretty_expl, sep = ' ')) +
-    xlab(cap(
-      paste(pretty_expl, '[', units(expl_var),']', sep = ' '))) +
-    ylab(cap(
-      paste(pretty_res, '[', units(res_var),']', sep = ' '))) +
+    xlab(
+      paste(cap(pretty_expl), '[', units(expl_var),']', sep = ' ')) +
+    ylab(
+      paste(cap(pretty_res), '[', units(res_var),']', sep = ' ')) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
@@ -95,7 +95,8 @@ main <- function () {
   # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(4, 36, 4), sep = '_'))
   query = paste('SELECT',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
-                'FROM', table, sep = ' ')
+                'FROM', table,
+                sep = ' ')
   obs <- dbGetQuery(con, query)
   
   for (res_var in response_vars) {
