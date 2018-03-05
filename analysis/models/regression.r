@@ -2,6 +2,9 @@ require('RPostgreSQL')
 require('ggplot2')
 require('reshape')
 require('caTools')
+require('MASS')
+require('hydroGOF')
+source("prediction_goodness.r")
 Sys.setenv(LANG = "en")
 
 cap <- function (s) {
@@ -101,6 +104,21 @@ save_histogram <- function (data, factor, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
+# ---------------------------------------------
+# Measures specific to linear regression models
+# (taking into consideration the number of coefficients)
+# ---------------------------------------------
+
+# Mean Squared Error taking into consideration the number of coefficients
+adj_mse <- function (results, model) {
+  sse(results) / (length(results) -  length(model$coefficients))
+}
+
+# Adjusted R squared
+adj_r_squared <- function (results, model) {
+  1 - adj_mse(results, model) / mst(results, model)
+}
+
 main <- function () {
   driver <- dbDriver('PostgreSQL')
   passwd <- { 'pass' }
@@ -113,7 +131,7 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir, 'filled_missing')
+  target_root_dir <- file.path(target_root_dir,  'filled_missing')
   mkdir(target_root_dir)
   
   # Fetch all observations
@@ -128,7 +146,7 @@ main <- function () {
                 'FROM', table,
                 # "WHERE station_id = 'airly_172'",
                 sep = ' ')
-  obs <- dbGetQuery(con, query)
+  obs <- na.omit(dbGetQuery(con, query))
   
   # Random sets split
   # set.seed(101)
@@ -140,33 +158,33 @@ main <- function () {
   test_set <- obs[which_test,]
   training_set <- obs[-which_test,]
   
-  expl_formula <- paste(explanatory_vars, collapse = ' + ')
-  
+  rhs_formula <- paste(explanatory_vars, collapse = ' + ')
   for (res_var in response_vars) {
-    fit <- lm(as.formula(
-      paste(res_var, '~', expl_formula, sep = ' ')),
+    res_formula <- as.formula(
+      paste(res_var, '~', rhs_formula, sep = ' '))
+    fit <- lm(res_formula,
       data = training_set)
     pred_vals <- predict(fit, test_set)
-    compared <- data.frame(cbind(actual = test_set[,res_var], predicted = pred_vals))
-    cor_accuracy <- cor(compared, use = 'complete.obs')
+    
     lag <- tail(strsplit(res_var, '_')[[1]], n = 1)
     t_offset <- strtoi(lag, base = 10) * 60 * 60
-    compared[,'date'] <- test_set$timestamp + t_offset
+    results <- data.frame(actual = test_set[,res_var], predicted = pred_vals)
+    results$residuals <- results$predicted - results$actual
     
-    print(summary(fit))
-    print(cor_accuracy)
-    print(head(compared))
+    model_desc_path <- file.path(target_dir, 'prediction_goodness.txt')
+    save_prediction_goodness(results, fit, model_desc_path)
     
     target_dir <- file.path(target_root_dir, res_var)
     mkdir(target_dir)
     plot_path <- file.path(target_dir, paste(res_var, '_prediction.png', sep = ''))
-    save_comparison_plot(compared, res_var, plot_path)
-    plot_path <- file.path(target_dir, paste(res_var, '_prediction_bivariate.png', sep = ''))
-    save_scatter_plot(compared, res_var, plot_path = plot_path)
-    plot_path <- file.path(target_dir, paste(res_var, '_residuals_distribution.png', sep = ''))
+    results$date = test_set$timestamp + t_offset
+    save_comparison_plot(results, res_var, plot_path)
     
-    compared$residuals <- compared$predicted - compared$actual
-    save_histogram(compared, 'residuals', plot_path = plot_path)
+    plot_path <- file.path(target_dir, paste(res_var, '_prediction_bivariate.png', sep = ''))
+    save_scatter_plot(results, res_var, plot_path = plot_path)
+    
+    plot_path <- file.path(target_dir, paste(res_var, '_residuals_distribution.png', sep = ''))
+    save_histogram(results, 'residuals', plot_path = plot_path)
   }
 }
 main()

@@ -114,7 +114,7 @@ main <- function () {
   # table_name <- 'observations'
   # factors <- c('pm1', 'pm2_5', 'pm10', 'temperature',
   #              'humidity', 'pressure')
-  # 
+
   table_name <- 'meteo_observations'
   factors <- c('temperature', 'pressure', 'humidity', 'wind_speed',
                'precip_total', 'precip_rate', 'solradiation')
