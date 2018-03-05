@@ -1,8 +1,9 @@
-require('RPostgreSQL')
-require('ggplot2')
-require('reshape')
-require('caTools')
-require('hydroGOF')
+library(RPostgreSQL)
+library(ggplot2)
+library(reshape)
+library(caTools)
+library(MASS)
+library(hydroGOF)
 Sys.setenv(LANG = "en")
 
 # Measure formulas are based on the article by Selva Prabhakaran

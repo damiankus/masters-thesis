@@ -2,6 +2,7 @@ library(RPostgreSQL)
 library(ggplot2)
 library(reshape)
 library(caTools)
+library(neuralnet)
 source('prediction_goodness.r')
 Sys.setenv(LANG = "en")
 
@@ -102,19 +103,23 @@ save_histogram <- function (data, factor, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-# ---------------------------------------------
-# Measures specific to linear regression models
-# (taking into consideration the number of coefficients)
-# ---------------------------------------------
-
-# Mean Squared Error taking into consideration the number of coefficients
-adj_mse <- function (results, model) {
-  sse(results) / (length(results) -  length(model$coefficients))
+# Taken from https://www.r-bloggers.com/fitting-a-neural-network-in-r-neuralnet-package/
+# Section: Preparing to fit the neural network
+scale_columns <- function (data) {
+  # It is assumed that the passed data frame contains only 
+  # numeric-valued columns
+  
+  maxs <- apply(data, 2, max)
+  mins <- apply(data, 2, min)
+  data.frame(scale(data, center = mins, scale = maxs - mins))
 }
 
-# Adjusted R squared
-adj_r_squared <- function (results, model) {
-  1 - adj_mse(results, model) / mst(results, model)
+scale_vals <- function (vals, min, max) {
+  (vals - min) / (max - min)
+}
+
+backscale_vals <- function (vals, min, max) {
+  vals * (max - min) + min
 }
 
 main <- function () {
@@ -129,7 +134,7 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir,  'filled_missing')
+  target_root_dir <- file.path(target_root_dir, 'nn', 'filled_missing')
   mkdir(target_root_dir)
   
   # Fetch all observations
@@ -142,10 +147,14 @@ main <- function () {
   query = paste('SELECT timestamp, ',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
                 'FROM', table,
-                # "WHERE station_id = 'airly_172'",
+                "WHERE station_id = 'airly_172'",
                 sep = ' ')
   obs <- na.omit(dbGetQuery(con, query))
   
+  # Scale the explanatory variables
+  print('Scaling')
+  obs[, explanatory_vars] <- scale_columns(obs[, explanatory_vars])
+    
   # Random sets split
   # set.seed(101)
   # sample <- sample.split(obs$pm2_5_plus_24, SplitRatio = 0.75)
@@ -157,30 +166,43 @@ main <- function () {
   training_set <- obs[-which_test,]
   
   rhs_formula <- paste(explanatory_vars, collapse = ' + ')
+  
   for (res_var in response_vars) {
+    res_min <- min(obs[, res_var])
+    res_max <- max(obs[, res_var])
+    training_set[, res_var] <- scale_vals(training_set[, res_var], res_min, res_max)
+    test_set[, res_var] <- scale_vals(test_set[, res_var], res_min, res_max)
+        
     res_formula <- as.formula(
       paste(res_var, '~', rhs_formula, sep = ' '))
-    fit <- lm(res_formula,
-      data = training_set)
-    pred_vals <- predict(fit, test_set)
-    
+  
+    print('Training')
+    nn <- neuralnet(res_formula,
+      data = training_set,
+      hidden = c(5), 
+      linear.output = TRUE)
+    plot(nn)
+    pred_vals <- compute(nn, test_set[, explanattest_setory_vars])
+    pred_vals <- backscale_vals(pred_vals, res_min, res_max)
+    act_vals <- backscale_vals(test_set[, res_var], res_min, res_max)
+
     lag <- tail(strsplit(res_var, '_')[[1]], n = 1)
     t_offset <- strtoi(lag, base = 10) * 60 * 60
-    results <- data.frame(actual = test_set[,res_var], predicted = pred_vals)
+    results <- data.frame(actual = act_vals, predicted = pred_vals)
     results$residuals <- results$predicted - results$actual
-    
+
     model_desc_path <- file.path(target_dir, 'prediction_goodness.txt')
     save_prediction_goodness(results, fit, model_desc_path)
-    
+
     target_dir <- file.path(target_root_dir, res_var)
     mkdir(target_dir)
     plot_path <- file.path(target_dir, paste(res_var, '_prediction.png', sep = ''))
     results$date = test_set$timestamp + t_offset
     save_comparison_plot(results, res_var, plot_path)
-    
+
     plot_path <- file.path(target_dir, paste(res_var, '_prediction_bivariate.png', sep = ''))
     save_scatter_plot(results, res_var, plot_path = plot_path)
-    
+
     plot_path <- file.path(target_dir, paste(res_var, '_residuals_distribution.png', sep = ''))
     save_histogram(results, 'residuals', plot_path = plot_path)
   }
