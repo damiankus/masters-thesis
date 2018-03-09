@@ -190,6 +190,15 @@ OR humidity > 100;
 
 -- Deleting empty records
 
+/*
+It is assumed that the main pollution type to be forecasted
+is PM2.5. Records with missing values of PM2.5 won't be 
+filled with measurements from other stations because obsevations
+can vary vastly based on the environment of the sensor.
+*/ 
+DELETE FROM observations
+WHERE pm2_5 IS NULL;
+
 DELETE FROM observations
 WHERE pm1 IS NULL
 AND pm2_5 IS NULL
@@ -283,14 +292,10 @@ SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
 -- ===================================
 -- Indexes on observations
 
-SELECT * FROM pg_indexes WHERE tablename = 'observations';
 DROP INDEX IF EXISTS observations_timestamp_idx;
 DROP INDEX IF EXISTS observations_station_id_idx;
 CREATE INDEX ON observations(timestamp);
 CREATE INDEX ON observations(station_id);
--- CLUSTER observations USING "observations_station_id_idx";
--- CLUSTER observations USING "observations_timestamp_idx";
-
 
 /*
 SELECT date_trunc('day', timestamp) AS date, MIN(temperature), MAX(temperature), AVG(temperature), STDDEV_POP(temperature) 
@@ -411,6 +416,12 @@ WHERE source = 'wunderground'
 );
 
 /*
+Transforming wind direction measurements into continuous-valued representations
+*/
+UPDATE meteo_observations 
+SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
+
+/*
 Copy meteo data from observations in order to make
 filling missing values easier
 */
@@ -439,7 +450,7 @@ Deleting outliers
 */
 
 /*
-Additional outlier elimination for specific factors
+Iniial outlier elimination for specific factors
 */
 
 UPDATE meteo_observations 
@@ -460,6 +471,18 @@ UPDATE meteo_observations
 SET humidity = NULL
 WHERE humidity <= 0
 OR humidity > 100;
+
+/*
+Based on the number of row with wind speed equal to 0 it seems
+it can be a value meaning the lack of measurement.
+The precip_* variables are a similar case but it's actually
+possible that a large portion of measurements is 0-valued
+(there might be no rain for long periods of time).
+*/
+
+UPDATE meteo_observations 
+SET wind_speed = NULL, wind_dir_deg = NULL, wind_dir = NULL
+WHERE wind_speed = 0;
 
 -- Deleting outliers based on the percentile thresholds
 
@@ -585,13 +608,16 @@ AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
 
--- Transforming wind direction measurements into continuous-valued representations
-UPDATE meteo_observations 
-SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
-
--- SELECT * FROM pg_indexes WHERE tablename = 'meteo_observations';
 CREATE INDEX ON meteo_observations(timestamp);
 CREATE INDEX ON meteo_observations(station_id);
+CREATE INDEX ON meteo_observations(temperature) WHERE temperature IS NOT NULL;
+CREATE INDEX ON meteo_observations(pressure) WHERE pressure IS NOT NULL;
+CREATE INDEX ON meteo_observations(humidity) WHERE humidity IS NOT NULL;
+CREATE INDEX ON meteo_observations(wind_speed) WHERE wind_speed IS NOT NULL;
+CREATE INDEX ON meteo_observations(wind_dir_deg) WHERE wind_dir_deg IS NOT NULL;
+CREATE INDEX ON meteo_observations(wind_dir) WHERE wind_dir IS NOT NULL;
+CREATE INDEX ON meteo_observations(precip_total) WHERE precip_total IS NOT NULL;
+CREATE INDEX ON meteo_observations(precip_rate) WHERE precip_rate IS NOT NULL;
 CLUSTER meteo_observations USING "meteo_observations_timestamp_idx";
 
 /*
@@ -614,7 +640,7 @@ For reference see: https://www.movable-type.co.uk/scripts/latlong.html
 
 DROP TABLE IF EXISTS meteo_distance;
 CREATE TABLE meteo_distance AS (
-SELECT s1.id AS id1, s2.id AS id2, 
+SELECT row_number() OVER() AS id, s1.id AS station_id1, s2.id AS station_id2, 
 	(ACOS(
 		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
 		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
@@ -625,13 +651,13 @@ SELECT s1.id AS id1, s2.id AS id2,
 FROM stations AS s1
 CROSS JOIN meteo_stations AS s2
 WHERE s1.id <> s2.id
-ORDER BY 1, 3, 2
+ORDER BY 2, 4, 3
 );
 
--- SELECT * FROM pg_indexes WHERE tablename = 'meteo_distance';
-CREATE INDEX ON meteo_distance(id1);
-CREATE INDEX ON meteo_distance(id2);
-CLUSTER meteo_distance USING "meteo_distance_id1_idx";
+ALTER TABLE meteo_distance ADD PRIMARY KEY (id);
+CREATE INDEX ON meteo_distance(station_id1);
+CREATE INDEX ON meteo_distance(station_id2);
+CLUSTER meteo_distance USING "meteo_distance_station_id1_idx";
 
 /*
 Similarly, calculate the distance between
@@ -640,7 +666,7 @@ the stations measuring air quality.
 
 DROP TABLE IF EXISTS air_quality_distance;
 CREATE TABLE air_quality_distance AS (
-SELECT s1.id AS id1, s2.id AS id2, 
+SELECT row_number() OVER() AS id, s1.id AS station_id1, s2.id AS station_id2, 
 	(ACOS(
 		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
 		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
@@ -651,13 +677,13 @@ SELECT s1.id AS id1, s2.id AS id2,
 FROM stations AS s1
 CROSS JOIN stations AS s2
 WHERE s1.id <> s2.id
-ORDER BY 1, 3, 2
+ORDER BY 2, 4, 3
 );
 
--- SELECT * FROM pg_indexes WHERE tablename = 'air_quality_distance';
-CREATE INDEX ON air_quality_distance(id1);
-CREATE INDEX ON air_quality_distance(id2);
-CLUSTER air_quality_distance USING "air_quality_distance_id1_idx";
+ALTER TABLE air_quality_distance ADD PRIMARY KEY (id);
+CREATE INDEX ON air_quality_distance(station_id1);
+CREATE INDEX ON air_quality_distance(station_id2);
+CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
 
 /*
 A function filling missing values by 
@@ -674,37 +700,65 @@ DECLARE
 	query text;
 	query_template text;
 BEGIN
+	/*
+	The following query is based on the assumption that
+	the rows in the distance tables are sorted ascending
+	by the distance between stations
+	parameters: 
+	target table, source table, distance table, column name
+	*/
 	query_template := '
-		UPDATE observations AS upd_obs
-		SET %s = (
-			SELECT obs.%s
-			FROM %s AS obs
-			JOIN %s AS dist
-			ON dist.id1 = upd_obs.station_id
-			AND dist.id2 = obs.station_id
-			WHERE obs.timestamp = upd_obs.timestamp
-			AND obs.%s IS NOT NULL
-			ORDER BY dist.dist
-			LIMIT 1
-	) WHERE %s IS NULL';
-		
+	UPDATE %1$s AS obs
+	SET %4$s = nearest.%4$s
+	FROM (
+		SELECT obs.station_id, obs.timestamp, nearest.%4$s 
+		FROM %1$s AS obs
+		JOIN (
+			SELECT obs.timestamp, obs.station_id, MIN(dist.id) row_id
+			FROM %1$s as obs
+			JOIN %3$s as dist
+			ON dist.station_id1 = obs.station_id
+			JOIN %2$s as other
+			ON other.station_id = dist.station_id2
+			AND other.timestamp = obs.timestamp
+			WHERE obs.%4$s IS NULL
+			AND other.%4$s IS NOT NULL
+			GROUP BY obs.station_id, obs.timestamp
+		) AS dist_rows
+		ON dist_rows.station_id = obs.station_id
+		AND dist_rows.timestamp = obs.timestamp
+		JOIN %3$s AS dist
+		ON dist.id = dist_rows.row_id
+		JOIN %2$s as nearest
+		ON nearest.station_id = dist.station_id2
+		AND nearest.timestamp = obs.timestamp
+	) AS nearest
+	WHERE nearest.station_id = obs.station_id
+	AND nearest.timestamp = obs.timestamp';
+
+	/* 
+	Filling missing PM data with measurements from another station
+	can be risky because they can be vastly different depending
+	on the location of the station 
+	
         air_quality_cols := ARRAY['pm1', 'pm2_5', 'pm10'];
 	FOREACH col IN ARRAY air_quality_cols
 	LOOP	
-		query := format(query_template, col, col, 'observations', 
-		 'air_quality_distance', col, col);
+		query := format(query_template, 'observations', 'observations', 
+		 'air_quality_distance', col);
 		 
 		RAISE NOTICE 'Filling missing % values', col;
 		RAISE NOTICE '%', query;
 		EXECUTE query;
 	END LOOP;
-	
-        meteo_cols := ARRAY['wind_speed', 'wind_dir_deg', 'wind_dir', 'precip_total',
-		'precip_rate', 'solradiation', 'temperature', 'humidity', 'pressure'];
+	*/
+
+        meteo_cols := ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'wind_dir', 'precip_total',
+		'precip_rate', 'solradiation'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
-		query := format(query_template, col, col, 'meteo_observations',
-		 'meteo_distance', col, col);
+		query := format(query_template, 'observations', 'meteo_observations',
+		 'meteo_distance', col);
 		 
 		RAISE NOTICE 'Filling missing % values', col;
 		RAISE NOTICE '%', query;
@@ -714,7 +768,6 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT fill_missing();
--- SELECT count(*) FROM observations WHERE pm2_5_12 IS NULL;
 
 -- ===================================
 -- Adding time-lagged PM level values
@@ -735,10 +788,10 @@ BEGIN
 	create_temp := 'ALTER TABLE observations ADD COLUMN %s NUMERIC(22, 15)';
 	update_temp := '
 		UPDATE observations AS upd_obs
-		SET %s = upd_obs_%s.%s
-		FROM observations AS upd_obs_%s
-		WHERE upd_obs_%s.timestamp = upd_obs.timestamp - INTERVAL ''%s hours''
-		AND upd_obs_%s.station_id = upd_obs.station_id';
+		SET %s = upd_obs%s.%s
+		FROM observations AS upd_obs%s
+		WHERE upd_obs%s.timestamp = upd_obs.timestamp - INTERVAL ''%s hours''
+		AND upd_obs%s.station_id = upd_obs.station_id';
 	FOR lag IN start_idx..end_idx BY step
 	LOOP	
 		lagged_colname := colname || '_minus_' || lag;		
@@ -779,9 +832,6 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
- SELECT add_time_lagged('pm2_5', 4, 36, 4);
- SELECT drop_time_lagged('pm2_5', 4, 36, 4);
-
 /*
  SELECT add_time_lagged('pm2_5', 1, 36, 4);
  SELECT drop_time_lagged('pm2_5', 1, 36, 4);
@@ -807,10 +857,10 @@ BEGIN
 	create_temp := 'ALTER TABLE observations ADD COLUMN %s NUMERIC(22, 15)';
 	update_temp := '
 		UPDATE observations AS upd_obs
-		SET %s = upd_obs_%s.%s
-		FROM observations AS upd_obs_%s
-		WHERE upd_obs_%s.timestamp = upd_obs.timestamp + INTERVAL ''%s hours''
-		AND upd_obs_%s.station_id = upd_obs.station_id';
+		SET %s = upd_obs%s.%s
+		FROM observations AS upd_obs%s
+		WHERE upd_obs%s.timestamp = upd_obs.timestamp + INTERVAL ''%s hours''
+		AND upd_obs%s.station_id = upd_obs.station_id';
 		
 	FOREACH lag IN ARRAY time_deltas
 	LOOP	
@@ -852,21 +902,16 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-select MIN(pressure) from meteo_observations;
-
-
 SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
 -- SELECT drop_future_vals('pm2_5', ARRAY[12, 24]);
-
--- SELECT * from observations limit 10;
 
 UPDATE observations AS upd_obs
 SET pm2_5_plus_12 = (
 	SELECT obs.pm2_5
 	FROM observations AS obs
 	JOIN air_quality_distance AS dist
-	ON dist.id1 = upd_obs.station_id
-	AND dist.id2 = obs.station_id
+	ON dist.station_id1 = upd_obs.station_id
+	AND dist.station_id2 = obs.station_id
 	WHERE obs.timestamp = upd_obs.timestamp + INTERVAL '12 hours'
 	AND obs.pm2_5 IS NOT NULL
 	LIMIT 1
@@ -877,9 +922,55 @@ SET pm2_5_plus_24 = (
 	SELECT obs.pm2_5
 	FROM observations AS obs
 	JOIN air_quality_distance AS dist
-	ON dist.id1 = upd_obs.station_id
-	AND dist.id2 = obs.station_id
+	ON dist.station_id1 = upd_obs.station_id
+	AND dist.station_id2 = obs.station_id
 	WHERE obs.timestamp = upd_obs.timestamp + INTERVAL '24 hours'
 	AND obs.pm2_5 IS NOT NULL
 	LIMIT 1
 ) WHERE pm2_5_plus_24 IS NULL;
+
+
+DROP FUNCTION IF EXISTS add_daily_aggr_vals(TEXT, TEXT[], TEXT[]);
+CREATE OR REPLACE FUNCTION add_daily_aggr_vals(tabname TEXT, colnames TEXT[], aggr_types TEXT[])
+RETURNS VOID AS $$
+DECLARE
+	drop_temp TEXT;
+	create_temp TEXT;
+	update_temp TEXT;
+	query TEXT;
+	colname TEXT;
+	aggr_type TEXT;
+BEGIN
+	drop_temp := 'ALTER TABLE %1$s DROP COLUMN IF EXISTS %3$s_daily_%2$s';
+	create_temp := 'ALTER TABLE %1$s ADD COLUMN %3$s_daily_%2$s NUMERIC(22, 15)';
+	update_temp := '
+		UPDATE %1$s AS obs
+		SET %3$s_daily_%2$s = aggr_obs.%2$s
+		FROM (
+			SELECT station_id, date_trunc(''day'', timestamp) AS timestamp, %3$s(%2$s) AS %2$s
+			FROM %1$s
+			GROUP BY 1, 2
+			ORDER BY 1, 2
+		) AS aggr_obs
+		WHERE aggr_obs.station_id = obs.station_id
+		AND aggr_obs.timestamp = date_trunc(''day'', obs.timestamp)';
+		
+	FOREACH colname IN ARRAY colnames
+	LOOP	
+		FOREACH aggr_type IN ARRAY aggr_types
+		LOOP
+			EXECUTE format(drop_temp, tabname, colname, aggr_type);
+			EXECUTE format(create_temp, tabname, colname, aggr_type);
+			query := format(update_temp, tabname, colname, aggr_type);
+			RAISE NOTICE '%', query;
+			EXECUTE query;
+		END LOOP;
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT add_daily_aggr_vals('observations', 
+	ARRAY['temperature', 'pressure', 'humidity'],
+	ARRAY['min', 'max', 'avg']);
+
+select * from observations limit 10;
