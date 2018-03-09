@@ -1,0 +1,42 @@
+
+Call:
+lm(formula = res_formula, data = training_set)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-231.44  -12.78   -2.55    6.44  476.39 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       -4.226e+02  1.460e+01 -28.942  < 2e-16 ***
+pm2_5              4.870e-01  2.994e-03 162.675  < 2e-16 ***
+temperature       -6.006e-01  2.441e-02 -24.606  < 2e-16 ***
+pressure           4.635e-01  1.432e-02  32.358  < 2e-16 ***
+humidity          -1.341e-01  5.969e-03 -22.465  < 2e-16 ***
+wind_speed        -9.160e-01  9.979e-02  -9.180  < 2e-16 ***
+cont_date         -1.958e+01  8.254e-01 -23.726  < 2e-16 ***
+cont_hour         -4.052e+00  3.386e-01 -11.969  < 2e-16 ***
+is_heating_season -2.256e+00  4.340e-01  -5.198 2.02e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 31.68 on 92231 degrees of freedom
+Multiple R-squared:  0.4603,	Adjusted R-squared:  0.4603 
+F-statistic:  9835 on 8 and 92231 DF,  p-value: < 2.2e-16
+
+
+----------------------------------------------
+ Goodness of prediction
+----------------------------------------------
+ MSE: 1531.59122480457
+ RMSE 39.1355493739971
+ MAE: 26.5402429558503
+ MAPE: 147.812060363518
+ MAXPE: 7904.65694870751
+ Standard Error: 0.339395411919796
+ R-squared: 0.380437049153889
+ Index of Agreement: 0.725928712614905
+ Prediction correlation (Pearson): 0.617598230918928
+----------------------------------------------
+
+

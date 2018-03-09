@@ -147,24 +147,24 @@ main <- function () {
     }
   }
   
-  # stat_fun <- function (x, na.rm) {
-  #   c(avg = mean(x, na.rm = na.rm), std = sd(x, na.rm = na.rm), samples = length(x))
-  # }
-  # 
-  # target_dir <- file.path(target_root_dir, 'summary')
-  # mkdir(target_dir)
-  # for (factor in factors) {
-  #   # stats <- aggregate(obs[,factor], by = list(obs$full_hour), FUN = stat_fun, na.rm = TRUE)
-  #   # write.csv(stats, file.path(target_dir, paste(factor, '_hourly.csv')))
-  #   # stats <- aggregate(obs[,factor], by = list(obs$date), FUN = stat_fun, na.rm = TRUE)
-  #   # write.csv(stats, file.path(target_dir, paste(factor, '_daily.csv')))
-  # 
-  #   stats <- as.data.frame(
-  #     aggregate(obs[,factor], by = list(obs$date), FUN = mean, na.rm = TRUE))
-  #   names(stats) <- c('date', factor)
-  #   stats[,'date'] <- as.Date(stats$date)
-  #   plot_path <- file.path(target_dir, paste(factor, '_yearly_trend.png', sep = ''))
-  #   save_lineplot(stats, factor, plot_path)
-  # }
+  stat_fun <- function (x, na.rm) {
+    c(avg = mean(x, na.rm = na.rm), std = sd(x, na.rm = na.rm), samples = length(x))
+  }
+
+  target_dir <- file.path(target_root_dir, 'summary')
+  mkdir(target_dir)
+  for (factor in factors) {
+    # stats <- aggregate(obs[,factor], by = list(obs$full_hour), FUN = stat_fun, na.rm = TRUE)
+    # write.csv(stats, file.path(target_dir, paste(factor, '_hourly.csv')))
+    # stats <- aggregate(obs[,factor], by = list(obs$date), FUN = stat_fun, na.rm = TRUE)
+    # write.csv(stats, file.path(target_dir, paste(factor, '_daily.csv')))
+
+    stats <- as.data.frame(
+      aggregate(obs[,factor], by = list(obs$date), FUN = mean, na.rm = TRUE))
+    names(stats) <- c('date', factor)
+    stats[,'date'] <- as.Date(stats$date)
+    plot_path <- file.path(target_dir, paste(factor, '_yearly_trend.png', sep = ''))
+    save_lineplot(stats, factor, plot_path)
+  }
 }
 main()

@@ -123,12 +123,12 @@ main <- function () {
   meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'period_of_day',
                      'is_heating_season', 'wind_speed', 'wind_dir',
                      'precip_total', 'precip_rate', 'solradiation', 'cont_date', 'cont_hour')
-  meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'wind_speed', 'wind_dir')
+  # meteo_factors <- c('temperature', 'pressure', 'humidity', 'is_holiday', 'wind_speed', 'wind_dir')
   # meteo_factors <- c()
   
   target_root_dir <- getwd()
   formatter <- aggr_formatter_factory('AVG')
-  target_root_dir <- file.path(target_root_dir, 'original')
+  target_root_dir <- file.path(target_root_dir, 'filled')
   dir.create(target_root_dir)
   table_name <- 'observations'
   

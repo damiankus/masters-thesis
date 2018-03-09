@@ -1,0 +1,30 @@
+                    Length Class      Mode    
+call                    7  -none-     call    
+response             6735  -none-     numeric 
+covariate           53880  -none-     numeric 
+model.list              2  -none-     list    
+err.fct                 1  -none-     function
+act.fct                 1  -none-     function
+linear.output           1  -none-     logical 
+data                   10  data.frame list    
+net.result              1  -none-     list    
+weights                 1  -none-     list    
+startweights            1  -none-     list    
+generalized.weights     1  -none-     list    
+result.matrix          54  -none-     numeric 
+
+----------------------------------------------
+ Goodness of prediction
+----------------------------------------------
+ MSE: 1051.31120453109
+ RMSE 32.4239295047823
+ MAE: 22.7594591633953
+ MAPE: 123.167695944415
+ MAXPE: 7071.86818210623
+ Standard Error: 0.903515347326052
+ R-squared: 0.26679425546144
+ Index of Agreement: 0.73254039698032
+ Prediction correlation (Pearson): 0.558781795919748
+----------------------------------------------
+
+
