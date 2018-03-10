@@ -37,11 +37,6 @@ mst <- function (results) {
   sst(results) / (length(results$predicted) - 1)
 }
 
-# R squared
-r_squared <- function(results) {
-  1 - sse(results) / sst(results)
-}
-
 # Standard Error of the mean
 se <- function (results) {
   sd(results$residuals) / sqrt(length(results$predicted))
@@ -54,7 +49,11 @@ ia <- function (results) {
 
 # Mean Absolute Error
 mae <- function (results) {
-  sum(abs(results$residuals)) / length(results$predicted)
+  hydroGOF::mae(sim = results$predicted, obs = results$actual, na.rm = TRUE)
+}
+
+nrmse <- function (results) {
+  hydroGOF::nrmse(sim = results$predicted, obs = results$actual, na.rm = TRUE)
 }
 
 # Mean Absolute Percentage Error
@@ -85,23 +84,23 @@ prediction_goodness <- function (results) {
     paste(' MAPE:', mape(results), sep = ' '),
     paste(' MAXPE:', maxpe(results), sep = ' '),
     paste(' Standard Error:', se(results), sep = ' '),
-    paste(' R-squared:', r_squared(results), sep = ' '),
     paste(' Index of Agreement:', ia(results), sep = ' '),
-    paste(' Prediction correlation (Pearson):', toString(
-      cor(results[, c('actual', 'predicted')], use = 'complete.obs', method = c('pearson'))[1, 2],
+    paste(' Coefficient of Determination ^ 2 (Pearson):', toString(
+      (cor(results[, c('actual', 'predicted')],
+          use = 'complete.obs',
+          method = c('pearson'))[1, 2]
+      ) ^ 2
     ), sep = ' '),
     hline, '\n',
   sep = '\n')
 }
 
-save_prediction_goodness <- function (results, model, file_path) {
-  goodness <- prediction_goodness(results)
-  
-  print(summary(model))
-  cat(goodness)
-  
-  s <- summary(model)
+save_prediction_goodness <- function (results, model, file_path, summary_fun = summary) {
+  s <- summary_fun(model)
   capture.output(s, file = file_path)
+  
+  goodness <- prediction_goodness(results)
+  cat(goodness)
   f <- file(file_path, open = 'a')
   write(paste('', goodness, sep = '\n'), f)
   close(f)
