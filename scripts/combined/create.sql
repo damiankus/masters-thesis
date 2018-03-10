@@ -480,9 +480,11 @@ possible that a large portion of measurements is 0-valued
 (there might be no rain for long periods of time).
 */
 
+/*
 UPDATE meteo_observations 
 SET wind_speed = NULL, wind_dir_deg = NULL, wind_dir = NULL
 WHERE wind_speed = 0;
+*/
 
 -- Deleting outliers based on the percentile thresholds
 
@@ -619,6 +621,7 @@ CREATE INDEX ON meteo_observations(wind_dir) WHERE wind_dir IS NOT NULL;
 CREATE INDEX ON meteo_observations(precip_total) WHERE precip_total IS NOT NULL;
 CREATE INDEX ON meteo_observations(precip_rate) WHERE precip_rate IS NOT NULL;
 CLUSTER meteo_observations USING "meteo_observations_timestamp_idx";
+
 
 /*
 Find the distances between stations 
@@ -902,8 +905,8 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
--- SELECT drop_future_vals('pm2_5', ARRAY[12, 24]);
+SELECT add_future_vals('pm2_5', ARRAY[6, 12, 24]);
+-- SELECT drop_future_vals('pm2_5', ARRAY[12, 24, 36, 48]);
 
 UPDATE observations AS upd_obs
 SET pm2_5_plus_12 = (
@@ -970,7 +973,5 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT add_daily_aggr_vals('observations', 
-	ARRAY['temperature', 'pressure', 'humidity'],
+	ARRAY['temperature', 'pressure', 'humidity', 'wind_speed', 'wind_dir'],
 	ARRAY['min', 'max', 'avg']);
-
-select * from observations limit 10;

@@ -10,6 +10,7 @@ scripts/imgw-collector/links.txt
 **/config*.json
 **/*.secret
 **/*.csv*
+**/*prediction_goodness.txt
 **/**/*.jpg
 **/**/*.png
 **/*.Rhistory
