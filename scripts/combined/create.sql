@@ -264,7 +264,7 @@ OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week;
 ALTER TABLE observations ADD COLUMN day_of_week INT;
 UPDATE observations 
-SET day_of_week = EXTRACT(DOW FROM timestamp);
+SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6) + 0.5;
 
 -- ===================================
 
@@ -906,7 +906,7 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT add_future_vals('pm2_5', ARRAY[6, 12, 24]);
--- SELECT drop_future_vals('pm2_5', ARRAY[12, 24, 36, 48]);
+-- SELECT drop_future_vals('pm2_5', ARRAY[3, 6]);
 
 UPDATE observations AS upd_obs
 SET pm2_5_plus_12 = (

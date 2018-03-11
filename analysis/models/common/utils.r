@@ -1,3 +1,10 @@
+import <- function (packages) {
+  Sys.setenv(LANG = 'en')
+  new_packages <- packages[!(packages %in% installed.packages()[,'Package'])]
+  if (length(new_packages) > 0) { install.packages(new_packages) }
+  lapply(packages, library, character.only = TRUE)
+}
+
 cap <- function (s) {
   s <- strsplit(s, ' ')[[1]]
   paste(toupper(substring(s, 1, 1)), substring(s, 2), sep = '', collapse = ' ')

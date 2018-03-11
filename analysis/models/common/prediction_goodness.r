@@ -1,10 +1,5 @@
-library(RPostgreSQL)
-library(ggplot2)
-library(reshape)
-library(caTools)
-library(MASS)
-library(hydroGOF)
-Sys.setenv(LANG = "en")
+source('utils.r')
+import(c('hydroGOF'))
 
 # Measure formulas are based on the article by Selva Prabhakaran
 # Source: http://r-statistics.co/Linear-Regression.html
@@ -95,12 +90,16 @@ prediction_goodness <- function (results) {
   sep = '\n')
 }
 
-save_prediction_goodness <- function (results, model, file_path, summary_fun = summary) {
-  s <- summary_fun(model)
-  capture.output(s, file = file_path)
-  
+save_prediction_goodness <- function (results, model, file_path, summary_funs = c(summary)) {
+  file.remove(file_path)
+  for (summary_fun in summary_funs) {
+    s <- summary_fun(model)
+    capture.output(s, file = file_path, append = TRUE)
+  }
+
   goodness <- prediction_goodness(results)
   cat(goodness)
+    
   f <- file(file_path, open = 'a')
   write(paste('', goodness, sep = '\n'), f)
   close(f)

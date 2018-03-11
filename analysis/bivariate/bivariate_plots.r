@@ -88,16 +88,14 @@ main <- function () {
   # Fetch all observations
   target_dir <- target_root_dir
   table <- 'observations'
-  response_vars <- c('pm2_5', 'pm2_5_plus_12', 'pm2_5_plus_24')
-  # response_vars <- c('pm2_5', 'pm2_5_plus_12', 'pm2_5_plus_24')
+  response_vars <- c('pm2_5_plus_24')
   
-  explanatory_vars <- c('pm2_5', 'temperature', 'pressure', 'humidity', 'precip_total', 'precip_rate', 'wind_speed', 'wind_dir', 'wind_dir_deg', 'cont_date')
-  # explanatory_vars <- c(explanatory_vars, paste('pm2_5_minus', seq(4, 36, 4), sep = '_'))
-  query = paste('SELECT',
-                paste(c(response_vars, explanatory_vars), collapse = ', '),
-                'FROM', table,
-                sep = ' ')
-  obs <- dbGetQuery(con, query)
+  query = paste('SELECT * FROM', table, sep = ' ')
+  obs <- na.omit(dbGetQuery(con, query))
+  
+  explanatory_vars <- colnames(obs)
+  excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
+  explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
   
   for (res_var in response_vars) {
     target_dir <- file.path(target_root_dir, res_var)

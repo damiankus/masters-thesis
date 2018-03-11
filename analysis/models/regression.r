@@ -1,17 +1,12 @@
-Sys.setenv(LANG = "en")
-
-library(RPostgreSQL)
-library(ggplot2)
-library(reshape)
-library(caTools)
-library(glmnet)
-
 wd <- getwd()
 setwd(file.path(wd, 'common'))
 source('utils.r')
 source('prediction_goodness.r')
 source('plotting.r')
 setwd(wd)
+
+packages <- c('RPostgreSQL', 'ggplot2', 'reshape', 'caTools', 'glmnet', 'car')
+import(packages)
 
 # ---------------------------------------------
 # Measures specific to linear regression models
@@ -46,15 +41,21 @@ main <- function () {
   # Fetch all observations
   target_dir <- target_root_dir
   table <- 'observations'
-  response_vars <- c('pm2_5_plus_3', 'pm2_5_plus_6', 'pm2_5_plus_12')
-  explanatory_vars <- c('pm2_5', 'min_daily_temperature', 'max_daily_pressure', 'avg_daily_wind_speed',
-                        'cont_date')
-  query = paste('SELECT timestamp, ',
-                paste(c(response_vars, explanatory_vars), collapse = ', '),
-                'FROM', table,
-                # "WHERE station_id = 'airly_172'",
-                sep = ' ')
+  response_vars <- c('pm2_5_plus_24')
+  # explanatory_vars <- c('pm2_5', 'min_daily_temperature', 'max_daily_pressure', 'avg_daily_wind_speed',
+  #                       'cont_date')
+  # query = paste('SELECT timestamp, ',
+  #               paste(c(response_vars, explanatory_vars), collapse = ', '),
+  #               'FROM', table,
+  #               # "WHERE station_id = 'airly_172'",
+  #               sep = ' ')
+  
+  query <- paste('SELECT * FROM', table, sep = ' ')
   obs <- na.omit(dbGetQuery(con, query))
+  
+  explanatory_vars <- colnames(obs)
+  excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
+  explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
   rhs_formula <- paste(explanatory_vars, collapse = ' + ')
   
   # which_test <- which(format(obs$timestamp, '%m') %in% c('04', '05', '06', '07', '08'))
@@ -80,13 +81,22 @@ main <- function () {
     target_dir <- file.path(target_root_dir, res_var)
     mkdir(target_dir)
     model_desc_path <- file.path(target_dir, paste(res_var, 'prediction_goodness.txt', sep = '_'))
-    save_prediction_goodness(results, fit, model_desc_path)
+    save_prediction_goodness(results, fit, model_desc_path, 
+                             summary_funs = c(
+                               summary,
+                               vif,
+                               function (fit) {
+                                data_vif <- sort(vif(fit))
+                                paste('Chosen explanatory variables: c(\'', 
+                                  paste(names(data_vif[data_vif < 3]), collapse = "', '"),
+                                "')", sep = '')
+                               }))
     
     plot_path <- file.path(target_dir, paste(res_var, '_prediction.png', sep = ''))
     lag <- tail(strsplit(res_var, '_')[[1]], n = 1)
     t_offset <- strtoi(lag, base = 10) * 60 * 60
     results$date = test_set$timestamp + t_offset
-    save_comparison_plot(results, res_var, plot_path)
+    save_comparison_plot(results[,c('date', 'actual', 'predicted')], res_var, plot_path)
     
     plot_path <- file.path(target_dir, paste(res_var, '_prediction_bivariate.png', sep = ''))
     save_scatter_plot(results, res_var, plot_path = plot_path)

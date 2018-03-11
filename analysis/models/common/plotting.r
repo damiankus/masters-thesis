@@ -1,8 +1,5 @@
-library(RPostgreSQL)
-library(ggplot2)
-library(reshape)
 source('utils.r')
-Sys.setenv(LANG = "en")
+import(c('ggplot2', 'reshape'))
 
 # Based on http://r-statistics.co/Linear-Regression.html
 
