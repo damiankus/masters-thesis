@@ -647,7 +647,7 @@ SELECT row_number() OVER() AS id, s1.id AS station_id1, s2.id AS station_id2,
 	(ACOS(
 		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
 		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-		* COS(radians(s1.longitude) - radians(s2.longitude))
+		* COS(radians(s2.longitude) - radians(s1.longitude))
 	) * 6371000) AS dist,
 	s1.latitude AS latitude1, s1.longitude AS longitude1,
 	s2.latitude AS latitude2, s2.longitude AS longitude2
@@ -673,7 +673,7 @@ SELECT row_number() OVER() AS id, s1.id AS station_id1, s2.id AS station_id2,
 	(ACOS(
 		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
 		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-		* COS(radians(s1.longitude) - radians(s2.longitude))
+		* COS(radians(s2.longitude) - radians(s1.longitude))
 	) * 6371000) AS dist,
 	s1.latitude AS latitude1, s1.longitude AS longitude1,
 	s2.latitude AS latitude2, s2.longitude AS longitude2
@@ -905,9 +905,10 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT add_future_vals('pm2_5', ARRAY[6, 12, 24]);
--- SELECT drop_future_vals('pm2_5', ARRAY[3, 6]);
+SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
+-- SELECT drop_future_vals('pm2_5', ARRAY[12]);
 
+/*
 UPDATE observations AS upd_obs
 SET pm2_5_plus_12 = (
 	SELECT obs.pm2_5
@@ -920,6 +921,7 @@ SET pm2_5_plus_12 = (
 	LIMIT 1
 ) WHERE pm2_5_plus_12 IS NULL;
 
+
 UPDATE observations AS upd_obs
 SET pm2_5_plus_24 = (
 	SELECT obs.pm2_5
@@ -931,7 +933,7 @@ SET pm2_5_plus_24 = (
 	AND obs.pm2_5 IS NOT NULL
 	LIMIT 1
 ) WHERE pm2_5_plus_24 IS NULL;
-
+*/
 
 DROP FUNCTION IF EXISTS add_daily_aggr_vals(TEXT, TEXT[], TEXT[]);
 CREATE OR REPLACE FUNCTION add_daily_aggr_vals(tabname TEXT, colnames TEXT[], aggr_types TEXT[])
