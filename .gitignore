@@ -19,3 +19,4 @@ thesis/articles/
 **/observation*
 thesis/*.log
 thesis/*.swp
+db-backup/**

@@ -34,3 +34,12 @@ fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
   save_all_stats(fit, test_set, results, res_var, 'regression', target_dir, sum_funs)
 }
 
+fit_loglin <- function (res_formula, training_set, test_set, target_dir) {
+  conting_tab <- ftable(res_formula, data = training_set) 
+  fit <- loglin(conting_tab)
+  pred_vals <- predict(fit, test_set)
+  res_var <- all.vars(res_formula)[[1]]
+  results <- data.frame(actual = test_set[,res_var], predicted = pred_vals)
+  sum_funs <- c(summary)
+  save_all_stats(fit, test_set, results, res_var, 'regression', target_dir, sum_funs)
+} 

@@ -212,84 +212,6 @@ AND precip_rate IS NULL
 AND solradiation IS NULL;
 
 -- ===================================
--- Creating auxilliary variables
--- ===================================
-
-ALTER TABLE observations DROP COLUMN IF EXISTS is_holiday;
-ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
-
-UPDATE observations 
-SET is_holiday = 1
-WHERE EXTRACT(DOW FROM timestamp) = 0 
-OR EXTRACT(DOW FROM timestamp) = 6	
-OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
-OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
-OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
-OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
-OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
-OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
-OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
-
--- ===================================
-
-ALTER TABLE observations DROP COLUMN IF EXISTS period_of_day;
-ALTER TABLE observations ADD COLUMN period_of_day INT;
-
-UPDATE observations 
-SET period_of_day = 0
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
-UPDATE observations 
-SET period_of_day = 1
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
-UPDATE observations 
-SET period_of_day = 2
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
-UPDATE observations
-SET period_of_day = 3
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
-
--- ===================================
-
-ALTER TABLE observations DROP COLUMN IF EXISTS is_heating_season;
-ALTER TABLE observations ADD COLUMN is_heating_season smallint DEFAULT 0;
-UPDATE observations 
-SET is_heating_season = 1
-WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
-OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
-
--- ===================================
-
-ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week;
-ALTER TABLE observations ADD COLUMN day_of_week INT;
-UPDATE observations 
-SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6) + 0.5;
-
--- ===================================
-
--- Transform the date to a continuous value
-
-ALTER TABLE observations DROP COLUMN IF EXISTS cont_date;
-ALTER TABLE observations ADD COLUMN cont_date FLOAT;
-UPDATE observations 
-SET cont_date = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365) + 0.5;
-
--- Transform the hour of day to a continuous value
-
-ALTER TABLE observations DROP COLUMN IF EXISTS cont_hour;
-ALTER TABLE observations ADD COLUMN cont_hour FLOAT;
-UPDATE observations 
-SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
-
--- ===================================
-
-ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir;
-ALTER TABLE observations ADD COLUMN wind_dir FLOAT;
-UPDATE observations 
-SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
-
--- ===================================
 -- Indexes on observations
 
 DROP INDEX IF EXISTS observations_timestamp_idx;
@@ -480,12 +402,6 @@ possible that a large portion of measurements is 0-valued
 (there might be no rain for long periods of time).
 */
 
-/*
-UPDATE meteo_observations 
-SET wind_speed = NULL, wind_dir_deg = NULL, wind_dir = NULL
-WHERE wind_speed = 0;
-*/
-
 -- Deleting outliers based on the percentile thresholds
 
 DROP FUNCTION IF EXISTS delete_percentile_outliers(text, text, real, real);
@@ -617,11 +533,19 @@ CREATE INDEX ON meteo_observations(pressure) WHERE pressure IS NOT NULL;
 CREATE INDEX ON meteo_observations(humidity) WHERE humidity IS NOT NULL;
 CREATE INDEX ON meteo_observations(wind_speed) WHERE wind_speed IS NOT NULL;
 CREATE INDEX ON meteo_observations(wind_dir_deg) WHERE wind_dir_deg IS NOT NULL;
-CREATE INDEX ON meteo_observations(wind_dir) WHERE wind_dir IS NOT NULL;
 CREATE INDEX ON meteo_observations(precip_total) WHERE precip_total IS NOT NULL;
 CREATE INDEX ON meteo_observations(precip_rate) WHERE precip_rate IS NOT NULL;
+CREATE INDEX ON meteo_observations(solradiation) WHERE solradiation IS NOT NULL;
 CLUSTER meteo_observations USING "meteo_observations_timestamp_idx";
 
+CREATE INDEX ON observations(temperature) WHERE temperature IS NULL;
+CREATE INDEX ON observations(pressure) WHERE pressure IS NULL;
+CREATE INDEX ON observations(humidity) WHERE humidity IS NULL;
+CREATE INDEX ON observations(wind_speed) WHERE wind_speed IS NULL;
+CREATE INDEX ON observations(wind_dir_deg) WHERE wind_dir_deg IS NULL;
+CREATE INDEX ON observations(precip_total) WHERE precip_total IS NULL;
+CREATE INDEX ON observations(precip_rate) WHERE precip_rate IS NULL;
+CREATE INDEX ON observations(solradiation) WHERE solradiation IS NULL;
 
 /*
 Find the distances between stations 
@@ -736,7 +660,8 @@ BEGIN
 		ON nearest.station_id = dist.station_id2
 		AND nearest.timestamp = obs.timestamp
 	) AS nearest
-	WHERE nearest.station_id = obs.station_id
+	WHERE obs.%4$s IS NULL
+	AND nearest.station_id = obs.station_id
 	AND nearest.timestamp = obs.timestamp';
 
 	/* 
@@ -756,7 +681,7 @@ BEGIN
 	END LOOP;
 	*/
 
-        meteo_cols := ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'wind_dir', 'precip_total',
+        meteo_cols := ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_total',
 		'precip_rate', 'solradiation'];
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
@@ -771,6 +696,131 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT fill_missing();
+
+
+-- ===================================
+-- Creating auxilliary variables
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS is_holiday;
+ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
+UPDATE observations 
+SET is_holiday = 1
+WHERE EXTRACT(DOW FROM timestamp) = 0 
+	OR EXTRACT(DOW FROM timestamp) = 6	
+	OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
+	OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
+	OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
+	OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
+	OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
+	OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
+	OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
+	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
+	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS period_of_day;
+ALTER TABLE observations ADD COLUMN period_of_day INT;
+
+UPDATE observations 
+SET period_of_day = 0
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
+UPDATE observations 
+SET period_of_day = 1
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
+UPDATE observations 
+SET period_of_day = 2
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
+UPDATE observations
+SET period_of_day = 3
+WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS season;
+ALTER TABLE observations ADD COLUMN season INT;
+
+UPDATE observations 
+SET season = 0
+WHERE date_trunc('day', timestamp) < '2017-03-21' OR date_trunc('day', timestamp) > '2017-12-21';
+UPDATE observations 
+SET season = 1
+WHERE date_trunc('day', timestamp) BETWEEN '2017-03-21' AND '2017-06-21';
+UPDATE observations 
+SET season = 2
+WHERE date_trunc('day', timestamp) BETWEEN '2017-06-22' AND '2017-09-22';
+UPDATE observations
+SET season = 3
+WHERE date_trunc('day', timestamp) BETWEEN '2017-09-23' AND '2017-12-21';
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS is_heating_season;
+ALTER TABLE observations ADD COLUMN is_heating_season smallint DEFAULT 0;
+UPDATE observations 
+SET is_heating_season = 1
+WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
+OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week_cont;
+ALTER TABLE observations ADD COLUMN day_of_week_cont INT;
+UPDATE observations 
+SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6) + 0.5;
+
+-- ===================================
+
+-- Transform the date to a continuous value
+
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year_cont;
+ALTER TABLE observations ADD COLUMN day_of_year_cont FLOAT;
+UPDATE observations 
+SET cont_date = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365.0) + 0.5;
+
+-- Transform the hour of day to a continuous value
+
+ALTER TABLE observations DROP COLUMN IF EXISTS hour_cont;
+ALTER TABLE observations ADD COLUMN hour_cont FLOAT;
+UPDATE observations 
+SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_rad;
+ALTER TABLE observations ADD COLUMN wind_dir_rad FLOAT;
+UPDATE observations 
+SET wind_dir_rad = wind_dir_deg * PI() / 180;
+
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ew;
+ALTER TABLE observations ADD COLUMN wind_dir_ew FLOAT;
+UPDATE observations 
+SET wind_dir_ew = COS(wind_dir_rad);
+
+
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ns;
+ALTER TABLE observations ADD COLUMN wind_dir_ns FLOAT;
+UPDATE observations 
+SET wind_dir_ns = SIN(wind_dir_rad);
+
+/*
+Values in this column are linearly dependent on the values
+in the wind_dir_rad column which is problematic while finding
+the best subsets for regression.
+*/
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_deg;
+
+-- SELECT * FROM pg_indexes WHERE tablename = 'observations';
+DROP INDEX "observations_temperature_idx";
+DROP INDEX "observations_pressure_idx";
+DROP INDEX "observations_humidity_idx";
+DROP INDEX "observations_wind_speed_idx";
+DROP INDEX "observations_wind_dir_deg_idx";
+DROP INDEX "observations_precip_total_idx";
+DROP INDEX "observations_precip_rate_idx";
+DROP INDEX "observations_solradiation_idx";
+
 
 -- ===================================
 -- Adding time-lagged PM level values
@@ -836,8 +886,8 @@ END;
 $$  LANGUAGE plpgsql;
 
 /*
- SELECT add_time_lagged('pm2_5', 1, 36, 4);
- SELECT drop_time_lagged('pm2_5', 1, 36, 4);
+ SELECT add_time_lagged('pm2_5', 1, 3, 1);
+ SELECT drop_time_lagged('pm2_5', 1, 3, 1);
  */
  
 -- ===================================
@@ -908,35 +958,8 @@ $$  LANGUAGE plpgsql;
 SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
 -- SELECT drop_future_vals('pm2_5', ARRAY[12]);
 
-/*
-UPDATE observations AS upd_obs
-SET pm2_5_plus_12 = (
-	SELECT obs.pm2_5
-	FROM observations AS obs
-	JOIN air_quality_distance AS dist
-	ON dist.station_id1 = upd_obs.station_id
-	AND dist.station_id2 = obs.station_id
-	WHERE obs.timestamp = upd_obs.timestamp + INTERVAL '12 hours'
-	AND obs.pm2_5 IS NOT NULL
-	LIMIT 1
-) WHERE pm2_5_plus_12 IS NULL;
-
-
-UPDATE observations AS upd_obs
-SET pm2_5_plus_24 = (
-	SELECT obs.pm2_5
-	FROM observations AS obs
-	JOIN air_quality_distance AS dist
-	ON dist.station_id1 = upd_obs.station_id
-	AND dist.station_id2 = obs.station_id
-	WHERE obs.timestamp = upd_obs.timestamp + INTERVAL '24 hours'
-	AND obs.pm2_5 IS NOT NULL
-	LIMIT 1
-) WHERE pm2_5_plus_24 IS NULL;
-*/
-
-DROP FUNCTION IF EXISTS add_daily_aggr_vals(TEXT, TEXT[], TEXT[]);
-CREATE OR REPLACE FUNCTION add_daily_aggr_vals(tabname TEXT, colnames TEXT[], aggr_types TEXT[])
+DROP FUNCTION IF EXISTS add_daily_aggr_vals(TEXT, TEXT[]);
+CREATE OR REPLACE FUNCTION add_daily_aggr_vals(tabname TEXT, colnames TEXT[])
 RETURNS VOID AS $$
 DECLARE
 	drop_temp TEXT;
@@ -945,14 +968,29 @@ DECLARE
 	query TEXT;
 	colname TEXT;
 	aggr_type TEXT;
+	aggr_types TEXT[];
 BEGIN
 	drop_temp := 'ALTER TABLE %1$s DROP COLUMN IF EXISTS %3$s_daily_%2$s';
 	create_temp := 'ALTER TABLE %1$s ADD COLUMN %3$s_daily_%2$s NUMERIC(22, 15)';
+	aggr_types := ARRAY['min', 'avg', 'max'];
+
+	FOREACH colname IN ARRAY colnames
+	LOOP	
+		FOREACH aggr_type IN ARRAY aggr_types
+		LOOP	
+			EXECUTE format(drop_temp, tabname, colname, aggr_type);
+			EXECUTE format(create_temp, tabname, colname, aggr_type);
+		END LOOP;
+	END LOOP;
+	
 	update_temp := '
 		UPDATE %1$s AS obs
-		SET %3$s_daily_%2$s = aggr_obs.%2$s
+		SET min_daily_%2$s = aggr_obs.min_daily_%2$s, avg_daily_%2$s = aggr_obs.avg_daily_%2$s, max_daily_%2$s = aggr_obs.max_daily_%2$s
 		FROM (
-			SELECT station_id, date_trunc(''day'', timestamp) AS timestamp, %3$s(%2$s) AS %2$s
+			SELECT station_id, date_trunc(''day'', timestamp) AS timestamp, 
+				MIN(%2$s) AS min_daily_%2$s,
+				AVG(%2$s) AS avg_daily_%2$s,
+				MAX(%2$s) AS max_daily_%2$s
 			FROM %1$s
 			GROUP BY 1, 2
 			ORDER BY 1, 2
@@ -962,18 +1000,13 @@ BEGIN
 		
 	FOREACH colname IN ARRAY colnames
 	LOOP	
-		FOREACH aggr_type IN ARRAY aggr_types
-		LOOP
-			EXECUTE format(drop_temp, tabname, colname, aggr_type);
-			EXECUTE format(create_temp, tabname, colname, aggr_type);
-			query := format(update_temp, tabname, colname, aggr_type);
-			RAISE NOTICE '%', query;
-			EXECUTE query;
-		END LOOP;
+		query := format(update_temp, tabname, colname);
+		RAISE NOTICE '%', query;
+		EXECUTE query;
 	END LOOP;
 END;
 $$  LANGUAGE plpgsql;
 
 SELECT add_daily_aggr_vals('observations', 
-	ARRAY['temperature', 'pressure', 'humidity', 'wind_speed', 'wind_dir'],
-	ARRAY['min', 'max', 'avg']);
+	ARRAY['temperature', 'pressure', 'humidity', 'wind_speed',
+	      'wind_dir_rad', 'wind_dir_ew', 'wind_dir_ns']);

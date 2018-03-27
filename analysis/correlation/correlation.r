@@ -30,7 +30,6 @@ main <- function () {
   
   # Fetch all data
   target_dir <- target_root_dir
-  # query <- get_all(query_args, table = table_name)
   obs <- dbGetQuery(con, paste('SELECT * FROM', table, sep = ' '))
   obs <- na.omit(obs)
   

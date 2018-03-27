@@ -63,13 +63,16 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_best_subset <- function (res_formula, df) {
-  test <- regsubsets(res_formula, data = df, nvmax = 15)
-  plot_path <- file.path(target_root_dir, 'best_subsets.png')
-  png(filename = plot_path, width = 1366, height = 1366, pointsize = 25)
-  summary(test)
-  plot.subsets(test, scale = 'adjr2', cex.subsets = 0.5)
-  dev.off()
+save_best_subset <- function (res_formula, df, method, nvmax) {
+  test <- regsubsets(res_formula, data = df, nvmax = nvmax, nbest = 3, method = method)
+  for (scale in c('adjr2', 'bic')) {
+    plot_path <- file.path(paste(scale, 'best_subsets.png', sep = '_'))
+    png(filename = plot_path, width = 1366, height = 1366, pointsize = 25)
+    plot(test, scale = scale)
+    dev.off()
+    print(paste('Saved plot under: ', plot_path))
+  }
+  test
 }
 
 save_all_stats <- function (fit, test_set, results, res_var, model_name, target_dir, summary_funs) {

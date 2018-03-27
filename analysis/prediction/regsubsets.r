@@ -29,14 +29,10 @@ main <- function () {
   target_root_dir <- getwd()
   table <- 'observations'
   response_vars <- c('pm2_5_plus_24')
-  explanatory_vars <- c('pm2_5','wind_speed','avg_daily_temperature','max_daily_temperature','min_daily_pressure','max_daily_pressure','max_daily_humidity','avg_daily_wind_speed','min_daily_wind_dir_ew','avg_daily_wind_dir_ew','cont_date','cont_hour','season')
-  query = paste('SELECT timestamp, ',
-                paste(c(response_vars, explanatory_vars), collapse = ', '),
-                'FROM', table,
+  query = paste('SELECT * FROM', table,
                 "WHERE station_id = 'airly_171'",
                 sep = ' ')
   
-  # query <- paste('SELECT * FROM', table, sep = ' ')
   obs <- na.omit(dbGetQuery(con, query))
   # transform(obs, c('max_daily_wind_speed', 'precip_total'), log)
   
@@ -45,18 +41,19 @@ main <- function () {
   explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
   rhs_formula <- paste(explanatory_vars, collapse = ' + ')
   
-  # Random sets split
-  set.seed(101)
-  sample <- sample.split(obs, SplitRatio = 0.75)
-  training_set <- subset(obs, sample == TRUE)
-  test_set <- subset(obs, sample == FALSE)
-  
   for (res_var in response_vars) {
     target_dir <- file.path(target_root_dir, res_var)
     mkdir(target_dir)
     res_formula <- as.formula(
       paste(res_var, '~', rhs_formula, sep = ' '))
-    fit_mlr(res_formula, training_set, test_set, target_dir)
+    print(length(explanatory_vars))
+    summ <- summary(save_best_subset(res_formula, obs, 'exhaustive', 13))
+    idx <- which.max(summ$adjr2)
+    best_vars <- colnames(summ$which)[summ$which[idx,]]
+    
+    # Skip the intercept
+    best_vars <- best_vars[-1]
+    print(paste("Best found var subset: c('", paste(best_vars, collapse = "','"), "')", sep = ''))
   }
 }
 main()
