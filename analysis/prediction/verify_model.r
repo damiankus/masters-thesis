@@ -29,14 +29,15 @@ main <- function () {
   target_root_dir <- getwd()
   table <- 'observations'
   response_vars <- c('pm2_5_plus_24')
-  explanatory_vars <- c('pm2_5','wind_speed','avg_daily_temperature','max_daily_temperature','min_daily_pressure','max_daily_pressure','max_daily_humidity','avg_daily_wind_speed','min_daily_wind_dir_ew','avg_daily_wind_dir_ew','cont_date','cont_hour','season')
-  query = paste('SELECT timestamp, ',
-                paste(c(response_vars, explanatory_vars), collapse = ', '),
-                'FROM', table,
-                "WHERE station_id = 'airly_171'",
-                sep = ' ')
+  explanatory_vars <- c('is_holiday', 'day_of_week', 'pm1', 'pm2_5', 'pm2_5_minus_1', 'pm2_5_minus_2', 'pm2_5_minus_3', 'wind_speed','avg_daily_temperature','max_daily_temperature','min_daily_pressure','max_daily_pressure','max_daily_humidity','avg_daily_wind_speed','min_daily_wind_dir_ew','avg_daily_wind_dir_ew','cont_date','cont_hour','season')
+  # 'pm1', 'pm2_5_minus_1', 'pm2_5_minus_2', 'pm2_5_minus_3'
   
-  # query <- paste('SELECT * FROM', table, sep = ' ')
+  query = paste('SELECT timestamp, ',
+            paste(c(response_vars, explanatory_vars), collapse = ', '),
+            'FROM', table,
+            "WHERE station_id = 'airly_172'",
+            sep = ' ')
+  
   obs <- na.omit(dbGetQuery(con, query))
   # transform(obs, c('max_daily_wind_speed', 'precip_total'), log)
   

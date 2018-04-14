@@ -30,13 +30,13 @@ main <- function () {
   table <- 'observations'
   response_vars <- c('pm2_5_plus_24')
   query = paste('SELECT * FROM', table,
-                "WHERE station_id = 'airly_171'",
+                "WHERE station_id = 'airly_172'",
                 sep = ' ')
   
   obs <- na.omit(dbGetQuery(con, query))
-  # transform(obs, c('max_daily_wind_speed', 'precip_total'), log)
+  xtabs(obs)
   
-  explanatory_vars <- colnames(obs)
+  # explanatory_vars <- colnames(obs)
   excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
   explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
   rhs_formula <- paste(explanatory_vars, collapse = ' + ')
@@ -53,6 +53,7 @@ main <- function () {
     
     # Skip the intercept
     best_vars <- best_vars[-1]
+    print(paste('Best adj R2: ', max(summ$adjr2)))
     print(paste("Best found var subset: c('", paste(best_vars, collapse = "','"), "')", sep = ''))
   }
 }

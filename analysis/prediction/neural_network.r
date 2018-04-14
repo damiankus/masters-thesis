@@ -23,7 +23,7 @@ main <- function () {
   # Fetch all observations
   table <- 'observations'
   response_vars <- c('pm2_5_plus_24')
-  explanatory_vars <- c('pm2_5', 'temperature', 'min_daily_pressure', 'avg_daily_wind_speed', 'humidity')
+  explanatory_vars <-  c('is_holiday', 'day_of_week', 'pm1', 'pm2_5', 'pm2_5_minus_1', 'pm2_5_minus_2', 'pm2_5_minus_3', 'wind_speed','avg_daily_temperature','max_daily_temperature','min_daily_pressure','max_daily_pressure','max_daily_humidity','avg_daily_wind_speed','min_daily_wind_dir_ew','avg_daily_wind_dir_ew','cont_date','cont_hour','season')
   query = paste('SELECT timestamp, ',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
                 'FROM', table,
@@ -65,18 +65,23 @@ main <- function () {
     print('Training')
     nn <- neuralnet(res_formula,
       data = training_set,
-      hidden = c(13),
-      stepmax = 1e+06,
-      threshold = 0.05,
+      hidden = c(8),
+      stepmax = 1e+04,
+      threshold = 0.1,
       linear.output = TRUE)
-
+    
+    plot_path <- file.path(target_dir, 'nn_architecture.png')
+    png(filename = plot_path, width = 1366, height = 768, pointsize = 25)
     plot(nn)
+    dev.off()
+
     # compute() returns a matrix. In order to make it work with 
     # the mae() function work with it
     pred_vals <- compute(nn, test_set[, explanatory_vars])$net.result
     pred_vals <- c(pred_vals)
+    
     results$predicted <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
-    save_all_stats(nn, results, res_var, 'nn', target_dir, c(summary))
+    save_all_stats(nn, test_set, results, res_var, 'nn', target_dir, c(summary))
   }
 }
 main()

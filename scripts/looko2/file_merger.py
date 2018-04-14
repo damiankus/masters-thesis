@@ -30,6 +30,8 @@ class FileMerger:
                         else:
                             is_first = False
                         for line in input_file:
+                            if (ord(line[-1]) != 10):
+                                print(ord(line[-1]))
                             output_file.write(line)
         logger.info('Merged file saved under {}'.format(self.target_path))
 
@@ -40,8 +42,9 @@ if __name__ == '__main__':
         containing files', required=True)
     parser.add_argument('--out', '-o', help='Path to the target file',
                         required=True)
-    parser.add_argument('--header', action='store_true',
+    parser.add_argument('--skip_headers', action='store_true',
                         help='Do the merged files have headers to skip?')
     args = vars(parser.parse_args())
-    merger = FileMerger(args['dir'], args['out'], args['header'])
+    print(args)
+    merger = FileMerger(args['dir'], args['out'], args['skip_headers'])
     merger.merge()

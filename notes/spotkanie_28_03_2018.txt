@@ -1,0 +1,9 @@
+jeśli będzie problem z wydajnością, można założyć konto w Cyfronecie (w razie czego zapytać Klaudii Bałazy)
+
+można spróbować uśrednić wyjście modeli, które znajdują się blisko (znajdowanie sąsiadów)
+u Labuza na wiki swieta ruchome
+
+trenować modele osobno dla sezonu grzewczego i reszty roku (połowa maja - połowa września)
+przygotować historgram liczby danych w stacjach, na jego podstawie można usunąć stacje z niedostateczną liczbą rekordów,
+nadrobić pisanie tekstu pracy - przegląd systemów w literaturze, uwzględnić model IMGW,
+analiza danych, jakieś pierwsze wyniki

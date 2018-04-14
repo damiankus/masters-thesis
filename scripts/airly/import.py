@@ -28,12 +28,14 @@ class AirlyImporter:
             VALUES(%s, %s, %s)'
         self.save_from_csv(in_path, statement, lambda c, h: [c])
 
-    def preprocess_observations(self, cols, header, rec_len=6):
+    def preprocess_observations(self, cols, header):
+        # Number of columns other than utc_time and station_id
+        rec_len = 6
         utc_time = cols[0]
         print('Importing data for {}'.format(utc_time))
         observations = []
         append = observations.append
-        for i in range(1, len(cols) // rec_len, rec_len):
+        for i in range(1, len(cols), rec_len):
             station_header = header[i:(i + rec_len)]
             station_id = station_header[0].split('_')[0]
             observation = [utc_time, station_id] + cols[i:(i + rec_len)]
@@ -59,7 +61,7 @@ if __name__ == '__main__':
         connection = psycopg2.connect(**conn_params)
         importer = AirlyImporter(connection)
         importer.import_stations('sensor_locations.csv')
-        importer.import_observations('airly_observations.csv')
+        importer.import_observations('airly-merged.csv')
     finally:
         if connection:
             connection.close()

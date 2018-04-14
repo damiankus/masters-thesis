@@ -1,30 +1,615 @@
-[1] Agirre-Basurko E., Ibarra-Berastegi G., Madariaga I.: Regression and multilayer perceptron-based models to forecast hourly O3 and NO2 levels in the Bilbao area. In: Environmental Modelling & Software, vol. 21(4), pp. 430 – 446, 2006. ISSN 1364- 8152. URL http://dx.doi.org/10.1016/j.envsoft.2004.07.008
-[2] Biancofiore F., Busilacchio M., Verdecchia M., Tomassetti B., Aruffo E., Bianco S., Tommaso S.D., Colangeli C., Rosatelli G., Carlo P.D.: Recursive neural network model for analysis and forecast of PM10 and PM2.5. In: Atmospheric Pollution Research, vol. 8(4), pp. 652 – 659, 2017. ISSN 1309-1042. URL http://dx.doi.org/https: //doi.org/10.1016/j.apr.2016.12.014
-[3] Bishop C.M.: Neural Networks for Pattern Recognition. Oxford University Press, Inc., New York, NY, USA, 1995. ISBN 0198538642.
-[4] Chellali M.R., Abderrahim H., Hamou A., Nebatti A., Janovec J.: Artificial neural network models for prediction of daily fine particulate matter concentrations in Algiers. In: Environmental Science and Pollution Research, vol. 23(14), pp. 14008–14017, 2016. ISSN 1614-7499. URL http://dx.doi.org/10.1007/s11356-016-6565-9
-[5] Cobourn W.G.: An enhanced PM2.5 air quality forecast model based on nonlinear regression and back-trajectory concentrations. In: Atmospheric Environment, vol. 44(25), pp. 3015 – 3023, 2010. ISSN 1352-2310. URL http://dx.doi. org/10.1016/j.atmosenv.2010.05.009. 31
-[6] Corani G.: Air quality prediction in Milan: feed-forward neural networks, pruned neural networks and lazy learning. In: Ecological Modelling, vol. 185(2), pp. 513 – 529, 2005. ISSN 0304-3800. URL http://dx.doi.org/10.1016/j. ecolmodel.2005.01.008
-[7] Dotse S.Q., Petra M.I., Dagar L., Silva L.C.D.: Application of computational intelligence techniques to forecast daily PM10 exceedances in Brunei Darussalam. In: Atmospheric Pollution Research, vol. 9(2), pp. 358 – 368, 2018. ISSN 1309-1042. URL http://dx.doi.org/10.1016/j.apr.2017.11.004
-[8] Firmino P.R.A., de Mattos Neto P.S., Ferreira T.A.: Correcting and combining time series forecasters. In: Neural Networks, vol. 50, pp. 1 – 11, 2014. ISSN 0893-6080. URL http://dx.doi.org/10.1016/j.neunet.2013.10.008
-[9] Gardner M., Dorling S.: Artificial neural networks (the multilayer perceptron)a review of applications in the atmospheric sciences. In: Atmospheric Environment, vol. 32(14), pp. 2627 – 2636, 1998. ISSN 1352-2310. URL http://dx.doi. org/10.1016/S1352-2310(97)00447-0
-[10] Han J.: Data Mining: Concepts and Techniques. Morgan Kaufmann Publishers Inc., San Francisco, CA, USA, 2005. ISBN 1558609016.
-[11] Ho T.K.: Random Decision Forests. In: Proceedings of the Third International Conference on Document Analysis and Recognition (Volume 1) - Volume 1, ICDAR ’95, pp. 278–. IEEE Computer Society, Washington, DC, USA, 1995. ISBN 0-8186-7128-9. URL http://dl.acm.org/citation.cfm?id=844379.844681
-[12] Hrust L., Klai Z.B., Krian J., Antoni O., Hercog P.: Neural network forecasting of air pollutants hourly concentrations using optimised temporal averages of meteorological variables and pollutant concentrations. In: Atmospheric Environment, vol. 43(35), pp. 5588 – 5596, 2009. ISSN 1352-2310. URL http://dx.doi.org/ 10.1016/j.atmosenv.2009.07.048. 32
-[13] Siwek K., Osowski S.: Data mining methods for prediction of air pollution. In: International Journal of Applied Mathematics and Computer Science, vol. 26, pp. 467 – 478, 2016. URL http://dx.doi.org/10.1515/amcs-2016-0033
-[14] Kukkonen J., Partanen L., Karppinen A., Ruuskanen J., Junninen H., Kolehmainen M., Niska H., Dorling S., Chatterton T., Foxall R., Cawley G.: Extensive evaluation of neural network models for the prediction of NO2 and PM10 concentrations, compared with a deterministic modelling system and measurements in central Helsinki. In: Atmospheric Environment, vol. 37(32), pp. 4539 – 4550, 2003. ISSN 1352-2310. URL http://dx.doi.org/10.1016/S1352-2310(03)00583-1
-[15] Luo H., Wang D., Yue C., Liu Y., Guo H.: Research and application of a novel hybrid decomposition-ensemble learning paradigm with error correction for daily PM10 forecasting. In: Atmospheric Research, vol. 201, pp. 34 – 45, 2018. ISSN 0169-8095. URL http://dx.doi.org/10.1016/j.atmosres.2017.10.009
-[16] de Mattos Neto P.S., Cavalcanti G.D., Madeiro F.: Nonlinear combination method of forecasters applied to PM time series. In: Pattern Recognition Letters, vol. 95, pp. 65 – 72, 2017. ISSN 0167-8655. URL http://dx.doi.org/10. 1016/j.patrec.2017.06.008
-[17] Moustris K.P., Nastos P.T., Larissi I.K., Paliatsos A.G.: Application of Multiple Linear Regression Models and Artificial Neural Networks on the Surface Ozone Forecast in the Greater Athens Area, Greece. In: Advances in Meteorology, vol. 2012, p. 8, 2012. URL http://dx.doi.org/10.1155/2012/894714
-[18] Paschalidou A.K., Kassomenos P.A., Bartzokas A.: A comparative study on various statistical techniques predicting ozone concentrations: implications to environmental management. In: Environmental Monitoring and Assessment, vol. 148(1), pp. 277–289, 2009. ISSN 1573-2959. URL http://dx.doi.org/10.1007/s10661-008-0158-0
-[19] Pawul M., liwka M.: APPLICATION OF ARTIFICIAL NEURAL NETWORKS FOR PREDICTION OF AIR POLLUTION LEVELS IN ENVIRONMENTAL MONITOR33 ING. In: Journal of Ecological Engineering, vol. 17(4), pp. 190–196, 2016. URL http://dx.doi.org/10.12911/22998993/64828
-[20] Perez P., Gramsch E.: Forecasting hourly PM2.5 in Santiago de Chile with emphasis on night episodes. In: Atmospheric Environment, vol. 124, pp. 22 – 27, 2016. ISSN 1352-2310. URL http://dx.doi.org/10.1016/j.atmosenv.2015.11.016
-[21] Perez P., Reyes J.: Prediction of maximum of 24-h average of PM10 concentrations 30h in advance in Santiago, Chile. In: Atmospheric Environment, vol. 36(28), pp. 4555 – 4561, 2002. ISSN 1352-2310. URL http://dx.doi.org/10. 1016/S1352-2310(02)00419-3
-[22] Quinlan J.R.: Induction of Decision Trees. In: Mach. Learn., vol. 1(1), pp. 81–106, 1986. ISSN 0885-6125. URL http://dx.doi.org/10.1023/A:1022643204877
-[23] Quinlan J.R.: C4.5: Programs for Machine Learning. Morgan Kaufmann Publishers Inc., San Francisco, CA, USA, 1993. ISBN 1-55860-238-0.
-[24] Sayegh A.S., Munir S., Habeebullah T.M.: Comparing the Performance of Statistical Models for Predicting PM10 Concentrations. In: Aerosol and Air Quality Research, vol. 14(3), pp. 653–665, 2014. URL http://dx.doi.org/10.4209/aaqr.2013.07. 0259
-[25] Singh K.P., Gupta S., Kumar A., Shukla S.P.: Linear and nonlinear modeling approaches for urban air quality prediction. In: Science of The Total Environment, vol. 426, pp. 244 – 255, 2012. ISSN 0048-9697. URL http://dx.doi.org/10. 1016/j.scitotenv.2012.03.076
-[26] Sun W., Sun J.: Daily PM2.5 concentration prediction based on principal component analysis and LSSVM optimized by cuckoo search algorithm. In: Journal of Environmental Management, vol. 188, pp. 144 – 152, 2017. ISSN 0301-4797. URL http://dx.doi.org/10.1016/j.jenvman.2016.12.011
-[27] Vlachogianni A., Kassomenos P., Karppinen A., Karakitsios S., Kukkonen J.: Evaluation of a multiple regression model for the forecasting of the concentrations of NOx and PM10 in Athens and Helsinki. In: Science of The Total Environment, vol. 409(8), pp. 1559 – 1571, 2011. ISSN 0048-9697. URL http://dx.doi.org/https: //doi.org/10.1016/j.scitotenv.2010.12.040. 34
-[28] Westerlund J., Urbain J.P., Bonilla J.: Application of air quality combination forecasting to Bogota. In: Atmospheric Environment, vol. 89, pp. 22 – 28, 2014. ISSN 1352- 2310. URL http://dx.doi.org/10.1016/j.atmosenv.2014. 02.015
-[29] Wongsathan R., Chankham S.: Improvement on PM-10 Forecast by Using Hybrid ARIMAX and Neural Networks Model for the Summer Season in Chiang Mai. In: Procedia Computer Science, vol. 86, pp. 277 – 280, 2016. ISSN 1877-0509. URL http://dx.doi.org/10.1016/j.procs.2016.05.062. 2016 International Electrical Engineering Congress, iEECON2016, 2-4 March 2016, Chiang Mai, Thailand
-[30] Zheng Y., Yi X., Li M., Li R., Shan Z., Chang E., Li T.: Forecasting Fine-Grained Air Quality Based on Big Data. In: Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD’15, pp.2267–2276. ACM, New York, NY, USA, 2015. ISBN 978-1-4503-3664-2. URL http://dx.doi.org/10.1145/2783258.2788573
+TYPE{
+==========================================================
+Motivation references
+==========================================================
+}
+@misc{WHO2016AMBIENT,
+  title={Ambient air pollution: A global assessment of exposure and burden of disease},
+  author={{WHO}},
+  year={2016},
+  publisher={World Health Organization},
+  url={http://www.who.int/phe/health_topics/outdoorair/databases/cities/en}
+}
+
+@Article{WHO2008AQGUIDELINES,
+    author="Krzyzanowski, Michal
+    and Cohen, Aaron",
+    title="Update of WHO air quality guidelines",
+    journal="Air Quality, Atmosphere {\&} Health",
+    year="2008",
+    month="Jun",
+    day="01",
+    volume="1",
+    number="1",
+    pages="7--13",
+    issn="1873-9326",
+    doi="10.1007/s11869-008-0008-9",
+    url="https://doi.org/10.1007/s11869-008-0008-9"
+}
+
+@misc{WIOSALERTS,
+  title = {PM10 norm exceedance alerts},
+  author = {{WIOŚ}},
+  howpublished = {\url{http://monitoring.krakow.pios.gov.pl/komunikaty}},
+  year={2018},
+  note = {Accessed: 2018-04-03}
+}
+
+@misc{WIOSNORMS,
+  title={Air quality standards},
+  author={{WIOŚ}},
+  howpublished = {\url{http://monitoring.krakow.pios.gov.pl/standardy-jakosci-powietrza}},
+  year={2018},
+  note = {Accessed: 2018-04-03}
+}
+
+@misc{COALBURNERS,
+  title={Number of coal burners in Krakow},
+  author={{Krakow City Council Press Office}},
+  year={2017},
+  howpublished = {\url{http://krakow.pl/aktualnosci/214020,29,komunikat,coraz_mniej_palenisk_weglowych_w_krakowie.html}},
+  note = {Accessed: 2018-04-03}
+}
+
+@misc{WHO2013PMHEALTH,
+    author={{WHO}},
+    title="Health effects of particulate matter. Policy implications for countries in eastern Europe, Caucasus and central Asia",
+    year="2013",
+    url="http://www.euro.who.int/__data/assets/pdf_file/0006/189051/Health-effects-of-particulate-matter-final-Eng.pdf"
+}
+
+TYPE{
+==========================================================
+TEXTBOOKS
+==========================================================
+}
+
+@book{BISHOP1995,
+ author = {Bishop, Christopher M.},
+ title = {Neural Networks for Pattern Recognition},
+ year = {1995},
+ isbn = {0198538642},
+ pages = "116 - 163",
+ publisher = {Oxford University Press, Inc.},
+ address = {New York, NY, USA},
+} 
+
+@book{HAN2005,
+ author = {Han, Jiawei},
+ title = {Data Mining: Concepts and Techniques},
+ year = {2005},
+ isbn = {1558609016},
+ pages = "279 - 328",
+ publisher = {Morgan Kaufmann Publishers Inc.},
+ address = {San Francisco, CA, USA},
+} 
+
+@inproceedings{HO1995,
+ author = {Ho, Tin Kam},
+ title = {Random Decision Forests},
+ booktitle = {Proceedings of the Third International Conference on Document Analysis and Recognition (Volume 1) - Volume 1},
+ series = {ICDAR '95},
+ year = {1995},
+ isbn = {0-8186-7128-9},
+ pages = {278--},
+ url = {http://dl.acm.org/citation.cfm?id=844379.844681},
+ acmid = {844681},
+ publisher = {IEEE Computer Society},
+ address = {Washington, DC, USA},
+ keywords = {complexity, decision theory, decision trees, generalization accuracy, handwriting recognition, handwritten digits, optical character recognition, random decision forests, stochastic modeling, suboptimal accuracy, tree-based classifiers},
+} 
+
+@article{QUINLAN1986,
+ author = {Quinlan, J. R.},
+ title = {Induction of Decision Trees},
+ journal = {Mach. Learn.},
+ volume = {1},
+ number = {1},
+ month = mar,
+ year = {1986},
+ issn = {0885-6125},
+ pages = {81--106},
+ numpages = {26},
+ url = {http://dx.doi.org/10.1023/A:1022643204877},
+ doi = {10.1023/A:1022643204877},
+ acmid = {637969},
+ publisher = {Kluwer Academic Publishers},
+ address = {Hingham, MA, USA},
+ keywords = {classification, decision trees, expert systems, induction, information theory, knowledge acquisition},
+}
+
+@book{QUINLAN1993,
+ author = {Quinlan, J. Ross},
+ title = {C4.5: Programs for Machine Learning},
+ year = {1993},
+ isbn = {1-55860-238-0},
+ publisher = {Morgan Kaufmann Publishers Inc.},
+ address = {San Francisco, CA, USA},
+} 
+
+TYPE{
+==========================================================
+DETERMINISTIC MODELS
+==========================================================
+}
+
+
+Hajto M. J., Godłowska J., Kaszowski W., Tomaszewska A.M.; 2012, System prognozowania rozprzestrzeniania zanieczyszczeń powietrza FAPPS – założenia, możliwości, rozwój. [W:] Ochrona powietrza w teorii i praktyce. T. 2 (red. Konieczyński J.), Instytut Podstaw Inżynierii Środowiska PAN, Zabrze, s. 89-96. 
+
+@article{HAJTO2012FAPPS,
+title = "System prognozowania rozprzestrzeniania zanieczyszczeń powietrza FAPPS – założenia, możliwości, rozwój",
+journal = "Ochrona powietrza w teorii i praktyce",
+volume = "2",
+pages = "89 - 96",
+year = {2012},
+url = "http://smog.imgw.pl/content/desc#bibliografia",
+author = "Monika J. Hajto and Jolanta Godłowska and Wiesław Kaszowski and A. Monika Tomaszewska "
+}
+
+TYPE{
+==========================================================
+STATISTICAL MODELS OVERVIEW
+==========================================================
+}
+
+@article{ZHANG2012632,
+title = "Real-time air quality forecasting, part I: History, techniques, and current status",
+journal = "Atmospheric Environment",
+volume = "60",
+pages = "632 - 655",
+year = "2012",
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/j.atmosenv.2012.06.031",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231012005900",
+author = "Yang Zhang and Marc Bocquet and Vivien Mallet and Christian Seigneur and Alexander Baklanov",
+keywords = "Air quality forecasting, Historic milestone, Techniques and tools, Evaluation methods"
+}
+
+@incollection{Whalley2016,
+author = {Whalley, Jacqueline
+and Zandi, Sara},
+title = {Particulate Matter Sampling Techniques and Data Modelling Methods},
+booktitle = {Air Quality - Measurement and Modeling},
+publisher = {InTech},
+address = {Rijeka},
+year = {2016},
+editor = {Sallis, Philip},
+chapter = 02,
+doi = {10.5772/65054},
+url = {http://dx.doi.org/10.5772/65054}
+}
+
+@article{HOFFMAN2008,
+title = {Linear Regression Analysis: Assumptions and Applications},
+author = {Hoffmann, John},
+year = {2008},
+pages = {54 - 56},
+journal = {},
+url = {https://www.researchgate.net/publication/228896673_Linear_Regression_Analysis_Assumptions_and_Applications}
+}
+
+TYPE{
+==========================================================
+REGRESSION MODELS (+ OTHERS)
+==========================================================
+}
+
+@article{Sotoudeheian2014,
+title="Estimating ground-level PM<sub>10</sub> using satellite remote sensing and ground-based meteorological measurements over Tehran",
+author={Saeed Sotoudeheian and Mohammad Arhami},
+journal={Journal of Environmental Health Science and Engineering},
+publisher={BioMed Central},
+issn={2052-336X},
+year={2014},
+pages={122},
+volume={12},
+doi={10.1186/s40201-014-0122-6}
+}
+
+@article{AGIRREBASURKO2006430,
+title = "Regression and multilayer perceptron-based models to forecast hourly O3 and NO2 levels in the Bilbao area",
+journal = "Environmental Modelling \& Software",
+volume = "21",
+number = "4",
+pages = "430 - 446",
+year = {2006},
+note = "Urban Air Quality Modelling",
+issn = "1364-8152",
+doi = "10.1016/j.envsoft.2004.07.008",
+url = "http://www.sciencedirect.com/science/article/pii/S1364815204003056",
+author = "E. Agirre-Basurko and G. Ibarra-Berastegi and I. Madariaga",
+}
+
+@Article{Paschalidou2009,
+author="Paschalidou, A. K.
+and Kassomenos, P. A.
+and Bartzokas, A.",
+title="A comparative study on various statistical techniques predicting ozone concentrations: implications to environmental management",
+journal="Environmental Monitoring and Assessment",
+year = {2009},
+month="Jan",
+day="01",
+volume="148",
+number="1",
+pages="277--289",
+issn="1573-2959",
+doi="10.1007/s10661-008-0158-0",
+url="https://doi.org/10.1007/s10661-008-0158-0"
+}
+
+@article{VLACHOGIANNI20111559,
+title = "Evaluation of a multiple regression model for the forecasting of the concentrations of NOx and PM10 in Athens and Helsinki",
+journal = "Science of The Total Environment",
+volume = "409",
+number = "8",
+pages = "1559 - 1571",
+year = {2011},
+issn = "0048-9697",
+doi = "10.1016/j.scitotenv.2010.12.040",
+url = "http://www.sciencedirect.com/science/article/pii/S0048969711000064",
+author = "A. Vlachogianni and P. Kassomenos and Ari Karppinen and S. Karakitsios and Jaakko Kukkonen",
+keywords = "PM, NO, Multiple regression analysis, Air quality forecasting, Model evaluation"
+}
+
+@article{Moustris2012,
+title = "Application of Multiple Linear Regression Models and Artificial Neural Networks on the Surface Ozone Forecast in the Greater Athens Area, Greece",
+journal = "Advances in Meteorology",
+volume = "2012",
+author = "Moustris, K. P. and Nastos, P. T. and Larissi, I. K. and Paliatsos, A. G.",
+year = {2012},
+url = "http://dx.doi.org/10.1155/2012/894714",
+pages = "8"
+}
+
+@article{SINGH2012244,
+title = "Linear and nonlinear modeling approaches for urban air quality prediction",
+journal = "Science of The Total Environment",
+volume = "426",
+pages = "244 - 255",
+year = {2012},
+issn = "0048-9697",
+doi = "https://doi.org/10.1016/j.scitotenv.2012.03.076",
+url = "http://www.sciencedirect.com/science/article/pii/S0048969712004809",
+author = "Kunwar P. Singh and Shikha Gupta and Atulesh Kumar and Sheo Prasad Shukla",
+keywords = "Air quality, Partial least squares, Multivariate polynomial regression, Multilayer perceptron network, Radial basis function network, Generalized regression neural network"
+}
+
+@article{COBOURN20103015,
+title = "An enhanced PM2.5 air quality forecast model based on nonlinear regression and back-trajectory concentrations",
+journal = "Atmospheric Environment",
+volume = "44",
+number = "25",
+pages = "3015 - 3023",
+year = {2010},
+issn = "1352-2310",
+doi = "10.1016/j.atmosenv.2010.05.009",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231010003821",
+author = "W. Geoffrey Cobourn",
+keywords = "Air pollution, Air quality forecast, Particulate matter, PM, Nonlinear regression, Trajectory analysis, Empirical air quality model"
+}
+
+@article{WESTERLUND201422,
+title = "Application of air quality combination forecasting to Bogota",
+journal = "Atmospheric Environment",
+volume = "89",
+pages = "22 - 28",
+year = {2014},
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/j.atmosenv.2014.02.015",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231014001113",
+author = "Joakim Westerlund and Jean-Pierre Urbain and Jorge Bonilla",
+keywords = "Air quality forecasting, Bogota, Forecast combination, Neural networks"
+}
+
+@Article{,
+  author = {Arwa S.  Sayegh and Said  Munir and Turki M.  Habeebullah},
+  title = {Comparing the Performance of Statistical Models for Predicting PM10 Concentrations},
+  journal = {Aerosol and Air Quality Research},
+  volume = {14},
+  number = {3},
+  pages = {653-665},
+  year = {2014},
+  doi = {10.4209/aaqr.2013.07.0259},
+  url = {https://doi.org/10.4209/aaqr.2013.07.0259},
+}
+
+@article{GARCIANIETO201450,
+title = "Nonlinear air quality modeling using multivariate adaptive regression splines in Gijón urban area (Northern Spain) at local scale",
+journal = "Applied Mathematics and Computation",
+volume = "235",
+pages = "50 - 65",
+year = "2014",
+issn = "0096-3003",
+doi = "https://doi.org/10.1016/j.amc.2014.02.096",
+url = "http://www.sciencedirect.com/science/article/pii/S0096300314003440",
+author = "P.J. García Nieto and J.C. Álvarez Antón",
+keywords = "Air quality modeling, Pollutant substances, Statistical learning, Multivariate adaptive regression splines (MARS)"
+}
+
+TYPE{
+==========================================================
+NEURAL NETWORKS
+==========================================================
+}
+
+@article{GARDNER19982627,
+title = "Artificial neural networks (the multilayer perceptron)—a review of applications in the atmospheric sciences",
+journal = "Atmospheric Environment",
+volume = "32",
+number = "14",
+pages = "2627 - 2636",
+year = {1998},
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/S1352-2310(97)00447-0",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231097004470",
+author = "M.W Gardner and S.R Dorling",
+keywords = "Statistical modelling, neural network, backpropagation, artificial intelligence"
+}
+
+@article{PEREZ20024555,
+title = "Prediction of maximum of 24-h average of PM10 concentrations 30h in advance in Santiago, Chile",
+journal = "Atmospheric Environment",
+volume = "36",
+number = "28",
+pages = "4555 - 4561",
+year = {2002},
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/S1352-2310(02)00419-3",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231002004193",
+author = "Patricio Perez and Jorge Reyes",
+keywords = "Air pollution prediction, Particulate matter, PM10, Neural networks, Meteorology forecast"
+}
+
+@article{KUKKONEN2003,
+title = "Extensive evaluation of neural network models for the prediction of NO2 and PM10 concentrations, compared with a deterministic modelling system and measurements in central Helsinki",
+journal = "Atmospheric Environment",
+volume = "37",
+number = "32",
+pages = "4539 - 4550",
+year = {2003},
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/S1352-2310(03)00583-1",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231003005831",
+author = "Jaakko Kukkonen and Leena Partanen and Ari Karppinen and Juhani Ruuskanen and Heikki Junninen and Mikko Kolehmainen and Harri Niska and Stephen Dorling and Tim Chatterton and Rob Foxall and Gavin Cawley",
+keywords = "Neural network",
+keywords = "Urban air",
+keywords = "NO",
+keywords = "PM",
+keywords = "Model evaluation"
+}
+
+@article{CORANI2005,
+title = "Air quality prediction in Milan: feed-forward neural networks, pruned neural networks and lazy learning",
+journal = "Ecological Modelling",
+volume = "185",
+number = "2",
+pages = "513 - 529",
+year = {2005},
+issn = "0304-3800",
+doi = "https://doi.org/10.1016/j.ecolmodel.2005.01.008",
+url = "http://www.sciencedirect.com/science/article/pii/S0304380005000165",
+author = "Giorgio Corani",
+keywords = "Feed forward neural networks",
+keywords = "Pruned neural networks",
+keywords = "Lazy learning",
+keywords = "Time series prediction",
+keywords = "Atmospheric pollution",
+}
+
+@article{HRUST20095588,
+title = "Neural network forecasting of air pollutants hourly concentrations using optimised temporal averages of meteorological variables and pollutant concentrations",
+journal = "Atmospheric Environment",
+volume = "43",
+number = "35",
+pages = "5588 - 5596",
+year = {2009},
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/j.atmosenv.2009.07.048",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231009006669",
+author = "Lovro Hrust and Zvjezdana Bencetić Klaić and Josip Križan and Oleg Antonić and Predrag Hercog",
+keywords = "Multi-layer perceptron neural networks, Air quality forecasting, Model input selection"
+}
+
+@Article{Chellali2016,
+author="Chellali, M. R.
+and Abderrahim, H.
+and Hamou, A.
+and Nebatti, A.
+and Janovec, J.",
+title="Artificial neural network models for prediction of daily fine particulate matter concentrations in Algiers",
+journal="Environmental Science and Pollution Research",
+year = {2016},
+month="Jul",
+day="01",
+volume="23",
+number="14",
+pages="14008--14017",
+issn="1614-7499",
+doi="10.1007/s11356-016-6565-9",
+url="https://doi.org/10.1007/s11356-016-6565-9"
+}
+
+@article{PEREZ201622,
+title = "Forecasting hourly PM2.5 in Santiago de Chile with emphasis on night episodes",
+journal = "Atmospheric Environment",
+volume = "124",
+pages = "22 - 27",
+year = {2016},
+issn = "1352-2310",
+doi = "https://doi.org/10.1016/j.atmosenv.2015.11.016",
+url = "http://www.sciencedirect.com/science/article/pii/S1352231015305240",
+author = "Patricio Perez and Ernesto Gramsch",
+keywords = "Air quality forecasting, Particulate matter, PM2.5, Neural networks, Meteorology forecast"
+}
+
+@article{SIWEK2016,
+title = "Data mining methods for prediction of air pollution",
+journal = "International Journal of Applied Mathematics and Computer Science",
+volume = "26",
+pages = "467 - 478",
+year = {2016},
+doi = "10.1515/amcs-2016-0033",
+url = "https://www.degruyter.com/view/j/amcs.2016.26.issue-2/amcs-2016-0033/amcs-2016-0033.xml",
+author = "Krzysztof Siwek and Stanisław Osowski"
+}
+
+@Article{Pawul2016,
+journal="Journal of Ecological Engineering",
+volume="17",
+number="4",
+year = {2016},
+title="APPLICATION OF ARTIFICIAL NEURAL NETWORKS FOR PREDICTION OF AIR POLLUTION LEVELS IN ENVIRONMENTAL MONITORING",
+author="Pawul, Małgorzata
+and Śliwka, Małgorzata",
+pages="190--196",
+doi="10.12911/22998993/64828",
+url="http://dx.doi.org/10.12911/22998993/64828"
+}
+
+@article{BIANCOFIORE2017652,
+title = "Recursive neural network model for analysis and forecast of PM10 and PM2.5",
+journal = "Atmospheric Pollution Research",
+volume = "8",
+number = "4",
+pages = "652 - 659",
+year = {2017},
+issn = "1309-1042",
+doi = "https://doi.org/10.1016/j.apr.2016.12.014",
+url = "http://www.sciencedirect.com/science/article/pii/S1309104216304056",
+author = "Fabio Biancofiore and Marcella Busilacchio and Marco Verdecchia and Barbara Tomassetti and Eleonora Aruffo and Sebastiano Bianco and Sinibaldo Di Tommaso and Carlo Colangeli and Gianluigi Rosatelli and Piero Di Carlo",
+keywords = "PM10 and PM2.5, Model comparison, Urban pollution, Troposphere, Forecast, Neural networks, Air pollution"
+}
+
+@article{DOTSE2018358,
+title = "Application of computational intelligence techniques to forecast daily PM10 exceedances in Brunei Darussalam",
+journal = "Atmospheric Pollution Research",
+volume = "9",
+number = "2",
+pages = "358 - 368",
+year = {2018},
+issn = "1309-1042",
+doi = "https://doi.org/10.1016/j.apr.2017.11.004",
+url = "http://www.sciencedirect.com/science/article/pii/S1309104217304178",
+author = "Sam-Quarcoo Dotse and Mohammad Iskandar Petra and Lalit Dagar and Liyanage C. De Silva",
+keywords = "PM, Artificial neural networks, Genetic algorithm, Random forests, Variable selection, Brunei Darussalam"
+}
+
+TYPE{
+==========================================================
+HYBRID MODELS + ERROR CORRECTION
+==========================================================
+}
+
+@article{FIRMINO20141,
+title = "Correcting and combining time series forecasters",
+journal = "Neural Networks",
+volume = "50",
+pages = "1 - 11",
+year = {2014},
+issn = "0893-6080",
+doi = "https://doi.org/10.1016/j.neunet.2013.10.008",
+url = "http://www.sciencedirect.com/science/article/pii/S0893608013002517",
+author = "Paulo Renato A. Firmino and Paulo S.G. de Mattos Neto and Tiago A.E. Ferreira",
+keywords = "Time series forecasters, Unbiased forecasters, Maximum likelihood estimation, Linear combination of forecasts, Artificial neural networks hybrid systems"
+}
+
+@article{WONGSATHAN2016277,
+title = "Improvement on PM-10 Forecast by Using Hybrid ARIMAX and Neural Networks Model for the Summer Season in Chiang Mai",
+journal = "Procedia Computer Science",
+volume = "86",
+pages = "277 - 280",
+year = {2016},
+note = "2016 International Electrical Engineering Congress, iEECON2016, 2-4 March 2016, Chiang Mai, Thailand",
+issn = "1877-0509",
+doi = "https://doi.org/10.1016/j.procs.2016.05.062",
+url = "http://www.sciencedirect.com/science/article/pii/S1877050916303982",
+author = "Rati Wongsathan and Supawat Chankham",
+keywords = "PM-10, Hybrid ARIMAX and Neural Networks"
+}
+
+@article{DEMATTOSNETO201765,
+title = "Nonlinear combination method of forecasters applied to PM time series",
+journal = "Pattern Recognition Letters",
+volume = "95",
+pages = "65 - 72",
+year = {2017},
+issn = "0167-8655",
+doi = "https://doi.org/10.1016/j.patrec.2017.06.008",
+url = "http://www.sciencedirect.com/science/article/pii/S0167865517302143",
+author = "Paulo S.G. de Mattos Neto and George D.C. Cavalcanti and Francisco Madeiro",
+keywords = "Forecasting, Combination, Residual analysis, Air pollution, Hybrid system"
+}
+
+@article{LUO201834,
+title = "Research and application of a novel hybrid decomposition-ensemble learning paradigm with error correction for daily PM10 forecasting",
+journal = "Atmospheric Research",
+volume = "201",
+pages = "34 - 45",
+year = {2018},
+issn = "0169-8095",
+doi = "https://doi.org/10.1016/j.atmosres.2017.10.009",
+url = "http://www.sciencedirect.com/science/article/pii/S0169809517307627",
+author = "Hongyuan Luo and Deyun Wang and Chenqiang Yue and Yanling Liu and Haixiang Guo",
+keywords = "Daily PM forecasting, Error correction, Fast ensemble empirical mode decomposition, Variational mode decomposition, Cuckoo search, Extreme learning machine"
+}
+
+TYPE{
+==========================================================
+DECISION TREES
+==========================================================
+}
+
+@inproceedings{Zheng2015,
+ author = {Zheng, Yu and Yi, Xiuwen and Li, Ming and Li, Ruiyuan and Shan, Zhangqing and Chang, Eric and Li, Tianrui},
+ title = {Forecasting Fine-Grained Air Quality Based on Big Data},
+ booktitle = {Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+ series = {KDD '15},
+ year = {2015},
+ isbn = {978-1-4503-3664-2},
+ location = {Sydney, NSW, Australia},
+ pages = {2267--2276},
+ numpages = {10},
+ url = {http://doi.acm.org/10.1145/2783258.2788573},
+ doi = {10.1145/2783258.2788573},
+ acmid = {2788573},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {air quality forecast, big data, urban air, urban computing},
+} 
+
+@InProceedings{10.1007/978-3-642-37807-2_9,
+author="Loya, Nahun
+and Olmos Pineda, Iv{\'a}n
+and Pinto, David
+and G{\'o}mez-Adorno, Helena
+and Alem{\'a}n, Yuridiana",
+editor="Batyrshin, Ildar
+and Gonz{\'a}lez Mendoza, Miguel",
+title="Forecast of Air Quality Based on Ozone by Decision Trees and Neural Networks",
+booktitle="Advances in Artificial Intelligence",
+year="2013",
+url = "https://link.springer.com/chapter/10.1007/978-3-642-37807-2_9",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="97--106",
+isbn="978-3-642-37807-2"
+}
+
+TYPE{
+==========================================================
+xSVM
+==========================================================
+}
+
+@article{SUN2017144,
+title = "Daily PM2.5 concentration prediction based on principal component analysis and LSSVM optimized by cuckoo search algorithm",
+journal = "Journal of Environmental Management",
+volume = "188",
+pages = "144 - 152",
+year = "2017",
+issn = "0301-4797",
+doi = "https://doi.org/10.1016/j.jenvman.2016.12.011",
+url = "http://www.sciencedirect.com/science/article/pii/S0301479716309835",
+author = "Wei Sun and Jingyi Sun",
+keywords = "PM, Concentration forecasting, PCA, LSSVM, CS"
+}

@@ -94,6 +94,18 @@ CREATE TABLE observations (
 	pressure NUMERIC(7, 3)
 );
 
+UPDATE airly_observations 
+SET humidity = NULL
+WHERE humidity < 0;
+
+UPDATE airly_observations 
+SET humidity = NULL
+WHERE humidity > 100;
+
+UPDATE airly_observations 
+SET pm10 = NULL
+WHERE pm10 < 0;
+
 -- =====================================
 
 INSERT INTO observations (
@@ -125,7 +137,7 @@ INSERT INTO observations (
 	station_id, timestamp,
 	pm1, pm2_5, pm10
 )
-SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
+SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp AT time zone 'UTC',
 	pm1, pm2_5, pm10
 FROM looko2_observations
 JOIN stations AS s 
@@ -185,7 +197,7 @@ OR PRESSURE > 1050;
 
 UPDATE observations 
 SET humidity = NULL
-WHERE humidity <= 0
+WHERE humidity < 0
 OR humidity > 100;
 
 -- Deleting empty records
