@@ -1,13 +1,15 @@
-require('RPostgreSQL')
-require('ggplot2')
-require('reshape')
-require('corrplot')
-require('magrittr')
+wd <- getwd()
+setwd(file.path(wd, 'common'))
+source('utils.r')
+setwd(wd)
+
+packages <- c('RPostgreSQL', 'corrplot', 'magrittr')
+import(packages)
 Sys.setenv(LANG = "en")
 
 plotCorrMat <- function (observations, corr_path) {
   png(filename = corr_path, height = 1200, width = 1200, pointsize = 25)
-  M <- cor(observations[sapply(observations, is.numeric)], use = 'everything')
+  M <- cor(observations[sapply(observations, is.numeric)], use = 'complete.obs')
   corrplot(M, method = 'ellipse')
   dev.off()
 }
@@ -23,15 +25,13 @@ main <- function () {
   rm(passwd)
   on.exit(dbDisconnect(con))
   
-  target_root_dir <- getwd()
-  target_root_dir <- file.path(target_root_dir, 'filled')
-  dir.create(target_root_dir)
+  target_root_dir <- file.path(getwd(), 'correlation')
+  mkdir(target_root_dir)
   table <- 'observations'
   
   # Fetch all data
   target_dir <- target_root_dir
   obs <- dbGetQuery(con, paste('SELECT * FROM', table, sep = ' '))
-  obs <- na.omit(obs)
   
   factors <- colnames(obs)
   excluded <- c('id', 'timestamp', 'station_id')
