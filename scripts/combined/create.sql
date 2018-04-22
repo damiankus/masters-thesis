@@ -504,8 +504,8 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT delete_ref_station_outliers('meteo_observations', 'temperature', 'agh_meteo', 3);
-SELECT delete_ref_station_outliers('meteo_observations', 'pressure', 'agh_meteo', 6);
+-- SELECT delete_ref_station_outliers('meteo_observations', 'temperature', 'agh_meteo', 3);
+-- SELECT delete_ref_station_outliers('meteo_observations', 'pressure', 'agh_meteo', 6);
 
 UPDATE observations AS obs
 SET temperature = NULL
@@ -579,19 +579,24 @@ For reference see: https://www.movable-type.co.uk/scripts/latlong.html
 
 DROP TABLE IF EXISTS meteo_distance;
 CREATE TABLE meteo_distance AS (
-SELECT row_number() OVER() AS id, s1.id AS station_id1, s2.id AS station_id2, 
-	(ACOS(
-		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
-		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-		* COS(radians(s2.longitude) - radians(s1.longitude))
-	) * 6371000) AS dist,
-	s1.latitude AS latitude1, s1.longitude AS longitude1,
-	s2.latitude AS latitude2, s2.longitude AS longitude2
-FROM stations AS s1
-CROSS JOIN meteo_stations AS s2
-WHERE s1.id <> s2.id
-ORDER BY 2, 4, 3
+SELECT row_number() OVER() AS id, dist.*
+FROM (
+	SELECT s1.id AS station_id1, s2.id AS station_id2, 
+		(ACOS(
+			SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+			+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+			* COS(radians(s2.longitude) - radians(s1.longitude))
+		) * 6371000) AS dist,
+		s1.latitude AS latitude1, s1.longitude AS longitude1,
+		s2.latitude AS latitude2, s2.longitude AS longitude2
+	FROM stations AS s1
+	CROSS JOIN meteo_stations AS s2
+	WHERE s1.id <> s2.id
+	ORDER BY 1, 3, 2
+) AS dist
 );
+
+select * from meteo_distance
 
 ALTER TABLE meteo_distance ADD PRIMARY KEY (id);
 CREATE INDEX ON meteo_distance(station_id1);
@@ -605,18 +610,21 @@ the stations measuring air quality.
 
 DROP TABLE IF EXISTS air_quality_distance;
 CREATE TABLE air_quality_distance AS (
-SELECT row_number() OVER() AS id, s1.id AS station_id1, s2.id AS station_id2, 
-	(ACOS(
-		SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
-		+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-		* COS(radians(s2.longitude) - radians(s1.longitude))
-	) * 6371000) AS dist,
-	s1.latitude AS latitude1, s1.longitude AS longitude1,
-	s2.latitude AS latitude2, s2.longitude AS longitude2
-FROM stations AS s1
-CROSS JOIN stations AS s2
-WHERE s1.id <> s2.id
-ORDER BY 2, 4, 3
+SELECT row_number() OVER() AS id, dist.*
+FROM (
+	SELECT s1.id AS station_id1, s2.id AS station_id2, 
+		(ACOS(
+			SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+			+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+			* COS(radians(s2.longitude) - radians(s1.longitude))
+		) * 6371000) AS dist,
+		s1.latitude AS latitude1, s1.longitude AS longitude1,
+		s2.latitude AS latitude2, s2.longitude AS longitude2
+	FROM stations AS s1
+	CROSS JOIN stations AS s2
+	WHERE s1.id <> s2.id
+	ORDER BY 1, 3, 2
+) AS dist
 );
 
 ALTER TABLE air_quality_distance ADD PRIMARY KEY (id);
@@ -624,16 +632,18 @@ CREATE INDEX ON air_quality_distance(station_id1);
 CREATE INDEX ON air_quality_distance(station_id2);
 CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
 
+select * from air_quality_distance;
+
 /*
 A function filling missing values by 
 copying them from the nearest meteo station
 containing the desired value
 */
 
-CREATE OR REPLACE FUNCTION fill_missing()
+DROP FUNCTION IF EXISTS fill_missing(TEXT[]);
+CREATE OR REPLACE FUNCTION fill_missing(meteo_cols TEXT[])
 RETURNS VOID AS $$
 DECLARE
-	meteo_cols text[];
 	air_quality_cols text[];
 	col text;
 	query text;
@@ -650,10 +660,9 @@ BEGIN
 	UPDATE %1$s AS obs
 	SET %4$s = nearest.%4$s
 	FROM (
-		SELECT obs.station_id, obs.timestamp, nearest.%4$s 
-		FROM %1$s AS obs
-		JOIN (
-			SELECT obs.timestamp, obs.station_id, MIN(dist.id) row_id
+		SELECT dist_rows.station_id, dist_rows.timestamp, nearest.%4$s 
+		FROM (
+			SELECT obs.timestamp, obs.station_id, MIN(dist.id) AS row_id
 			FROM %1$s as obs
 			JOIN %3$s as dist
 			ON dist.station_id1 = obs.station_id
@@ -664,16 +673,13 @@ BEGIN
 			AND other.%4$s IS NOT NULL
 			GROUP BY obs.station_id, obs.timestamp
 		) AS dist_rows
-		ON dist_rows.station_id = obs.station_id
-		AND dist_rows.timestamp = obs.timestamp
 		JOIN %3$s AS dist
 		ON dist.id = dist_rows.row_id
 		JOIN %2$s as nearest
 		ON nearest.station_id = dist.station_id2
-		AND nearest.timestamp = obs.timestamp
+		AND nearest.timestamp = dist_rows.timestamp
 	) AS nearest
-	WHERE obs.%4$s IS NULL
-	AND nearest.station_id = obs.station_id
+	WHERE nearest.station_id = obs.station_id
 	AND nearest.timestamp = obs.timestamp';
 
 	/* 
@@ -692,9 +698,7 @@ BEGIN
 		EXECUTE query;
 	END LOOP;
 	*/
-
-        meteo_cols := ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_total',
-		'precip_rate', 'solradiation'];
+	
 	FOREACH col IN ARRAY meteo_cols
 	LOOP
 		query := format(query_template, 'observations', 'meteo_observations',
@@ -707,8 +711,8 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT fill_missing();
-
+SELECT fill_missing(ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_total',
+		'precip_rate', 'solradiation']);
 
 -- ===================================
 -- Creating auxilliary variables
@@ -777,8 +781,8 @@ OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
 
 -- ===================================
 
-ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week_cont;
-ALTER TABLE observations ADD COLUMN day_of_week_cont INT;
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week;
+ALTER TABLE observations ADD COLUMN day_of_week INT;
 UPDATE observations 
 SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6) + 0.5;
 
@@ -786,17 +790,17 @@ SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6) + 0.5;
 
 -- Transform the date to a continuous value
 
-ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year_cont;
-ALTER TABLE observations ADD COLUMN day_of_year_cont FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year;
+ALTER TABLE observations ADD COLUMN day_of_year FLOAT;
 UPDATE observations 
-SET cont_date = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365.0) + 0.5;
+SET day_of_year = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365.0) + 0.5;
 
 -- Transform the hour of day to a continuous value
 
-ALTER TABLE observations DROP COLUMN IF EXISTS hour_cont;
-ALTER TABLE observations ADD COLUMN hour_cont FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day;
+ALTER TABLE observations ADD COLUMN hour_of_day FLOAT;
 UPDATE observations 
-SET cont_hour = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
+SET hour_of_day = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
 
 -- ===================================
 
@@ -818,10 +822,10 @@ SET wind_dir_ns = SIN(wind_dir_rad);
 
 /*
 Values in this column are linearly dependent on the values
-in the wind_dir_rad column which is problematic while finding
+in the wind_dir_deg column which is problematic while finding
 the best subsets for regression.
 */
-ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_deg;
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_rad;
 
 -- SELECT * FROM pg_indexes WHERE tablename = 'observations';
 DROP INDEX "observations_temperature_idx";
@@ -967,7 +971,7 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT add_future_vals('pm2_5', ARRAY[12, 24]);
+SELECT add_future_vals('pm2_5', ARRAY[24]);
 -- SELECT drop_future_vals('pm2_5', ARRAY[12]);
 
 DROP FUNCTION IF EXISTS add_daily_aggr_vals(TEXT, TEXT[]);
@@ -1021,4 +1025,4 @@ $$  LANGUAGE plpgsql;
 
 SELECT add_daily_aggr_vals('observations', 
 	ARRAY['temperature', 'pressure', 'humidity', 'wind_speed',
-	      'wind_dir_rad', 'wind_dir_ew', 'wind_dir_ns']);
+	      'wind_dir_deg', 'wind_dir_ew', 'wind_dir_ns']);
