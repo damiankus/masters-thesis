@@ -37,6 +37,16 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
+save_multiple_vars_plot <- function (df, plot_path) {
+  # Transform the data frame into mapping timestamp -> (variable name, value)
+  melted <- melt(df, id.vars = 'timestamp')
+  plot <- ggplot(data = melted, aes(x = timestamp, y = value, fill = variable)) +
+    geom_bar(stat = 'identity') +
+    xlab('Date') +
+    ylab('Value')
+  ggsave(plot_path, width = 16, height = 10, dpi = 200)
+  print(paste('Plot saved in', plot_path, sep = ' '))
+}
 
 save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   # The bin width is calculated using the Freedman-Diaconis formula
@@ -61,18 +71,6 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
-}
-
-save_best_subset <- function (res_formula, df, method, nvmax) {
-  test <- regsubsets(res_formula, data = df, nvmax = nvmax, nbest = 3, method = method)
-  for (scale in c('adjr2', 'bic')) {
-    plot_path <- file.path(paste(scale, 'best_subsets.png', sep = '_'))
-    png(filename = plot_path, width = 1366, height = 1366, pointsize = 25)
-    plot(test, scale = scale)
-    dev.off()
-    print(paste('Saved plot under: ', plot_path))
-  }
-  test
 }
 
 save_all_stats <- function (fit, test_set, results, res_var, model_name, target_dir, summary_funs) {

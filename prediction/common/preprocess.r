@@ -67,3 +67,38 @@ transform <- function (df, factors, trans) {
     df[,f] <- trans(df[,f])
   }
 }
+
+# Imputing missing values
+
+impute <- function (df, from_date, to_date, imputation_count = 5, iters = 10) {
+  year_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
+                  to = as.POSIXct(to_date, tz = 'UTC'),
+                  by = 'hour')
+  variables <- colnames(df)
+  variables <- variables[variables != 'timestamp']
+  
+  # If all values in all columns in the row are present -> TRUE
+  row_presence_mask <- rep(TRUE, length(df[, 1]))
+  for (col in colnames(df)) {
+    row_presence_mask <- row_presence_mask & (!is.na(df[, col]))
+  }
+  which.present <- which(row_presence_mask)
+  present_ts <- df[which.present, 'timestamp']
+  missing_ts <- as.POSIXct(c(setdiff(year_seq, present_ts)), origin = '1970-01-01', tz = 'UTC')
+  missing_obs <- data.frame(timestamp = missing_ts)
+  for (col in variables) {
+    missing_obs[, col] <- NA
+  }
+  imputed <- data.frame(obs)
+  imputed <- rbind(imputed, missing_obs)
+  imputed <- imputed[order(imputed$timestamp),]
+  ts <- imputed$timestamp
+  
+  temp_data <- mice(imputed[, variables], m = imputation_count, maxit = iters, meth = 'pmm', seed = 500)
+  densityplot(temp_data)
+  imputed <- complete(temp_data, 1)
+  imputed$timestamp <- ts
+  
+  # Return imputed data
+  imputed
+}

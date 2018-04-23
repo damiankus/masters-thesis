@@ -1,0 +1,35 @@
+
+Call:
+lm(formula = best_formula, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-120.652  -11.712   -2.048    8.038  193.253 
+
+Coefficients:
+                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)           -193.36962   51.52101  -3.753 0.000176 ***
+pm2_5                    0.87772    0.09814   8.943  < 2e-16 ***
+pm10                    -0.36677    0.07019  -5.225 1.78e-07 ***
+wind_speed               4.02575    0.54977   7.323 2.66e-13 ***
+day_of_year            -12.08410    1.82538  -6.620 3.82e-11 ***
+hour_of_day            -15.44420    0.88454 -17.460  < 2e-16 ***
+min_daily_temperature   -0.99466    0.19875  -5.005 5.72e-07 ***
+avg_daily_temperature   -1.91908    0.37461  -5.123 3.08e-07 ***
+max_daily_temperature    1.35885    0.20598   6.597 4.45e-11 ***
+min_daily_pressure       1.37706    0.08897  15.477  < 2e-16 ***
+max_daily_pressure      -1.13246    0.10762 -10.523  < 2e-16 ***
+max_daily_humidity      -0.29652    0.02234 -13.271  < 2e-16 ***
+max_daily_wind_speed    -3.92790    0.44635  -8.800  < 2e-16 ***
+max_daily_wind_dir_ew   20.05520    1.79735  11.158  < 2e-16 ***
+min_daily_wind_dir_ns   -6.12442    0.95736  -6.397 1.67e-10 ***
+avg_daily_wind_dir_ns    5.98553    0.73405   8.154 4.04e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 25.39 on 8183 degrees of freedom
+Multiple R-squared:  0.5653,	Adjusted R-squared:  0.5645 
+F-statistic: 709.4 on 15 and 8183 DF,  p-value: < 2.2e-16
+
+Best adj R2:  0.564498937317356
+Best found var subset: c('pm10','wind_speed','day_of_year','hour_of_day','min_daily_temperature','avg_daily_temperature','max_daily_temperature','min_daily_pressure','max_daily_pressure','max_daily_humidity','max_daily_wind_speed','max_daily_wind_dir_ew','min_daily_wind_dir_ns','avg_daily_wind_dir_ns')
