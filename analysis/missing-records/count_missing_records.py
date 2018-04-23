@@ -117,9 +117,8 @@ if __name__ == '__main__':
                        '{0:.2f}'.format(missing_ratio)]
 
             for f in factors:
-                present_count = count_present(conn, s, f)
-                missing_ratio = ((theoretical_total - present_count)
-                                 / float(theoretical_total)) * 100
+                missing_count = theoretical_total - count_present(conn, s, f)
+                missing_ratio = (missing_count / float(theoretical_total)) * 100
                 tab_row += [missing_count, '{0:.2f}'.format(missing_ratio)]
             tab_rows.append(tab_row)
 
