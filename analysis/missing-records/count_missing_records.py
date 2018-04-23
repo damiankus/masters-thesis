@@ -16,36 +16,36 @@ def execute(conn, statement, vals):
 def count_factory(config):
     count_fun = None
     if len(config['sources']) == 0:
-        missing_stat_template = """
+        present_stat_template = """
             SELECT COUNT(*) FROM {observations}
-            WHERE {{}} IS NULL
+            WHERE {{}} IS NOT NULL
         """.format(observations=config['observations-table'])
 
-        def count_missing_records(conn, source, factor):
-            missing_stat = sql.SQL(missing_stat_template).format(
+        def count_present_records(conn, source, factor):
+            present_stat = sql.SQL(present_stat_template).format(
                 sql.Identifier(factor.lower()))
             cursor = conn.cursor()
-            cursor.execute(missing_stat)
+            cursor.execute(present_stat)
             return int(cursor.fetchall()[0][0])
-        count_fun = count_missing_records
+        count_fun = count_present_records
     else:
-        missing_stat_template = """
+        present_stat_template = """
             SELECT COUNT(*) FROM {observations} AS o
             JOIN {stations} AS s
             ON s.id = o.station_id
             WHERE s.source = %s
-            AND {{}} IS NULL
+            AND {{}} IS NOT NULL
         """.format(observations=config['observations-table'],
                    stations=config['stations-table'])
-        print(missing_stat_template)
+        print(present_stat_template)
 
-        def count_missing_by_source(conn, source, factor):
-            missing_stat = sql.SQL(missing_stat_template).format(
+        def count_present_by_source(conn, source, factor):
+            present_stat = sql.SQL(present_stat_template).format(
                 sql.Identifier(factor.lower()))
             cursor = conn.cursor()
-            cursor.execute(missing_stat, (source,))
+            cursor.execute(present_stat, (source,))
             return int(cursor.fetchall()[0][0])
-        count_fun = count_missing_by_source
+        count_fun = count_present_by_source
     return count_fun
 
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     count_stations_stat, count_total_stat = count_stats_factory(config)
 
     conn = None
-    count_missing = count_factory(config)
+    count_present = count_factory(config)
     try:
         conn = psycopg2.connect(**config['db-connection'])
         if len(sources) == 0:
@@ -117,8 +117,9 @@ if __name__ == '__main__':
                        '{0:.2f}'.format(missing_ratio)]
 
             for f in factors:
-                missing_count = count_missing(conn, s, f)
-                missing_ratio = (missing_count / float(total_count)) * 100
+                present_count = count_present(conn, s, f)
+                missing_ratio = ((theoretical_total - present_count)
+                                 / float(theoretical_total)) * 100
                 tab_row += [missing_count, '{0:.2f}'.format(missing_ratio)]
             tab_rows.append(tab_row)
 
