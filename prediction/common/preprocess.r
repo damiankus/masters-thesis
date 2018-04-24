@@ -68,9 +68,26 @@ transform <- function (df, factors, trans) {
   }
 }
 
+# WARNING!
+# After returning the result it must be casted to data.frame!
+# R seemingly does not support returning multiple data frames directly
+# Thus the workaround with the list
+split_by_heating_season <- function (df) {
+  sapply(df$timestamp, function (ts) {
+    month <- as.POSIXlt(ts)$mon + 1
+    (month < 4) || (month > 8) })
+}
+
+# WARNING!
+# After returning the result it must be casted to data.frame!
+split_randomly <- function (df, training_ratio = 0.75) {
+  set.seed(101)
+  sample(c(TRUE, FALSE), length(df[,1]), replace = TRUE, prob=c(0.75, 0.25))
+}
+
 # Imputing missing values
 
-impute <- function (df, from_date, to_date, imputation_count = 5, iters = 10) {
+impute <- function (df, from_date, to_date, imputation_count = 5, iters = 5) {
   year_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
                   to = as.POSIXct(to_date, tz = 'UTC'),
                   by = 'hour')

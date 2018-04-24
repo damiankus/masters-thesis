@@ -5,7 +5,6 @@ source('prediction_goodness.r')
 source('plotting.r')
 source('preprocess.r')
 setwd(wd)
-source('regression.r')
 
 packages <- c(
   'RPostgreSQL', 'mice')
@@ -32,11 +31,15 @@ main <- function () {
                 "WHERE station_id = 'airly_171'",
                 sep = ' ')
   obs <- dbGetQuery(con, query)
-  # variables <- colnames(obs)
-  # excluded <- c('id', 'station_id')
-  # variables <- variables[!(variables %in% excluded)]
-  # obs <- obs[, variables]
-  print(summary(impute(obs, from_date = '2017-01-01 00:00', to_date = '2017-12-31 23:00')))
+  
+  # Useful when loading all variables and removing
+  # just those unwanted
+  variables <- colnames(obs)
+  excluded <- c('id', 'station_id')
+  variables <- variables[!(variables %in% excluded)]
+  obs <- obs[, variables]
+  imputed <- impute(obs, from_date = '2017-01-01 00:00', to_date = '2017-12-31 23:00')
+  print(summary(imputed))
 }
 main()
 
