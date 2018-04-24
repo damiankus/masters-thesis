@@ -1,0 +1,26 @@
+{
+    "services": {
+        "monitoring_agh_public": {
+            "db-connection": {
+                "user": "",
+                "password": "",
+                "host": "",
+                "database": ""
+            },
+            "city": "Kraków",
+            "stations-table": "monitoring_agh_stations",
+            "observations-table": "monitoring_agh_observations",
+            "stations-raw": "data/public_stations_raw.json",
+            "stations": "data/public_stations.json",
+            "auth-endpoint": "https://monitoring.fslab.agh.edu.pl/oauth/token?username=&password=&grant_type=password",
+            "auth-refresh-endpoint": "https://monitoring.fslab.agh.edu.pl/oauth/token?refresh_token={}&grant_type=refresh_token",
+            "api-endpoint": "https://monitoring.fslab.agh.edu.pl/public/v2/measurement/{}/find?since={}&type=HOUR&to={}",
+            "max-calls": 10,
+            "retry-period-s": 60,
+            "timestamp-since": 1483228800000,
+            "timestamp-to": 1514764800000,
+            "timestamp-steps": 4,
+            "url-params": [ "id" ]
+        }
+    }
+}

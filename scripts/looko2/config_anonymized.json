@@ -1,0 +1,41 @@
+{
+    "archive-url": "http://api.looko2.com/Archives/",
+    "target-dir": "csv-2018",
+    "target-file": "looko2-2018.csv",
+    "api-token": "",
+    "api-endpoint": " http://api.looko2.com/?method=GetAll&token={token}",
+    "db-connection": {
+        "user": "",
+        "password": "",
+        "host": "",
+        "database": ""
+    },
+    "stations-table": "looko2_stations",
+    "station-ids": [
+        "00000000",
+        "00000001",
+        "00000002",
+        "00000003",
+        "00000004",
+        "00000005",
+        "18FE34D5C9BE",
+        "2C3AE8340119",
+        "2C3AE834011D",
+        "5CCF7F0C2E8B",
+        "5CCF7F1A543E",
+        "5CCF7F85DFC7",
+        "5CCF7F85E211",
+        "5CCF7FC125EC",
+        "5CCF7FC128EC",
+        "5CCF7FC12A8F",
+        "5CCF7FC17EAD",
+        "5CCF7FC182B8",
+        "5CCF7FC1830B",
+        "600194009370",
+        "60019400AB79",
+        "A020A603674C",
+        "A020A6036872",
+        "A020A6294F9C",
+        "A020A629525C"
+    ]
+}

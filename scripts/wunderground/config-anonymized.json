@@ -1,0 +1,58 @@
+{
+    "log-file": "wunderground-collector.log",
+    "services": {
+        "wunderground": {
+            "db-connection": {
+                "user": "",
+                "password": "",
+                "host": "",
+                "database": ""
+            },
+            "stations-table": "wunderground_stations",
+            "observations-table": "wunderground_observations",
+            "api-endpoint": "http://api.wunderground.com/api/{{api_key}}/history_{{date}}/q/Poland/{type}:{id}.json",
+            "api-keys": [""],
+            "max-calls": 10,
+            "retry-period-s": 60,
+            "response-file": "data/response.json",
+            "stations-file": "data/stations.json",
+            "url-params": ["type", "id"],
+            "date-start": "2017-01-01",
+            "date-end": "2018-01-01",
+            "target-dir": "responses",
+            "schema": {
+                "current_observation": {
+                    "observation_location": {
+                        "city": "Łęg, Kraków",
+                        "latitude": "50.063408",
+                        "longitude": "20.018280",
+                        "elevation": "646 ft"
+                    },
+                    "observation_time_rfc822": "Fri, 24 Nov 2017 18:47:21 +0100",
+                    "observation_epoch": "1511545641",
+                    "local_time_rfc822": "Fri, 24 Nov 2017 18:49:13 +0100",
+                    "local_epoch": "1511545753",
+                    "weather": "Clear",
+                    "temp_c": 5.8,
+                    "relative_humidity": "80%",
+                    "wind_string": "Calm",
+                    "wind_dir": "North",
+                    "wind_degrees": -9999,
+                    "wind_kph": 0,
+                    "wind_gust_kph": 0,
+                    "pressure_mb": "1015",
+                    "pressure_in": "29.98",
+                    "dewpoint_c": 3,
+                    "heat_index_c": "NA",
+                    "windchill_c": "6",
+                    "feelslike_c": "6",
+                    "visibility_km": "3.5",
+                    "solarradiation": "--",
+                    "UV": "-1",
+                    "precip_1hr_metric": " 0",
+                    "precip_today_metric": "--"
+                }
+            }
+        }
+    }
+}
