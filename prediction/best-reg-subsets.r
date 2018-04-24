@@ -75,7 +75,7 @@ main <- function () {
   obs <- na.omit(dbGetQuery(con, query))
   
   explanatory_vars <- colnames(obs)
-  ignored_base_vars <- c()
+  ignored_base_vars <- c('pressure', 'humidity', 'wind_dir_deg', 'pm1', 'pm10', 'is_heating_season')
   ignored_vars <- ignored_base_vars
   if (length(ignored_base_vars) > 0) {
     ignored_masks <- sapply(ignored_base_vars, function (ignored) { endsWith(explanatory_vars, ignored) })

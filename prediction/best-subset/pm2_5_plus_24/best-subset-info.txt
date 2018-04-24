@@ -3,33 +3,33 @@ Call:
 lm(formula = best_formula, data = df)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--120.652  -11.712   -2.048    8.038  193.253 
+    Min      1Q  Median      3Q     Max 
+-137.33  -17.81   -3.30   12.40  196.80 
 
 Coefficients:
-                        Estimate Std. Error t value Pr(>|t|)    
-(Intercept)           -193.36962   51.52101  -3.753 0.000176 ***
-pm2_5                    0.87772    0.09814   8.943  < 2e-16 ***
-pm10                    -0.36677    0.07019  -5.225 1.78e-07 ***
-wind_speed               4.02575    0.54977   7.323 2.66e-13 ***
-day_of_year            -12.08410    1.82538  -6.620 3.82e-11 ***
-hour_of_day            -15.44420    0.88454 -17.460  < 2e-16 ***
-min_daily_temperature   -0.99466    0.19875  -5.005 5.72e-07 ***
-avg_daily_temperature   -1.91908    0.37461  -5.123 3.08e-07 ***
-max_daily_temperature    1.35885    0.20598   6.597 4.45e-11 ***
-min_daily_pressure       1.37706    0.08897  15.477  < 2e-16 ***
-max_daily_pressure      -1.13246    0.10762 -10.523  < 2e-16 ***
-max_daily_humidity      -0.29652    0.02234 -13.271  < 2e-16 ***
-max_daily_wind_speed    -3.92790    0.44635  -8.800  < 2e-16 ***
-max_daily_wind_dir_ew   20.05520    1.79735  11.158  < 2e-16 ***
-min_daily_wind_dir_ns   -6.12442    0.95736  -6.397 1.67e-10 ***
-avg_daily_wind_dir_ns    5.98553    0.73405   8.154 4.04e-16 ***
+                       Estimate Std. Error t value Pr(>|t|)    
+(Intercept)            12.27057    3.84221   3.194 0.001415 ** 
+pm2_5                   0.25113    0.01498  16.768  < 2e-16 ***
+temperature            -0.82447    0.25334  -3.254 0.001144 ** 
+period_of_day           2.13590    0.44423   4.808 1.57e-06 ***
+season                 -2.68512    0.42300  -6.348 2.40e-10 ***
+day_of_week             5.80666    0.98392   5.902 3.86e-09 ***
+hour_of_day           -16.32394    1.67380  -9.753  < 2e-16 ***
+wind_dir_ns            -5.92311    0.96106  -6.163 7.75e-10 ***
+avg_daily_temperature  -5.44854    0.39528 -13.784  < 2e-16 ***
+max_daily_temperature   3.14162    0.26323  11.935  < 2e-16 ***
+avg_daily_wind_speed   11.58746    2.56529   4.517 6.43e-06 ***
+max_daily_wind_speed  -12.28946    1.25557  -9.788  < 2e-16 ***
+min_daily_wind_dir_ew  -6.02099    1.46708  -4.104 4.13e-05 ***
+max_daily_wind_dir_ew  38.40425    3.00324  12.788  < 2e-16 ***
+min_daily_wind_dir_ns  -6.11609    1.69341  -3.612 0.000307 ***
+avg_daily_wind_dir_ns   8.47275    1.72686   4.906 9.60e-07 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 25.39 on 8183 degrees of freedom
-Multiple R-squared:  0.5653,	Adjusted R-squared:  0.5645 
-F-statistic: 709.4 on 15 and 8183 DF,  p-value: < 2.2e-16
+Residual standard error: 32.35 on 4584 degrees of freedom
+Multiple R-squared:  0.5206,	Adjusted R-squared:  0.519 
+F-statistic: 331.9 on 15 and 4584 DF,  p-value: < 2.2e-16
 
-Best adj R2:  0.564498937317356
-Best found var subset: c('pm10','wind_speed','day_of_year','hour_of_day','min_daily_temperature','avg_daily_temperature','max_daily_temperature','min_daily_pressure','max_daily_pressure','max_daily_humidity','max_daily_wind_speed','max_daily_wind_dir_ew','min_daily_wind_dir_ns','avg_daily_wind_dir_ns')
+Best adj R2:  0.519043181833904
+Best found var subset: c('temperature','period_of_day','season','day_of_week','hour_of_day','wind_dir_ns','avg_daily_temperature','max_daily_temperature','avg_daily_wind_speed','max_daily_wind_speed','min_daily_wind_dir_ew','max_daily_wind_dir_ew','min_daily_wind_dir_ns','avg_daily_wind_dir_ns')

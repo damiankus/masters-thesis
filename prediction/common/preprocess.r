@@ -1,7 +1,11 @@
 # Taken from https://www.r-bloggers.com/fitting-a-neural-network-in-r-neuralnet-package/
 # Section: Preparing to fit the neural network
 
-# Normalization x -> x' in [0, 1] 
+# Normalization x -> x' in [0, 1]
+
+source('utils.r')
+packages <- c('mice')
+import(packages)
 
 normalize <- function (data) {
   # It is assumed that the passed data frame contains only 
@@ -83,6 +87,18 @@ split_by_heating_season <- function (df) {
 split_randomly <- function (df, training_ratio = 0.75) {
   set.seed(101)
   sample(c(TRUE, FALSE), length(df[,1]), replace = TRUE, prob=c(0.75, 0.25))
+}
+
+split_by_date <- function (df, date_str) {
+  date_ts <- as.POSIXct(date_str, tz = 'UTC')
+  sapply(df$timestamp, function (ts) { ts < date_ts })
+}
+
+# This function assigns value TRUE to records from the specified month
+# and FALSE to the remaining ones
+# month_no begins from 1 (1 - January, 12 - December)
+split_by_month <- function (df, month_no) {
+  sapply(df$timestamp, function (ts) { (as.POSIXlt(ts)$mon + 1) == month_no  })
 }
 
 # Imputing missing values

@@ -5,10 +5,11 @@ source('plotting.r')
 source('preprocess.r')
 setwd(wd)
 
-packages <- c('RPostgreSQL', 'ggplot2', 'reshape', 'caTools', 'glmnet', 'car')
+packages <- c('RPostgreSQL', 'ggplot2', 'reshape', 'caTools', 'glmnet', 'car', 'e1071', 'forecast')
 import(packages)
 
 fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
+  print('Fitting a linear regression model')
   fit <- lm(res_formula,
             data = training_set)
   pred_vals <- predict(fit, test_set)
@@ -32,4 +33,16 @@ fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
       print(info)
     })
   save_all_stats(fit, test_set, results, res_var, 'regression', target_dir, sum_funs)
+}
+
+fit_svr <- function (res_formula, training_set, test_set, target_dir) {
+  print('Fitting a support vector regression model')
+  fit <- svm(res_formula, training_set)
+  pred_vals <- predict(fit, test_set)
+  res_var <- all.vars(res_formula)[[1]]
+  results <- data.frame(actual = test_set[,res_var], predicted = pred_vals)
+  save_all_stats(fit, test_set, results, res_var, 'svr', target_dir, summary_funs = c(summary))  
+}
+
+fit_arima <- function (res_formula, training_set, test_set, target_dir) {
 }
