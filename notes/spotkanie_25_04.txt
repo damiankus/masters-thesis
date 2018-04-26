@@ -1,0 +1,18 @@
+podzielić okres na sezon grzewczy, lato i okres przejściowy
+
+przewidujemy 1 gruddzień o 12 na podstawie 10, 11, 9
+uzupełnić dane na początek looko2
+
+napisać do arily żeby udostępnić dane
+na początek spróbować z looko2
+przewidywanie niedzieli
+przewidywanie soboty
+dokładność błąd
+święta poprzedni rok
+szereg niedziel - Sun -n, sun n +1, ... , current sunday
+
+zmniejszyć okres dla którego się przewiduje, nie miesiące tylko bardziej godziny
+ 
+za 2 tygodnie jak najwięcej
+drugi dyplomant znalazł artykuł
+

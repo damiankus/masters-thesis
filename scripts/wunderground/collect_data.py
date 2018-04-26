@@ -85,8 +85,9 @@ def get_and_save(url, out_path):
         with urllib.request.urlopen(url) as res:
             json_string = str(res.read(), 'utf-8')
             result = json.loads(json_string)
-            with open(out_path, 'w+') as out_file:
-                json.dump(result, out_file, indent=4)
+            if len(result['history']['observations']) > 0:
+                with open(out_path, 'w+') as out_file:
+                    json.dump(result, out_file, indent=4)
         logger.debug('Saved under {}'.format(out_path))
     except Exception as e:
         logger.error(e)
@@ -106,10 +107,7 @@ if __name__ == '__main__':
     logger.debug(global_config['log-file'])
     DATE_FORMAT = '%Y-%m-%d'
 
-    log_separator = """=====================================================================
-
-
-    ====================================================================="""
+    log_separator = ''.join(['=' * 50, '\n' * 5, '=' * 50])
 
     for service_name, config in global_config['services'].items():
         logger.info('Gathering data for {}'.format(service_name))
