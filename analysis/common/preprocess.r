@@ -64,17 +64,14 @@ reverse_standardize_vec_with <- function (vals, orig_mean, orig_sd) {
   vals * orig_sd + orig_mean
 }
 
-# WARNING!
-# After returning the result it must be casted to data.frame!
-# R seemingly does not support returning multiple data frames directly,
-# thus the workaround with the list
+# Splitting data
+
 split_by_heating_season <- function (df) {
   sapply(df$timestamp, function (ts) {
     month <- as.POSIXlt(ts)$mon + 1
     (month < 4) || (month > 9) })
 }
 
-# 0 - winter, 1 - spring, 2 - summer, 3 - autumn
 # The split is based on the astronomical seasons in Poland
 split_by_season <- function (df) {
   sapply(df$timestamp, function (ts) {
@@ -83,23 +80,62 @@ split_by_season <- function (df) {
     summer_day <- '06-22'
     autumn_day <- '09-23'
     winter_day <- '12-22'
-    season <- 0
+    season <- 'winter'
     if (date >= spring_day && date < summer_day) {
-      season <- 1
+      season <- 'spring'
     } else if (date >= summer_day && date < autumn_day) {
-      season <- 2
+      season <- 'summer'
     } else if (date >= autumn_day && date < winter_day) {
-      season <- 3
+      season <- 'autumn'
     }
     season
   })
 }
 
-# This function assigns value TRUE to records from the specified month
-# and FALSE to the remaining ones
-# month_no begins from 1 (1 - January, 12 - December)
-split_by_month <- function (df, month_no) {
-  sapply(df$timestamp, function (ts) { (as.POSIXlt(ts)$mon + 1) == month_no  })
+# The split is based on the astronomical seasons in Poland
+generate_ts_by_season <- function (season_name, year) {
+  from_date <- ''
+  to_date <- ''
+  series <- c()
+  
+  # It is necessary to specify the tz parameters in as.POSIXct
+  # without them the final timestamps will be shifted (conversion
+  # from localtime to UTC)
+  if (season_name == 'winter') {
+    from_date <- paste(year, '-01-01 00:00', sep = '')
+    to_date <- paste(year, '-03-20 23:00', sep = '')
+    series <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
+                  to = as.POSIXct(to_date, tz = 'UTC'),
+                  by = 'hour')
+    from_date <- '12-22 00:00'
+    to_date <- '12-31 23:00'
+  } else if (season_name == 'spring') {
+    from_date <- '03-21 00:00'
+    to_date <- '06-21 23:00'
+  } else if (season_name == 'summer') {
+    from_date <- '06-22 00:00'
+    to_date <- '09-22 23:00'
+  } else {
+    from_date <- '09-23 00:00'
+    to_date <- '12-21 23:00'
+  }
+  
+  from_date <- paste(year, '-', from_date, sep = '')
+  to_date <- paste(year, '-', to_date, sep = '')
+  
+  # Appending timestamps to an empty vector causes 
+  # conversion to the number of seconds since 1970-01-01
+  # Thus the if-else workaround
+  s <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
+           to = as.POSIXct(to_date, tz = 'UTC'),
+           by = 'hour')
+  if (length(series) == 0) {
+    series <- s
+  } else {
+    series <- c(series, s)
+  }
+  attr(series, 'tzone') <- 'UTC'
+  series
 }
 
 # Imputing missing values with MICE package

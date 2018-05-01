@@ -11,26 +11,11 @@ packages <- c(
 import(packages)
 
 main <- function () {
-  driver <- dbDriver('PostgreSQL')
-  passwd <- { 'pass' }
-  con <- dbConnect(driver, dbname = 'pollution',
-                   host = 'localhost',
-                   port = 5432,
-                   user = 'damian',
-                   password = passwd)
-  rm(passwd)
-  on.exit(dbDisconnect(con))
-  
-  # Fetch all observations
+  obs <- load_observations('observations',
+                           variables = c('timestamp', 'pm2_5', 'temperature', 'day_of_year'),
+                           stations = c('airly_172'))
   target_root_dir <- file.path(getwd(), 'imputed')
   mkdir(target_root_dir)
-  table <- 'observations'
-  variables <- c('timestamp', 'pm2_5', 'temperature', 'day_of_year')
-  query = paste('SELECT', paste(variables, collapse = ','),
-                'FROM', table,
-                "WHERE station_id = 'airly_171'",
-                sep = ' ')
-  obs <- dbGetQuery(con, query)
   
   # Useful when loading all variables and removing
   # just those unwanted
@@ -38,25 +23,28 @@ main <- function () {
   excluded <- c('id', 'station_id')
   variables <- variables[!(variables %in% excluded)]
   obs <- obs[, variables]
-  season_idx <- split_by_season(obs)
-  
   
   plot_path <- file.path(target_root_dir, 'original.png')
   save_line_plot(obs, 'timestamp', 'pm2_5', plot_path, 'Original PM2.5 timeseries')
   plot_path <- file.path(target_root_dir, 'original_histogram.png')
   save_histogram(obs, 'pm2_5', plot_path)
   
-  imputed <- impute(obs, from_date = '2017-05-01 00:00', to_date = '2017-08-31 23:00')
-  plot_path <- file.path(target_root_dir, 'imputed.png')
-  save_line_plot(imputed, 'timestamp', 'pm2_5', plot_path, 'Imputed PM2.5 timeseries')
-  plot_path <- file.path(target_root_dir, 'imputed_histogram.png')
-  save_histogram(imputed, 'pm2_5', plot_path)
-  
-  # year_seq <- seq(from = as.POSIXct('2017-01-01 00:00', tz = 'UTC'),
-  #                 to = as.POSIXct('2017-12-31 23:00', tz = 'UTC'),
-  #                 by = 'hour')
-  # window_width <- 8
-  # win <- window(year_seq)
+  imputed <- data.frame(colnames = colnames(obs))
+  season_idx <- split_by_season(obs)
+  season_dates <- c()
+  for (season in seq(0, 3)) {
+    data <- obs[season_idx == season,]
+    data <- impute(obs, )
+  }
+  spring_day <- '03-21'
+  summer_day <- '06-22'
+  autumn_day <- '09-23'
+  winter_day <- '12-22'
+  # 
+  # plot_path <- file.path(target_root_dir, 'imputed.png')
+  # save_line_plot(imputed, 'timestamp', 'pm2_5', plot_path, 'Imputed PM2.5 timeseries')
+  # plot_path <- file.path(target_root_dir, 'imputed_histogram.png')
+  # save_histogram(imputed, 'pm2_5', plot_path)
 }
 main()
 

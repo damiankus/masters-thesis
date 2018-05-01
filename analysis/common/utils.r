@@ -5,6 +5,32 @@ import <- function (packages) {
   lapply(packages, library, character.only = TRUE)
 }
 
+load_observations <- function (table, variables = c('*'), stations = c(), na.omit = FALSE) {
+  driver <- dbDriver('PostgreSQL')
+  passwd <- { 'pass' }
+  con <- dbConnect(driver, dbname = 'pollution',
+                   host = 'localhost',
+                   port = 5432,
+                   user = 'damian',
+                   password = passwd)
+  rm(passwd)
+  on.exit(dbDisconnect(con))
+  
+  query = paste('SELECT', paste(variables, collapse = ','),
+                'FROM', table, sep = ' ')
+  if (length(stations) > 0) {
+    query <- paste(query, " WHERE station_id IN ('", paste(stations, collapse = "','"), "')", sep = "")
+  }
+  df <- dbGetQuery(con, query)
+  if (na.omit) {
+    df <- na.omit(df)
+  }
+  if ('timestamp' %in% variables) {
+    df$timestamp <- as.POSIXct(df$timestamp, tz = 'UTC')
+  }
+  df
+}
+
 cap <- function (s) {
   paste(toupper(substring(s, 1, 1)), substring(s, 2), sep = '')
 }
