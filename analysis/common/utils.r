@@ -6,6 +6,9 @@ import <- function (packages) {
 }
 
 load_observations <- function (table, variables = c('*'), stations = c(), na.omit = FALSE) {
+  # Timestamps in database are stored without the time zone
+  # It is assumed they represent UTC time
+  Sys.setenv(TZ = 'UTC')
   driver <- dbDriver('PostgreSQL')
   passwd <- { 'pass' }
   con <- dbConnect(driver, dbname = 'pollution',
@@ -26,7 +29,7 @@ load_observations <- function (table, variables = c('*'), stations = c(), na.omi
     df <- na.omit(df)
   }
   if ('timestamp' %in% variables) {
-    df$timestamp <- as.POSIXct(df$timestamp, tz = 'UTC')
+    attr(df$timestamp, 'tzone') <- 'UTC'
   }
   df
 }

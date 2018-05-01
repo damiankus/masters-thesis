@@ -3,7 +3,7 @@ setwd(file.path(wd, 'common'))
 source('utils.r')
 setwd(wd)
 
-packages <- c('RPostgreSQL', 'reshape')
+packages <- c('RPostgreSQL', 'reshape', 'ggplot2')
 import(packages)
 Sys.setenv(LANG = "en")
 
@@ -36,7 +36,7 @@ save_histogram <- function (df, factor, plot_path, title) {
   
   fact_col <- df[,factor] 
   bw <- 2 * IQR(fact_col, na.rm = TRUE) / length(fact_col) ^ 0.33
-  outlier_thresholds <- quantile(fact_col, c(.01, .99), na.rm = TRUE)
+  outlier_thresholds <- quantile(fact_col, c(.001, .995), na.rm = TRUE)
   
   plot <- ggplot(data = df, aes_string(fact_col)) +
     geom_histogram(colour = 'white', fill = 'blue', binwidth = bw) +
@@ -65,9 +65,9 @@ main <- function () {
   table_name <- 'observations'
   # table_name <- 'meteo_observations'
   excluded <- c('id', 'station_id')
-  query = paste('SELECT * FROM',
+  query = paste('SELECT timestamp, pm2_5 FROM',
                  table_name,
-                # "WHERE station_id = 'airly_171'",
+                # "WHERE station_id = 'airly_172'",
                  sep = ' ')
   obs <- dbGetQuery(con, query)
   obs <- obs[, !(colnames(obs) %in% excluded)]

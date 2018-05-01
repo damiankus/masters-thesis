@@ -1,5 +1,5 @@
 wd <- getwd()
-setwd(file.path(wd, 'common'))
+setwd('common')
 source('utils.r')
 source('prediction_goodness.r')
 source('plotting.r')
@@ -24,27 +24,26 @@ main <- function () {
   variables <- variables[!(variables %in% excluded)]
   obs <- obs[, variables]
   
-  plot_path <- file.path(target_root_dir, 'original.png')
-  save_line_plot(obs, 'timestamp', 'pm2_5', plot_path, 'Original PM2.5 timeseries')
-  plot_path <- file.path(target_root_dir, 'original_histogram.png')
-  save_histogram(obs, 'pm2_5', plot_path)
   
-  imputed <- data.frame(colnames = colnames(obs))
-  season_idx <- split_by_season(obs)
-  season_dates <- c()
-  for (season in seq(0, 3)) {
-    data <- obs[season_idx == season,]
-    data <- impute(obs, )
+  season_labels <- split_by_season(obs)
+  seasons <- c('winter', 'spring', 'summer', 'autumn')
+  for (season in seasons) {
+    data <- obs[season_labels == season,]
+    
+    plot_path <- file.path(target_root_dir, paste(season, 'original.png', sep = '_'))
+    save_line_plot(data, 'timestamp', 'pm2_5', plot_path,  paste('Original PM2.5 timeseries - ', season))
+    plot_path <- file.path(target_root_dir,  paste(season, 'original_histogram.png', sep = '_'))
+    save_histogram(data, 'pm2_5', plot_path)
+    
+    ts_seq <- generate_ts_by_season(season, 2017)
+    imputed <- impute(data, ts_seq, imputation_count = 10, iters = 10)
+    print(ts_seq)
+    
+    plot_path <- file.path(target_root_dir, paste(season, 'imputed.png', sep = '_'))
+    save_line_plot(imputed, 'timestamp', 'pm2_5', plot_path,  paste('Imputed PM2.5 timeseries - ', season))
+    plot_path <- file.path(target_root_dir,  paste(season, 'imputed_histogram.png', sep = '_'))
+    save_histogram(imputed, 'pm2_5', plot_path)
   }
-  spring_day <- '03-21'
-  summer_day <- '06-22'
-  autumn_day <- '09-23'
-  winter_day <- '12-22'
-  # 
-  # plot_path <- file.path(target_root_dir, 'imputed.png')
-  # save_line_plot(imputed, 'timestamp', 'pm2_5', plot_path, 'Imputed PM2.5 timeseries')
-  # plot_path <- file.path(target_root_dir, 'imputed_histogram.png')
-  # save_histogram(imputed, 'pm2_5', plot_path)
 }
 main()
 
