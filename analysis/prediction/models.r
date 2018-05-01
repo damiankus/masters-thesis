@@ -1,5 +1,5 @@
 wd <- getwd()
-setwd(file.path(wd, 'common'))
+setwd(file.path('..', 'common'))
 source('utils.r')
 source('plotting.r')
 source('preprocess.r')

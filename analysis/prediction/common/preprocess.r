@@ -102,7 +102,6 @@ split_by_month <- function (df, month_no) {
 }
 
 # Imputing missing values
-
 impute <- function (df, from_date, to_date, imputation_count = 5, iters = 5) {
   year_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
                   to = as.POSIXct(to_date, tz = 'UTC'),

@@ -88,7 +88,7 @@ def get_and_save(url, out_path):
             if len(result['history']['observations']) > 0:
                 with open(out_path, 'w+') as out_file:
                     json.dump(result, out_file, indent=4)
-        logger.debug('Saved under {}'.format(out_path))
+                    logger.debug('Saved under {}'.format(out_path))
     except Exception as e:
         logger.error(e)
 

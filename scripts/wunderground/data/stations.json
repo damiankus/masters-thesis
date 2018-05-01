@@ -1,36 +1,28 @@
 {
     "stations": [
         {
-            "lon": 19.974623,
-            "type": "pws",
-            "city": "Rakowice",
-            "lat": 50.077888,
-            "neighborhood": "Krak\u00f3w",
-            "id": "IMARAKOW2"
-        },
-        {
-            "lon": 19.971878,
+            "lon": 19.929142,
             "type": "pws",
             "city": "Krak\u00f3w",
-            "lat": 50.074749,
-            "neighborhood": "Kazimierza Cha\u0142upnika",
-            "id": "IKRAKW27"
+            "lat": 50.067669,
+            "neighborhood": "Kremerowska",
+            "id": "IKRAKW84"
         },
         {
-            "lon": 19.969696,
+            "lon": 19.92911,
             "type": "pws",
-            "city": "Krak\u00f3w",
-            "lat": 50.077858,
-            "neighborhood": "Pilot\u00f3w",
-            "id": "IKRAKW71"
-        },
-        {
-            "lon": 19.987921,
-            "type": "pws",
-            "city": "Pradnik Czerwony",
-            "lat": 50.091858,
+            "city": "Krowodrza",
+            "lat": 50.069462,
             "neighborhood": "Krak\u00f3w",
-            "id": "IMAPRADN4"
+            "id": "IMAKROWO3"
+        },
+        {
+            "lon": 20.092024,
+            "type": "pws",
+            "city": "Lubocza",
+            "lat": 50.098541,
+            "neighborhood": "Krak\u00f3w",
+            "id": "IMALUBOC2"
         }
     ]
 }
