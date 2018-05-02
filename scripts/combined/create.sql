@@ -66,7 +66,9 @@ CREATE INDEX ON stations(id);
 -- ===================================
 
 /*
-A table storing complete records
+WARNING: it is assumed that the timestamp of observations
+refer to the UTC time standard - thus the default TIMESTAMP type 
+used in the table (without the time zone)
 */
 
 DROP TABLE IF EXISTS observations;
@@ -74,9 +76,9 @@ CREATE TABLE observations (
 	id SERIAL PRIMARY KEY,
 	station_id CHAR(20) REFERENCES stations(id),
 	timestamp TIMESTAMP,
-	pm1 NUMERIC(22, 15),
-	pm2_5 NUMERIC(22, 15),
-	pm10 NUMERIC(22, 15),
+	pm1 NUMERIC(9, 5),
+	pm2_5 NUMERIC(9, 5),
+	pm10 NUMERIC(9, 5),
 /*
 	co NUMERIC(22, 15),
 	no2 NUMERIC(22, 15), 
@@ -137,7 +139,7 @@ INSERT INTO observations (
 	station_id, timestamp,
 	pm1, pm2_5, pm10
 )
-SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp AT time zone 'UTC',
+SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
 	pm1, pm2_5, pm10
 FROM looko2_observations
 JOIN stations AS s 
@@ -459,54 +461,6 @@ $$  LANGUAGE plpgsql;
 SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0.001, 0.96);
 SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0.001, 0.98);
 
--- Deleting outliers based on the measurements from a reference station (AGH)
-
-DROP FUNCTION IF EXISTS delete_ref_station_outliers(text, text, text, real);
-CREATE OR REPLACE FUNCTION delete_ref_station_outliers(
-	tabname text, colname text, ref_station text, stddev_threshold real)
-RETURNS VOID AS $$
-DECLARE
-	query text;
-	temp_table_query text;
-BEGIN
-	DROP TABLE IF EXISTS stddevs;
-	temp_table_query := format('
-	CREATE TEMP TABLE stddevs AS(
-	SELECT timestamp, STDDEV_POP(%1$s) AS stddev
-	FROM %2$s
-	GROUP BY timestamp
-	)
-	', colname, tabname);
-
-	RAISE NOTICE '%', temp_table_query;
-	EXECUTE temp_table_query;
-	CREATE INDEX ON stddevs(timestamp);
-	
-	query := format('
-	UPDATE %1$s
-	SET %2$s = NULL
-	WHERE id IN (
-		SELECT obs.id
-		FROM %1$s as obs
-		JOIN (
-			SELECT timestamp, %2$s FROM %1$s
-			WHERE station_id = ''%3$s'')
-		AS ref_station
-		ON obs.timestamp = ref_station.timestamp
-		JOIN stddevs ON stddevs.timestamp = obs.timestamp
-		WHERE ABS(obs.%2$s - ref_station.%2$s) > %4$s * stddev
-	)', tabname, colname, ref_station, stddev_threshold::text);
-	
-	RAISE NOTICE 'Deleting outlier values from column %', colname;
-	RAISE NOTICE '%', query;
-	EXECUTE query;
-	DROP TABLE stddevs;
-END;
-$$  LANGUAGE plpgsql;
-
--- SELECT delete_ref_station_outliers('meteo_observations', 'temperature', 'agh_meteo', 3);
--- SELECT delete_ref_station_outliers('meteo_observations', 'pressure', 'agh_meteo', 6);
-
 UPDATE observations AS obs
 SET temperature = NULL
 FROM meteo_observations AS met
@@ -632,7 +586,60 @@ CREATE INDEX ON air_quality_distance(station_id1);
 CREATE INDEX ON air_quality_distance(station_id2);
 CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
 
-select * from air_quality_distance;
+/*
+A function creating empty records for timestamps not
+present in the data set. Columns will then be imputed
+(wherever possible) with the fill_missing function.
+The remaining empty values will be imputed in an R script,
+using the MICE package.
+*/
+
+DROP FUNCTION IF EXISTS create_empty_records();
+CREATE OR REPLACE FUNCTION create_empty_records()
+RETURNS VOID AS $$
+DECLARE
+	sid CHAR(20);
+	min_ts timestamp;
+	max_ts timestamp;
+	min_ts_for_station timestamp;
+	max_ts_for_station timestamp;
+BEGIN
+	min_ts := (SELECT MIN(timestamp) FROM observations);
+	max_ts := (SELECT MAX(timestamp) FROM observations);
+	raise notice '% %', min_ts, max_ts;
+	DROP TABLE IF EXISTS ts_seq;
+	CREATE TEMP TABLE ts_seq AS (
+		SELECT generate_series AS timestamp FROM generate_series(min_ts, max_ts, '1 hour'::interval)
+	);
+	CREATE INDEX ON ts_seq(timestamp);
+	
+	FOR sid IN SELECT id FROM stations
+	LOOP
+		RAISE NOTICE '%', sid;
+		min_ts_for_station := (SELECT MIN(timestamp) FROM observations WHERE station_id = sid);
+		max_ts_for_station := (SELECT MAX(timestamp) FROM observations WHERE station_id = sid);
+		INSERT INTO observations (station_id, timestamp) (
+			SELECT sid AS station_id, timestamp FROM ts_seq
+				WHERE timestamp BETWEEN min_ts_for_station AND max_ts_for_station
+			EXCEPT
+			SELECT station_id, timestamp FROM observations WHERE station_id = sid);
+			
+	END LOOP;
+	DROP TABLE ts_seq;
+END;
+$$  LANGUAGE plpgsql;
+
+-- SELECT create_empty_records();
+
+select * from observations where station_id = 'airly_205' and pm2_5 is null order by timestamp;
+select station_id, count(*) from observations 
+where pm2_5 is not null
+group by 1
+order by 2 desc, 1
+
+select * from observations 
+where station_id = 'airly_220'
+order by timestamp;
 
 /*
 A function filling missing values by 
@@ -732,7 +739,11 @@ WHERE EXTRACT(DOW FROM timestamp) = 0
 	OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
 	OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
 	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
-	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
+	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26)
+	-- Easter Mondays
+	OR date_trunc('day', timestamp) = '2017-04-17'
+	OR date_trunc('day', timestamp) = '2017-03-28'
+	OR date_trunc('day', timestamp) = '2017-04-02';
 
 -- ===================================
 
@@ -759,16 +770,16 @@ ALTER TABLE observations ADD COLUMN season INT;
 
 UPDATE observations 
 SET season = 0
-WHERE date_trunc('day', timestamp) < '2017-03-21' OR date_trunc('day', timestamp) > '2017-12-21';
+WHERE to_char(timestamp::date, 'MM-dd') < '03-21' OR to_char(timestamp::date, 'MM-dd') > '12-21';
 UPDATE observations 
 SET season = 1
-WHERE date_trunc('day', timestamp) BETWEEN '2017-03-21' AND '2017-06-21';
+WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '03-21' AND '06-21';
 UPDATE observations 
 SET season = 2
-WHERE date_trunc('day', timestamp) BETWEEN '2017-06-22' AND '2017-09-22';
+WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '2017-06-22' AND '09-22';
 UPDATE observations
 SET season = 3
-WHERE date_trunc('day', timestamp) BETWEEN '2017-09-23' AND '2017-12-21';
+WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
 
 -- ===================================
 
@@ -902,9 +913,9 @@ END;
 $$  LANGUAGE plpgsql;
 
 /*
- SELECT add_time_lagged('pm2_5', 1, 3, 1);
- SELECT drop_time_lagged('pm2_5', 1, 3, 1);
- */
+SELECT add_time_lagged('pm2_5', 1, 3, 1);
+SELECT drop_time_lagged('pm2_5', 1, 3, 1);
+*/
  
 -- ===================================
 -- Adding future PM level values
@@ -971,8 +982,10 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
+/*
 SELECT add_future_vals('pm2_5', ARRAY[24]);
--- SELECT drop_future_vals('pm2_5', ARRAY[12]);
+SELECT drop_future_vals('pm2_5', ARRAY[12]);
+*/
 
 DROP FUNCTION IF EXISTS add_daily_aggr_vals(TEXT, TEXT[]);
 CREATE OR REPLACE FUNCTION add_daily_aggr_vals(tabname TEXT, colnames TEXT[])
@@ -995,10 +1008,10 @@ BEGIN
 		FOREACH aggr_type IN ARRAY aggr_types
 		LOOP	
 			EXECUTE format(drop_temp, tabname, colname, aggr_type);
-			EXECUTE format(create_temp, tabname, colname, aggr_type);
+			--EXECUTE format(create_temp, tabname, colname, aggr_type);
 		END LOOP;
 	END LOOP;
-	
+
 	update_temp := '
 		UPDATE %1$s AS obs
 		SET min_daily_%2$s = aggr_obs.min_daily_%2$s, avg_daily_%2$s = aggr_obs.avg_daily_%2$s, max_daily_%2$s = aggr_obs.max_daily_%2$s
