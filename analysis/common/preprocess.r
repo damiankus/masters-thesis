@@ -1,12 +1,13 @@
-# Taken from https://www.r-bloggers.com/fitting-a-neural-network-in-r-neuralnet-package/
-# Section: Preparing to fit the neural network
-
-# Normalization x -> x' in [0, 1]
-
 source('utils.r')
 packages <- c('mice')
 import(packages)
 
+# Taken from https://www.r-bloggers.com/fitting-a-neural-network-in-r-neuralnet-package/
+# Section: Preparing to fit the neural network
+
+# =====================================
+# Normalization x -> x' in [0, 1]
+# =====================================
 normalize <- function (data) {
   # It is assumed that the passed data frame contains only 
   # numeric-valued columns
@@ -36,7 +37,9 @@ reverse_normalize_vec_with <- function (vals, min_val, max_val) {
   vals * (max_val - min_val) + min_val
 }
 
+# =====================================
 # Standadization ->  mean = 0, sd = 1
+# =====================================
 
 standardize <- function (data) {
   means <- apply(data, 2, mean)
@@ -64,7 +67,9 @@ reverse_standardize_vec_with <- function (vals, orig_mean, orig_sd) {
   vals * orig_sd + orig_mean
 }
 
+# =====================================
 # Splitting data
+# =====================================
 
 split_by_heating_season <- function (df) {
   sapply(df$timestamp, function (ts) {
@@ -93,13 +98,38 @@ split_by_season <- function (df) {
   })
 }
 
+# Returns a vector with TRUE values at positions that
+# should be included in the training set, the rest being
+# the values from the test set
+split_with_ratio <- function (d, ratio = 0.75) {
+  len <- 0
+  if (is.data.frame(d)) {
+    len <- length(d[, 1])
+  } else {
+    len <- length(d)
+  }
+  training_size <- round(ratio * len)
+  c(rep(TRUE, training_size), rep(FALSE, len - training_size))
+}
+
+split_with_day_ratio <- function (d, ratio = 0.75) {
+  len <- 0
+  if (is.data.frame(d)) {
+    len <- length(d[, 1])
+  } else {
+    len <- length(d)
+  }
+  training_days <- floor(len / 24)
+  training_size <- 24 * round(ratio * training_days)
+  c(rep(TRUE, training_size), rep(FALSE, len - training_size))
+}
+
 # The split is based on the astronomical seasons in Poland
 # 1 - winter, 2 - spring, 3 - summer, 4 - autumn
 generate_ts_by_season <- function (season_idx, year) {
   if (season_idx < 1 || season_idx > 4) {
     stop('Season index should take value between 1 (winter) and 4 (autumn)')
   }
-  
   from_date <- ''
   to_date <- ''
   series <- c()
@@ -144,7 +174,9 @@ generate_ts_by_season <- function (season_idx, year) {
   series
 }
 
+# ===========================================
 # Imputing missing values with MICE package
+# ===========================================
 impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, iters = 5) {
   
   # POSIX timestamp cannot be imputed with MICE 
@@ -173,7 +205,8 @@ impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, it
   
   imputed <- imputed[order(imputed$timestamp),]
   ts <- imputed$timestamp
-  temp_data <- mice(imputed[, variables], m = imputation_count, maxit = iters, method = method , seed = 500)
+  temp_data <- mice(imputed[, variables], m = imputation_count,
+                    maxit = iters, method = method , seed = 500)
   imputed <- complete(temp_data, 1)
   imputed$timestamp <- ts
   
@@ -182,15 +215,58 @@ impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, it
 }
 
 # Imputing missing values with MICE package
-impute_for_date_range <- function (df, from_date, to_date, method = 'cart', imputation_count = 5, iters = 5) {
+impute_for_date_range <- function (df, from_date, to_date, method = 'cart',
+                                   imputation_count = 5, iters = 5) {
+  print(method)
   ts_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
                   to = as.POSIXct(to_date, tz = 'UTC'),
                   by = 'hour')
-  impute_for_ts(df, ts_seq, imputation_count, iters)
+  impute_for_ts(df, ts_seq, method = method, imputation_count  = imputation_count, iters = iters)
 }
 
 impute <- function (df, method = 'cart', imputation_count = 5, iters = 5) {
   min_date <- min(df$timestamp)
   max_date <- max(df$timestamp)
-  impute_for_date_range(df, min_date, max_date, imputation_count, iters)
+  impute_for_date_range(df, min_date, max_date, method = method, imputation_count = imputation_count, iters = iters)
+}
+
+# This function assumes that the time series - @df - is complete
+# (there are records for every hourly measurment between the first and last
+# measurement)
+divide_into_windows <- function (df, past_lag, future_lag) {
+  window_width <- past_lag + 1
+  past_seq <- seq(past_lag, 1)
+  vars <- colnames(df)
+  past_vars <- c()
+  for (p in past_seq) {
+    past_vars <- c(past_vars, paste(vars, paste('minus', p, sep = '_'), sep = '_'))
+  }
+  future_vars <- paste(vars, paste('plus', future_lag, sep = '_'), sep = '_')
+  
+  # New columns of a single row: 
+  # * lagged observations with increasing timestamp, 
+  # * current observation
+  # * future observation
+  # Example (A, B - variables): 
+  # A-2, B-2, A-1, B-1, A, B, A+24, B+24
+  new_colnames <- c(past_vars, vars, future_vars)
+  data <- matrix(ncol = length(new_colnames),
+                 nrow = length(df[, 1]) - (past_lag + future_lag))
+  colnames(data) <- new_colnames
+  print(new_colnames)
+  
+  # Concatenating can be performed with a single c() call
+  # if the data frame is transposed
+  tdf <- t(df)
+  new_idx <- 1
+  
+  for (i in seq(past_lag + 1, length(tdf[1, ]) - future_lag)) {
+    # In the case of accessing a single column tdf cannot be used
+    # since it returns an object of class character instead of a data frame,
+    # like in the case of slicing 
+    row <- c(tdf[, (i - past_lag):i], t(df[i + future_lag, ]), recursive = TRUE)
+    data[new_idx, ] <- row
+    new_idx <- new_idx + 1
+  }
+  data.frame(data)
 }
