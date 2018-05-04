@@ -73,6 +73,7 @@ split_by_heating_season <- function (df) {
 }
 
 # The split is based on the astronomical seasons in Poland
+# 1 - winter, 2 - spring, 3 - summer, 4 - autumn
 split_by_season <- function (df) {
   sapply(df$timestamp, function (ts) {
     date <- format(as.Date(ts), format = '%m-%d')
@@ -80,20 +81,25 @@ split_by_season <- function (df) {
     summer_day <- '06-22'
     autumn_day <- '09-23'
     winter_day <- '12-22'
-    season <- 'winter'
+    season <- 1
     if (date >= spring_day && date < summer_day) {
-      season <- 'spring'
+      season <- 2
     } else if (date >= summer_day && date < autumn_day) {
-      season <- 'summer'
+      season <- 3
     } else if (date >= autumn_day && date < winter_day) {
-      season <- 'autumn'
+      season <- 4
     }
     season
   })
 }
 
 # The split is based on the astronomical seasons in Poland
-generate_ts_by_season <- function (season_name, year) {
+# 1 - winter, 2 - spring, 3 - summer, 4 - autumn
+generate_ts_by_season <- function (season_idx, year) {
+  if (season_idx < 1 || season_idx > 4) {
+    stop('Season index should take value between 1 (winter) and 4 (autumn)')
+  }
+  
   from_date <- ''
   to_date <- ''
   series <- c()
@@ -101,7 +107,7 @@ generate_ts_by_season <- function (season_name, year) {
   # It is necessary to specify the tz parameters in as.POSIXct
   # without them the final timestamps will be shifted (conversion
   # from localtime to UTC)
-  if (season_name == 'winter') {
+  if (season_idx == 1) {
     from_date <- paste(year, '-01-01 00:00', sep = '')
     to_date <- paste(year, '-03-20 23:00', sep = '')
     series <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
@@ -109,13 +115,13 @@ generate_ts_by_season <- function (season_name, year) {
                   by = 'hour')
     from_date <- '12-22 00:00'
     to_date <- '12-31 23:00'
-  } else if (season_name == 'spring') {
+  } else if (season_idx == 2) {
     from_date <- '03-21 00:00'
     to_date <- '06-21 23:00'
-  } else if (season_name == 'summer') {
+  } else if (season_idx == 3) {
     from_date <- '06-22 00:00'
     to_date <- '09-22 23:00'
-  } else {
+  } else if (season_idx == 4) {
     from_date <- '09-23 00:00'
     to_date <- '12-21 23:00'
   }
@@ -139,32 +145,35 @@ generate_ts_by_season <- function (season_name, year) {
 }
 
 # Imputing missing values with MICE package
-impute <- function (df, from_date, to_date, imputation_count = 5, iters = 5) {
-  year_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
-                  to = as.POSIXct(to_date, tz = 'UTC'),
-                  by = 'hour')
+impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, iters = 5) {
+  
+  # POSIX timestamp cannot be imputed with MICE 
+  # (and there is no point in doing so)
   variables <- colnames(df)
   variables <- variables[variables != 'timestamp']
+  print(variables)
   
-  # If all values in all columns in the row are present -> TRUE
-  row_presence_mask <- rep(TRUE, length(df[, 1]))
-  for (col in colnames(df)) {
-    row_presence_mask <- row_presence_mask & (!is.na(df[, col]))
+  # If there is at least one non-empty column,
+  # the row is considered present
+  present_rows_mask <- rep(FALSE, length(df[, 1]))
+  for (var in variables) {
+    present_rows_mask <- present_rows_mask | !is.na(df[, var]) 
   }
-  which.present <- which(row_presence_mask)
-  present_ts <- df[which.present, 'timestamp']
-  missing_ts <- as.POSIXct(c(setdiff(year_seq, present_ts)), origin = '1970-01-01', tz = 'UTC')
-  missing_obs <- data.frame(timestamp = missing_ts)
-  for (col in variables) {
-    missing_obs[, col] <- NA
-  }
+  
   imputed <- data.frame(df)
-  imputed <- rbind(imputed, missing_obs)
+  present_ts <- df[present_rows_mask, 'timestamp']
+  missing_ts <- as.POSIXct(c(setdiff(ts_seq, present_ts)), origin = '1970-01-01', tz = 'UTC')
+  if (length(missing_ts) > 0) {
+    missing_obs <- data.frame(timestamp = missing_ts)
+    for (col in variables) {
+      missing_obs[, col] <- NA
+    }
+    imputed <- rbind(imputed, missing_obs)
+  }
+  
   imputed <- imputed[order(imputed$timestamp),]
   ts <- imputed$timestamp
-  
-  temp_data <- mice(imputed[, variables], m = imputation_count, maxit = iters, meth = 'pmm', seed = 500)
-  densityplot(temp_data)
+  temp_data <- mice(imputed[, variables], m = imputation_count, maxit = iters, method = method , seed = 500)
   imputed <- complete(temp_data, 1)
   imputed$timestamp <- ts
   
@@ -173,32 +182,15 @@ impute <- function (df, from_date, to_date, imputation_count = 5, iters = 5) {
 }
 
 # Imputing missing values with MICE package
-impute <- function (df, ts_seq, imputation_count = 5, iters = 5) {
-  variables <- colnames(df)
-  variables <- variables[variables != 'timestamp']
-  
-  # If all values in all columns in the row are present -> TRUE
-  row_presence_mask <- rep(TRUE, length(df[, 1]))
-  for (col in colnames(df)) {
-    row_presence_mask <- row_presence_mask & (!is.na(df[, col]))
-  }
-  which.present <- which(row_presence_mask)
-  present_ts <- df[which.present, 'timestamp']
-  missing_ts <- as.POSIXct(c(setdiff(ts_seq, present_ts)), origin = '1970-01-01', tz = 'UTC')
-  missing_obs <- data.frame(timestamp = missing_ts)
-  for (col in variables) {
-    missing_obs[, col] <- NA
-  }
-  imputed <- data.frame(df)
-  imputed <- rbind(imputed, missing_obs)
-  imputed <- imputed[order(imputed$timestamp),]
-  ts <- imputed$timestamp
-  
-  temp_data <- mice(imputed[, variables], m = imputation_count, maxit = iters, meth = 'pmm', seed = 500)
-  densityplot(temp_data)
-  imputed <- complete(temp_data, 1)
-  imputed$timestamp <- ts
-  
-  # Return imputed data
-  imputed
+impute_for_date_range <- function (df, from_date, to_date, method = 'cart', imputation_count = 5, iters = 5) {
+  ts_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
+                  to = as.POSIXct(to_date, tz = 'UTC'),
+                  by = 'hour')
+  impute_for_ts(df, ts_seq, imputation_count, iters)
+}
+
+impute <- function (df, method = 'cart', imputation_count = 5, iters = 5) {
+  min_date <- min(df$timestamp)
+  max_date <- max(df$timestamp)
+  impute_for_date_range(df, min_date, max_date, imputation_count, iters)
 }

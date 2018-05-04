@@ -460,6 +460,7 @@ $$  LANGUAGE plpgsql;
 
 SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0.001, 0.96);
 SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0.001, 0.98);
+SELECT delete_percentile_outliers('observations', 'pm2_5', 0.001, 0.99);
 
 UPDATE observations AS obs
 SET temperature = NULL
@@ -633,12 +634,12 @@ $$  LANGUAGE plpgsql;
 
 select * from observations where station_id = 'airly_205' and pm2_5 is null order by timestamp;
 select station_id, count(*) from observations 
-where pm2_5 is not null
+--where pm2_5 is not null
 group by 1
 order by 2 desc, 1
 
 select * from observations 
-where station_id = 'airly_220'
+where station_id = 'looko2_5CCF7FC125EC'
 order by timestamp;
 
 /*
@@ -769,16 +770,16 @@ ALTER TABLE observations DROP COLUMN IF EXISTS season;
 ALTER TABLE observations ADD COLUMN season INT;
 
 UPDATE observations 
-SET season = 0
+SET season = 1
 WHERE to_char(timestamp::date, 'MM-dd') < '03-21' OR to_char(timestamp::date, 'MM-dd') > '12-21';
 UPDATE observations 
-SET season = 1
+SET season = 2
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '03-21' AND '06-21';
 UPDATE observations 
-SET season = 2
-WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '2017-06-22' AND '09-22';
-UPDATE observations
 SET season = 3
+WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '06-22' AND '09-22';
+UPDATE observations
+SET season = 4
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
 
 -- ===================================

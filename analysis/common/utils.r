@@ -30,6 +30,7 @@ load_observations <- function (table, variables = c('*'), stations = c(), na.omi
   }
   if ('timestamp' %in% variables) {
     attr(df$timestamp, 'tzone') <- 'UTC'
+    df <- df[ordered(df$timestamp),]
   }
   df
 }
