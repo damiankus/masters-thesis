@@ -24,7 +24,7 @@ main <- function () {
   variables <- variables[!(variables %in% excluded)]
   obs <- obs[, variables]
   
-  for (season in seq(1, 4)) {
+  for (season in seq(4, 4)) {
     data <- obs[obs$season == season,]
 
     plot_path <- file.path(target_root_dir, paste(season, 'original.png', sep = '_'))
@@ -39,6 +39,18 @@ main <- function () {
     day_split <- split_with_day_ratio(windows, 0.75)
     training_set <- windows[day_split,]
     test_set <- windows[!day_split,]
+    
+    training_count <- 24 * 7 * 3
+    test_count <- 24
+    offset_step <- 24 * 7
+    total_obs <- 24 * floor(length(windows[, 1]) / 24)
+    for (offset in seq(1, total_obs - (training_count + test_count), offset_step)) {
+      last_training_idx <- offset + training_count - 1
+      training_set <- windows[(offset):last_training_idx, ]
+      test_set <- windows[(last_training_idx + 1):(last_training_idx + test_count), ]
+      print(length(training_set[,1]))
+      print(length(test_set[,1]))
+    }
     
     save_line_plot(imputed, 'timestamp', 'pm2_5', plot_path,  paste('Imputed PM2.5 timeseries - ', season))
   }

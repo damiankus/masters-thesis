@@ -48,10 +48,10 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multiple_vars_plot <- function (df, plot_path) {
+save_multiple_vars_plot <- function (df, id_var, measure_var, plot_path) {
   # Transform the data frame into mapping timestamp -> (variable name, value)
-  melted <- melt(df, id.vars = 'timestamp')
-  plot <- ggplot(data = melted, aes(x = timestamp, y = value, fill = variable)) +
+  melted <- melt(df, id.vars = id_var, measure.vars = measure_var)
+  plot <- ggplot(data = melted, aes_string(x = 'timestamp', y = 'value', fill = 'type')) +
     geom_bar(stat = 'identity') +
     xlab('Date') +
     ylab('Value')

@@ -217,14 +217,13 @@ impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, it
 # Imputing missing values with MICE package
 impute_for_date_range <- function (df, from_date, to_date, method = 'cart',
                                    imputation_count = 5, iters = 5) {
-  print(method)
   ts_seq <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
                   to = as.POSIXct(to_date, tz = 'UTC'),
                   by = 'hour')
   impute_for_ts(df, ts_seq, method = method, imputation_count  = imputation_count, iters = iters)
 }
 
-impute <- function (df, method = 'cart', imputation_count = 5, iters = 5) {
+impute_missing <- function (df, method = 'cart', imputation_count = 5, iters = 5) {
   min_date <- min(df$timestamp)
   max_date <- max(df$timestamp)
   impute_for_date_range(df, min_date, max_date, method = method, imputation_count = imputation_count, iters = iters)
@@ -233,40 +232,38 @@ impute <- function (df, method = 'cart', imputation_count = 5, iters = 5) {
 # This function assumes that the time series - @df - is complete
 # (there are records for every hourly measurment between the first and last
 # measurement)
-divide_into_windows <- function (df, past_lag, future_lag) {
-  window_width <- past_lag + 1
-  past_seq <- seq(past_lag, 1)
-  vars <- colnames(df)
-  past_vars <- c()
-  for (p in past_seq) {
-    past_vars <- c(past_vars, paste(vars, paste('minus', p, sep = '_'), sep = '_'))
+divide_into_windows <- function (df, past_lag, future_lag, vars = 'all', future_vars = 'all', excluded_vars = c()) {
+  if (vars == 'all') {
+    vars <- colnames(df)
+    vars <- vars[!(vars %in% excluded_vars)]
   }
-  future_vars <- paste(vars, paste('plus', future_lag, sep = '_'), sep = '_')
+  past_seq <- seq(past_lag, 1)
+  past_var_cols <- unlist(lapply(vars, function (v) {
+    c(paste(v, paste('prev', past_seq, sep = '_'), sep = '_'), v)
+  }))
+  
+  if (future_vars == 'all') {
+    future_vars <- colnames(df)
+    future_vars <- vars[!(future_vars %in% excluded_vars)]
+  }
+  future_var_cols <- paste(future_vars, 'next', future_lag, sep = '_')
   
   # New columns of a single row: 
   # * lagged observations with increasing timestamp, 
   # * current observation
-  # * future observation
-  # Example (A, B - variables): 
-  # A-2, B-2, A-1, B-1, A, B, A+24, B+24
-  new_colnames <- c(past_vars, vars, future_vars)
-  data <- matrix(ncol = length(new_colnames),
-                 nrow = length(df[, 1]) - (past_lag + future_lag))
-  colnames(data) <- new_colnames
-  print(new_colnames)
+  # * future varaiable values
+  # Example (A, B - variables, A is the response var):
+  # A-2, B-2, A-1, B-1, A, B, A+24
+  new_colnames <- c(past_var_cols, future_var_cols)
   
-  # Concatenating can be performed with a single c() call
-  # if the data frame is transposed
-  tdf <- t(df)
-  new_idx <- 1
-  
-  for (i in seq(past_lag + 1, length(tdf[1, ]) - future_lag)) {
-    # In the case of accessing a single column tdf cannot be used
-    # since it returns an object of class character instead of a data frame,
-    # like in the case of slicing 
-    row <- c(tdf[, (i - past_lag):i], t(df[i + future_lag, ]), recursive = TRUE)
-    data[new_idx, ] <- row
-    new_idx <- new_idx + 1
-  }
-  data.frame(data)
+  rows <- sapply(seq(past_lag + 1, length(df[, 1]) - future_lag), function (i) {
+    row <- c(df[(i - past_lag):i, vars],
+             df[i + future_lag, future_vars],
+             recursive = TRUE)
+    row
+  })
+  rows <- t(rows)
+  windows <- data.frame(rows)
+  colnames(windows) <- new_colnames
+  windows
 }

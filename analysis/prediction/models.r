@@ -5,7 +5,7 @@ source('plotting.r')
 source('preprocess.r')
 setwd(wd)
 
-packages <- c('RPostgreSQL', 'ggplot2', 'reshape', 'caTools', 'glmnet', 'car', 'e1071', 'forecast')
+packages <- c('caTools', 'glmnet', 'car', 'e1071', 'forecast')
 import(packages)
 
 fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
