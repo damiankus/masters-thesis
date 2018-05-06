@@ -28,10 +28,8 @@ main <- function () {
   # Fetch all observations
   target_root_dir <- getwd()
   table <- 'observations'
-  response_vars <- c('pm2_5_plus_24')
-  explanatory_vars <- c('timestamp', 'is_holiday',
-                        'pm2_5','avg_daily_temperature',
-                        'max_daily_temperature', 'avg_daily_wind_speed')
+  response_vars <- c('pm2_5')
+  explanatory_vars <- c('timestamp')
   
   query = paste('SELECT',
                 paste(c(response_vars, explanatory_vars), collapse = ', '),
@@ -47,12 +45,13 @@ main <- function () {
   rhs_formula <- paste(explanatory_vars, collapse = ' + ')
   
   # obs <- obs[!split_by_heating_season(obs),]
-  obs <- impute(obs, from_date = '2017-01-01 00:00', to_date = '2017-12-31 23:00')
-  which_test <- split_by_month(obs, 2)
-  training_set <- obs[!which_test,]
-  test_set <- obs[which_test,]
+  obs <- impute_for_date_range(obs, from_date = '2017-01-01 00:00', to_date = '2017-12-31 23:00')
+  which_training <- split_with_ratio(obs, 0.75)
+  training_set <- obs[which_training,]
+  test_set <- obs[!which_training,]
+  training_set <- obs[obs$timestamp < '2017-04-1',]
   
-  pm_ts = ts(training_set$pm2_5_plus_24, frequency=24*7)
+  pm_ts = ts(training_set$pm2_5, frequency=8)
   decomp = stl(pm_ts, s.window="periodic")
   deseasonal_cnt <- seasadj(decomp)
   plot(decomp)

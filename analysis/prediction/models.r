@@ -10,21 +10,23 @@ import(packages)
 
 fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
   print('Fitting a linear regression model')
-  fit <- lm(res_formula,
+  model <- lm(res_formula,
             data = training_set)
-  pred_vals <- predict(fit, test_set)
+  pred_vals <- predict(model, test_set)
   res_var <- all.vars(res_formula)[[1]]
   results <- data.frame(actual = test_set[,res_var], predicted = pred_vals)
-  sum_funs <- c(
+  results$timestamp <- test_set$future_timestamp
+  
+  summ_funs <- c(
     summary,
-    function (fit) {
-      vifs <- vif(fit)
+    function (model) {
+      vifs <- vif(model)
       print(sort(vifs))
     },
-    function (fit) {
+    function (model) {
       # The first coeff is the intercept
       pvals <- sort(summary(fit)$coefficients[-1,4])
-      vifs <- vif(fit)
+      vifs <- vif(model)
       stats <- data.frame(pval = pvals, vif = vifs[names(pvals)])
       stats <- stats[which(stats$pval < 0.05 & stats$vif < 5),]
       info <- paste('Variables with p-val < 0.05 and VIF < 5: c(\'',
@@ -32,17 +34,29 @@ fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
                     "')", sep = '')
       print(info)
     })
-  save_all_stats(fit, test_set, results, res_var, 'regression', target_dir, sum_funs)
+  
+  file_path <- file.path(target_dir, 'regression_summary.txt')
+  save_summary(model, results, file_path, summary_funs = summ_funs)
+  save_prediction_goodness(results, file_path)
+  save_prediction_comparison(results, res_var, 'regression', target_dir)
+  results
 }
 
 fit_svr <- function (res_formula, training_set, test_set, target_dir) {
   print('Fitting a support vector regression model')
-  fit <- svm(res_formula, training_set)
-  pred_vals <- predict(fit, test_set)
+  model <- svm(res_formula, training_set)
+  pred_vals <- predict(model, test_set)
   res_var <- all.vars(res_formula)[[1]]
   results <- data.frame(actual = test_set[,res_var], predicted = pred_vals)
-  save_all_stats(fit, test_set, results, res_var, 'svr', target_dir, summary_funs = c(summary))  
+  results$timestamp <- test_set$future_timestamp
+  
+  file_path <- file.path(target_dir, 'svr_summary.txt')
+  save_summary(model, results, file_path)
+  save_prediction_goodness(results, file_path)
+  save_prediction_comparison(results, res_var, 'svr', target_dir)
+  results
 }
 
 fit_arima <- function (res_formula, training_set, test_set, target_dir) {
+  
 }

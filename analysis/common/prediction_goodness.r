@@ -1,4 +1,5 @@
 source('utils.r')
+source('plotting.r')
 import(c('hydroGOF'))
 
 # Measure formulas are based on the article by Selva Prabhakaran
@@ -90,17 +91,38 @@ prediction_goodness <- function (results) {
   sep = '\n')
 }
 
-save_prediction_goodness <- function (results, model, file_path, summary_funs = c(summary)) {
-  file.remove(file_path)
-  for (summary_fun in summary_funs) {
-    s <- summary_fun(model)
-    capture.output(s, file = file_path, append = TRUE)
+save_summary <- function(model, results, file_path, summary_funs = c(summary)) {
+  if (file.exists(file_path)) {
+    file.remove(file_path)
   }
+  sapply(summary_funs, function (fun) {
+    capture.output(fun(model), file = file_path, append = TRUE)
+  })
+}
 
+save_prediction_goodness <- function (results, file_path) {
+  results$residuals <- results$predicted - results$actual
   goodness <- prediction_goodness(results)
   cat(goodness)
-    
+  
   f <- file(file_path, open = 'a')
   write(paste('', goodness, sep = '\n'), f)
   close(f)
+}
+
+# This method accepts a @results parameter of the following form 
+# @resuts: $timestamp, $actual, $predicted
+save_prediction_comparison <- function (results, res_var, model_name, target_dir) {
+  plot_path <- file.path(target_dir, paste(res_var, model_name, 'prediction.png', sep = '_'))
+  save_comparison_plot(results, res_var, plot_path)
+  
+  plot_path <- file.path(target_dir, paste(res_var, model_name, 'prediction_bivariate.png', sep = '_'))
+  save_scatter_plot(results, res_var, plot_path = plot_path)
+  
+  results$residuals <- results$predicted - results$actual
+  plot_path <- file.path(target_dir, paste(res_var, model_name, 'residuals_distribution.png', sep = '_'))
+  save_histogram(results, 'residuals', plot_path = plot_path)
+  
+  plot_path <- file.path(target_dir, paste(res_var, model_name, 'scedascicity.png', sep = '_'))
+  save_scedascicity_plot(results, res_var, plot_path = plot_path)
 }

@@ -229,11 +229,11 @@ impute_missing <- function (df, method = 'cart', imputation_count = 5, iters = 5
   impute_for_date_range(df, min_date, max_date, method = method, imputation_count = imputation_count, iters = iters)
 }
 
-# This function assumes that the time series - @df - is complete
+# This function assumes that the time series @df is complete
 # (there are records for every hourly measurment between the first and last
 # measurement)
-divide_into_windows <- function (df, past_lag, future_lag, vars = 'all', future_vars = 'all', excluded_vars = c()) {
-  if (vars == 'all') {
+divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_vars = c(), excluded_vars = c()) {
+  if (length(vars) == 0) {
     vars <- colnames(df)
     vars <- vars[!(vars %in% excluded_vars)]
   }
@@ -242,18 +242,18 @@ divide_into_windows <- function (df, past_lag, future_lag, vars = 'all', future_
     c(paste(v, paste('prev', past_seq, sep = '_'), sep = '_'), v)
   }))
   
-  if (future_vars == 'all') {
+  if (length(future_vars) == 0) {
     future_vars <- colnames(df)
     future_vars <- vars[!(future_vars %in% excluded_vars)]
   }
-  future_var_cols <- paste(future_vars, 'next', future_lag, sep = '_')
+  future_var_cols <- paste('future', future_vars, sep = '_')
   
   # New columns of a single row: 
   # * lagged observations with increasing timestamp, 
   # * current observation
   # * future varaiable values
   # Example (A, B - variables, A is the response var):
-  # A-2, B-2, A-1, B-1, A, B, A+24
+  # A-2, B-2, A-1, B-1, A, B, future_A
   new_colnames <- c(past_var_cols, future_var_cols)
   
   rows <- sapply(seq(past_lag + 1, length(df[, 1]) - future_lag), function (i) {
