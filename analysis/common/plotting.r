@@ -49,10 +49,8 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multiple_vars_plot <- function (df, id_var, measure_var, plot_path) {
-  # Transform the data frame into mapping timestamp -> (variable name, value)
-  melted <- melt(df, id.vars = id_var, measure.vars = measure_var)
-  plot <- ggplot(data = melted, aes_string(x = 'timestamp', y = 'value', fill = 'type')) +
+save_multiple_vars_plot <- function (df, res_var, id_var, plot_path) {
+  plot <- ggplot(data = df, aes_string(x = 'timestamp', y = res_var, fill = id_var)) +
     geom_bar(stat = 'identity') +
     xlab('Date') +
     ylab('Value')
@@ -80,7 +78,6 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
       geom_vline(xintercept = outlier_thresholds[1]) +
       geom_vline(xintercept = outlier_thresholds[2])
   }
-  
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }

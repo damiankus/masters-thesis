@@ -237,10 +237,13 @@ divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_va
     vars <- colnames(df)
     vars <- vars[!(vars %in% excluded_vars)]
   }
-  past_seq <- seq(past_lag, 1)
-  past_var_cols <- unlist(lapply(vars, function (v) {
-    c(paste(v, paste('prev', past_seq, sep = '_'), sep = '_'), v)
-  }))
+  past_var_cols <- vars
+  if (past_lag > 0) {
+    past_seq <- seq(past_lag, 1)
+    past_var_cols <- unlist(lapply(vars, function (v) {
+      c(paste(v, paste('prev', past_seq, sep = '_'), sep = '_'), v)
+    }))
+  }
   
   if (length(future_vars) == 0) {
     future_vars <- colnames(df)
