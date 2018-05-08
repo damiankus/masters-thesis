@@ -81,3 +81,14 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
+
+save_data_split <- function (df, res_var, training_seq, test_seq, plot_path) {
+  data_split <- data.frame(df[, res_var])
+  colnames(data_split) <- c(res_var)
+  data_split$timestamp <- df$future_timestamp
+  data_split$type <- 'not used'
+  data_split[training_seq, 'type'] <- 'training'
+  data_split[test_seq, 'type'] <- 'test'
+  
+  save_multiple_vars_plot(data_split, res_var, id_var = 'type', plot_path = plot_path)
+}

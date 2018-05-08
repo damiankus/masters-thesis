@@ -270,3 +270,18 @@ divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_va
   colnames(windows) <- new_colnames
   windows
 }
+
+# Detect linearly dependent explanatory variables and remove them
+# from the model formula
+skip_colinear_variables <- function (res_formula, df, model = NA) {
+  if (is.na(model)) {
+    model <- lm(formula = res_formula, data = df)
+  }
+  lin_dep <- attributes(alias(model)$Complete)$dimnames[[1]]
+  vars <- all.vars(res_formula)
+  
+  # First var is the response variable
+  explanatory <- vars[2:length(vars)]
+  explanatory <- explanatory[!(explanatory %in% lin_dep)]
+  as.formula(paste(vars[1], '~', paste(explanatory, collapse = '+'), sep = ' '))
+} 

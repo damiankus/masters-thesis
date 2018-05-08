@@ -126,14 +126,3 @@ save_prediction_comparison <- function (results, res_var, model_name, target_dir
   plot_path <- file.path(target_dir, paste(res_var, model_name, 'scedascicity.png', sep = '_'))
   save_scedascicity_plot(results, res_var, plot_path = plot_path)
 }
-
-skip_colinear_variables <- function (res_formula, df, model = NA) {
-  if (is.na(model)) {
-    model <- lm(formula = res_formula, data = df)
-  }
-  lin_dep <- attributes(alias(model)$Complete)$dimnames[[1]]
-  vars <- all.vars(res_formula)
-  explanatory <- vars[1:length(vars)]
-  explanatory <- explanatory[!(explanatory %in% lin_dep)]
-  as.formula(paste(vars[1], '~', paste(explanatory, collapse = '+'), sep = ' '))
-} 

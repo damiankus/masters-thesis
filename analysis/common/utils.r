@@ -1,7 +1,7 @@
 import <- function (packages) {
   Sys.setenv(LANG = 'en')
   new_packages <- packages[!(packages %in% installed.packages()[,'Package'])]
-  if (length(new_packages) > 0) { install.packages(new_packages) }
+  if (length(new_packages) > 0) { install.packages(new_packages, dependencies = TRUE) }
   lapply(packages, library, character.only = TRUE)
 }
 
