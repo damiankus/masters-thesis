@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Column, ForeignKey, CHAR, \
-    NUMERIC, Sequence, INTEGER, TIMESTAMP
+from sqlalchemy import CHAR, NUMERIC, INTEGER, TIMESTAMP, \
+    Column, ForeignKey, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 

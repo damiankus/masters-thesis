@@ -5,7 +5,7 @@ source('plotting.r')
 source('preprocess.r')
 setwd(wd)
 
-packages <- c('caTools', 'glmnet', 'car', 'e1071', 'forecast')
+packages <- c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'keras')
 import(packages)
 Sys.setenv(LANG = 'en')
 
@@ -82,17 +82,80 @@ fit_svr <- function (res_formula, training_set, test_set, target_dir) {
 }
 
 fit_arima <- function (res_formula, training_set, test_set, target_dir) {
+  print('Fitting ARIMA model')
+  
+  # res_var - future_pm2_5
+  # base_var - pm2_5
   res_var <- all.vars(res_formula)[[1]]
-  res_ts = ts(training_set[, res_var], frequency=24)
-  decomp = stl(res_ts, s.window = 'periodic')
-  deseasonal_cnt <- seasadj(decomp)
-  plot(decomp)
-  acf(deseasonal_cnt)
-  model <- Arima(res_ts,
-                 order = c(4, 2, 1), 
-                 seasonal = list(order = c(1, 0, 1),
-                                 period = 24))
-  forecast_arima_params <- forecast(model, h = 24)
-  plot(forecast_arima_params)
+  base_var <- gsub('future_', '', res_var)
+
+  training_ts = ts(training_set[, base_var], frequency = 24)
+  test_seq <- c(training_set[, base_var], test_set[, base_var])
+  last_training_idx <- length(training_ts)
+  
+  model <- Arima(training_ts,
+                 order = c(1, 1, 2), 
+                 seasonal = list(order = c(2, 0, 0),
+                                 period = 24),
+                 method = 'CSS')
+  pred_vals <- unlist(
+    lapply(seq(last_training_idx + 1, last_training_idx + length(test_set[, 1])),
+           function (i) {
+             model <- Arima(ts(test_seq[1:i], frequency = 24), model = model)
+             tail(forecast(model, h = 24)$mean, n = 1)
+           }))
+  
+  results <- data.frame(actual = test_set[, res_var], 
+             predicted = pred_vals,
+             timestamp = test_set$future_timestamp)
+  
+  file_path <- file.path(target_dir, 'arima_summary.txt')
+  save_summary(model, results, file_path)
+  save_prediction_goodness(results, file_path)
+  save_prediction_comparison(results, res_var, 'arima', target_dir)
+  
+  results
+  
+  # decomposed = stl(res_ts, s.window = 'periodic')
+  # trend <- decomposed$time.series[, 'trend']
+  # seasonal <- decomposed$time.series[, 'seasonal']
+  # remainder <- decomposed$time.series[, 'remainder']
+}
+
+fit_lstm <- function (res_formula, training_set, test_set, target_dir) {
+  res_var <- all.vars(res_formula)[[1]]
+  vars <- colnames(training_set)
+  vars <- vars[startsWith(vars, 'pm2_5')]
+  vars <- c(vars, res_var) 
+  batch_size <- length(training_set[, 1])
+  cols_count <- length(vars)
+  
+  training_3d <- array(apply(training_set[, vars], 2, function (row) {
+      array(
+        lapply(row, function (x) { array(x, dim = c(1)) }),
+        dim = c(cols_count, 1)
+      )
+    }), dim = c(batch_size, cols_count, 1))
+  
+  model <- keras_model_sequential()
+  model %>%
+    layer_lstm(12, input_shape = c(cols_count, 1)) %>%
+    layer_dense(10) %>%
+    layer_dense(1) %>%
+    layer_activation("linear")
+  
+  model %>% compile(
+    loss = "mse",
+    metrics = "mse",
+    optimizer = "adam"
+  )
+  
+  history <- model %>% fit(
+    training_3d[, 1:(cols_count - 1), ], training_3d[, cols_count, ],
+    batch_size = 128,
+    epochs = 20,
+    validation_split = 0.8,
+    verbose = TRUE
+  )
 }
 

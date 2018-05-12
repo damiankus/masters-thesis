@@ -26,7 +26,7 @@ main <- function () {
   response_vars <- c('pm2_5')
   future_lag <- 24
   prev_lag <- 8
-  training_days <- 7 * 10
+  training_days <- 7 * 4
   test_days <- 7
   offset_days <- 7
   
@@ -34,7 +34,8 @@ main <- function () {
   excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
   explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
   seasons <- c('winter', 'spring', 'summer', 'autumn')
-  pred_models <- c(mlr = fit_mlr, log_mlr = fit_log_mlr, svr = fit_svr)
+  pred_models <- c(persistence = fit_persistence, regression = fit_mlr,
+                   log_mlr = fit_log_mlr, svr = fit_svr, arima = fit_arima)
 
   for (base_res_var in response_vars) {
     var_dir <- file.path(getwd(), base_res_var)
@@ -75,8 +76,13 @@ main <- function () {
       
       lapply(names(pred_models), function (model_name) {
         fit_model <- pred_models[[model_name]]
+        model_dir <- file.path(season_dir, model_name)
+        mkdir(model_dir)
         
         results <- lapply(offset_seq, function (offset) {
+          offset_dir <- file.path(model_dir, offset)
+          mkdir(offset_dir)
+          
           last_training_idx <- offset + training_count - 1
           training_seq <- (offset):last_training_idx
           test_seq <- (last_training_idx + 1):(last_training_idx + test_count)
@@ -84,7 +90,7 @@ main <- function () {
           training_set <- windows[training_seq, ]
           test_set <- windows[test_seq, ]
           
-          fit_model(res_formula, training_set, test_set, model_dir)
+          fit_model(res_formula, training_set, test_set, offset_dir)
         })
         results <- do.call(rbind, results)
         
