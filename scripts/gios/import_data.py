@@ -1,23 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
-import glob
 import json
 import logging
 import os
+from glob import glob
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Station, Observation, SqlBase
-
-
-def get_component_for_name(component_name):
-    if component_name is None or component_name == '':
-        raise ValueError('Invalid component name')
-    parts = component_name.split('.')
-    component = __import__(parts[0])
-    for child in parts[1:]:
-        component = getattr(component, child)
-    return component
+from readers import YearlyDataReader, MonthlyDataReader
 
 
 def setup_logger(fpath='import.log'):
@@ -35,13 +26,12 @@ def setup_logger(fpath='import.log'):
 
     logger.addHandler(fh)
     logger.addHandler(ch)
-
     return logger
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Parsing Wunderground \
-        history API responses')
+    parser = argparse.ArgumentParser(description='Parsing GIOS files \
+        and importing data to a database')
     parser.add_argument('--dir', '-d', help='Path to directory containing \
         the responses grouped in subdirectories named after the station IDs',
                         default=os.path.join('responses'))
@@ -67,6 +57,32 @@ if __name__ == '__main__':
     for tbl in SqlBase.metadata.sorted_tables:
         logger.debug('Created ' + str(tbl))
 
-    stations = list(map(lambda s: Station(**s), config['stations']))
+    stations = [Station(**s) for s in config['stations']]
     session.add_all(stations)
     session.commit()
+    logger.debug('Saved stations')
+
+    station_ids = [s['id'] for s in config['stations']]
+    uuids = [s['uuid'] for s in config['stations']]
+
+    # Yearly data
+    reader = YearlyDataReader(station_ids, uuids, config['var-names'])
+    for fpath in config['yearly-paths']:
+        logger.debug('Reading file {}'.format(fpath))
+        observations = reader.read_data(fpath)
+        session.add_all(observations)
+        session.commit()
+        logger.debug('Saved a batch of yearly observations')
+
+    # Monthly data
+    for d in config['monthly-dirs']:
+        for i, s in enumerate(station_ids):
+            reader = MonthlyDataReader(
+                [s], [uuids[i]], config['var-names'],
+                delimiter=';', quotechar='')
+            for fpath in glob(os.path.join(d, s, '*')):
+                logger.debug('Reading file {}'.format(fpath))
+                observations = reader.read_data(fpath)
+                session.add_all(observations)
+                session.commit()
+                logger.debug('Saved a batch of monthly observations')

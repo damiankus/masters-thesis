@@ -24,7 +24,6 @@ class Station(SqlBase):
     uuid = Column(CHAR(20))
 
     def __repr__(self):
-        print(vars(self))
         return 'Station[{id}]({address}, {latitude}, {longitude})' \
                .format(**vars(self))
 

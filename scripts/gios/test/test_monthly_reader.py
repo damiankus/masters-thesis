@@ -7,29 +7,32 @@ from readers import MonthlyDataReader
 class TestMonthlyReader(unittest.TestCase):
     def setUp(self):
         self.fpath = 'test/monthly_data.csv'
-        self.station_id = 'gios_krasinskiego'
-        self.station_uuid = 'MpKrakAlKras'
-        self.header_line_no = 0
-        self.data_line_no = 2
-        self.var_names = ['pm2.5', 'pm10']
+        self.station_ids = ['gios_krasinskiego']
+        self.station_uuids = ['MpKrakAlKras']
+        self.var_names = ['pm2_5', 'pm10']
         self.reader = MonthlyDataReader(
-            self.station_id, self.station_uuid, self.var_names,
-            self.header_line_no, self.data_line_no)
+            self.station_ids, self.station_uuids, self.var_names)
         self.header = 'Zanieczyszczenie,Aleja Krasińskiego - benzen,\
         Aleja Krasińskiego - pył zawieszony PM2.5,Aleja Krasińskiego - pył zawieszony PM10,\
         Aleja Krasińskiego - tlenki azotu,Aleja Krasińskiego - dwutlenek azotu,\
         Aleja Krasińskiego - tlenek węgla'
 
-        self.colnames = self.header.split(',')
-        self.col_indexes = [2, 3]
+        self.header = [self.header.split(',')]
         self.records = self.reader.read_from_file(self.fpath)
         self.observations = [
             self.reader.map_to_object(r) for r in self.records]
 
-    def test_monthly_getVarIndexes(self):
-        col_indexes = self.reader.get_var_indexes(self.colnames)
-        print(col_indexes)
-        self.assertEqual(self.col_indexes, col_indexes)
+    def test_monthly_getVarIndexes_firstVar(self):
+        col_indexes = self.reader.get_var_indexes(self.header)
+        self.assertEqual(
+            col_indexes[self.station_ids[0]][self.var_names[0]],
+            2)
+
+    def test_monthly_getVarIndexes_secondVar(self):
+        col_indexes = self.reader.get_var_indexes(self.header)
+        self.assertEqual(
+            col_indexes[self.station_ids[0]][self.var_names[1]],
+            3)
 
     def test_monthly_readFromFile_length(self):
         self.assertEqual(len(self.records), 10)
