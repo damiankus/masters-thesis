@@ -51,18 +51,15 @@ if __name__ == '__main__':
         session = DbSession()
 
         # Recreate all the necessary tables
-        Observation.__table__.drop(engine, checkfirst=True)
-        Station.__table__.drop(engine, checkfirst=True)
-        SqlBase.metadata.create_all(engine)
+        # Observation.__table__.drop(engine, checkfirst=True)
+        # Station.__table__.drop(engine, checkfirst=True)
+        # SqlBase.metadata.create_all(engine)
 
-        for tbl in SqlBase.metadata.sorted_tables:
-            print('Created ' + str(tbl))
-
-        with open(config['stations-file']) as stations_file:
-            stations = [Station(**s) for s in
-                        json.load(stations_file)['stations']]
-            session.add_all(stations)
-            session.commit()
+        # with open(config['stations-file']) as stations_file:
+        #     stations = [Station(**s) for s in
+        #                 json.load(stations_file)['stations']]
+        #     session.add_all(stations)
+        #     session.commit()
 
     padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
     timestamp_format = '{year}-{mon}-{mday} {hour}:{min}'

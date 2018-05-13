@@ -56,6 +56,13 @@ AND latitude IS NOT NULL
 AND longitude IS NOT NULL
 ORDER BY s.id;
 
+INSERT INTO stations(
+	source, id, address, city, latitude, longitude,
+	manufacturer, uuid)
+SELECT source, id, address, city, latitude, longitude,
+	manufacturer, uuid
+FROM gios_stations;
+
 CREATE INDEX ON stations(id);
 
 -- Fill the geographical coordinates 
@@ -76,7 +83,7 @@ CREATE TABLE observations (
 	id SERIAL PRIMARY KEY,
 	station_id CHAR(20) REFERENCES stations(id),
 	timestamp TIMESTAMP,
-	pm1 NUMERIC(9, 5),
+	-- pm1 NUMERIC(9, 5),
 	pm2_5 NUMERIC(9, 5),
 	pm10 NUMERIC(9, 5),
 /*
@@ -96,27 +103,14 @@ CREATE TABLE observations (
 	pressure NUMERIC(7, 3)
 );
 
-UPDATE airly_observations 
-SET humidity = NULL
-WHERE humidity < 0;
-
-UPDATE airly_observations 
-SET humidity = NULL
-WHERE humidity > 100;
-
-UPDATE airly_observations 
-SET pm10 = NULL
-WHERE pm10 < 0;
-
 -- =====================================
 
 INSERT INTO observations (
 	station_id, timestamp,
 	temperature, pressure, humidity,
-	pm1, pm2_5, pm10
+	pm2_5, pm10
 )
-SELECT 'airly_' || station_id, utc_time, temperature, (pressure / 100.0), humidity,
-	pm1, pm2_5, pm10
+SELECT 'airly_' || station_id, utc_time, temperature, (pressure / 100.0), humidity, pm2_5, pm10
 FROM airly_observations
 ORDER BY station_id, utc_time;
 
@@ -124,11 +118,11 @@ ORDER BY station_id, utc_time;
 INSERT INTO observations (
 	station_id, timestamp,
 	temperature, pressure, humidity,
-	pm1, pm2_5, pm10
+	pm2_5, pm10
 )
 SELECT 'agh_' || station_id, to_timestamp(measurementmillis / 1000) AT time zone 'UTC',
 	temperature, (pressure / 100.0), humidity,
-	pm1, pm2_5, pm10
+	pm2_5, pm10
 FROM monitoring_agh_observations AS o
 JOIN monitoring_agh_stations AS s
 ON o.station_id = s.id
@@ -137,14 +131,22 @@ ORDER BY station_id, measurementmillis;
 
 INSERT INTO observations (
 	station_id, timestamp,
-	pm1, pm2_5, pm10
+	pm2_5, pm10
 )
 SELECT 'looko2_' || station_id, format('%s %s:00', date, hour)::timestamp,
-	pm1, pm2_5, pm10
+	pm2_5, pm10
 FROM looko2_observations
 JOIN stations AS s 
 ON s.id = 'looko2_' || station_id
 ORDER BY station_id, date, hour;
+
+INSERT INTO observations (
+	station_id, timestamp,
+	pm2_5, pm10
+)
+SELECT station_id, timestamp, pm2_5, pm10
+FROM gios_observations
+ORDER BY station_id, timestamp;
 
 /* 
 There might be duplicated rows for the same station and timestamp
@@ -169,9 +171,11 @@ be equal exactly to 0.00. LookO2 data seems to use
 this value as an equivalent of an empty measurement
 */
 
+/*
 UPDATE observations 
 SET pm1 = NULL
 WHERE pm1 <= 0;
+*/
 
 UPDATE observations 
 SET pm2_5 = NULL
@@ -209,7 +213,14 @@ It is assumed that the main pollution type to be forecasted
 is PM2.5. Records with missing values of PM2.5 won't be 
 filled with measurements from other stations because obsevations
 can vary vastly based on the environment of the sensor.
+
+UPDATE: On the other hand the missing PM values
+can be approximated based on other values in from
+the same station, so maybe it is reasonable to leave
+them in the dataset
 */ 
+
+/*
 DELETE FROM observations
 WHERE pm2_5 IS NULL;
 
@@ -224,6 +235,7 @@ AND wind_dir_deg IS NULL
 AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
+*/
 
 -- ===================================
 -- Indexes on observations
@@ -295,7 +307,6 @@ CREATE TABLE meteo_observations (
 	pressure NUMERIC(7, 3), 
 	wind_speed NUMERIC(7, 3), -- m/s!
 	wind_dir_deg NUMERIC(6, 3),
-	wind_dir NUMERIC(4, 3),
 	precip_total NUMERIC(7, 3),
 	precip_rate NUMERIC(7, 3),
 	solradiation NUMERIC(8, 3)
@@ -323,13 +334,11 @@ SELECT 'agh_meteo', time, ta_hour_avg, ua_hour_avg, pa_hour_avg,
 FROM meteo_agh_observations
 ORDER BY time;
 
--- Wunderground records
--- Note that we cast the wind speed from kpm to mps! (1 kpm ~ 0.278 m/s)
 INSERT INTO meteo_observations(station_id, timestamp, temperature,
 	 humidity, pressure, wind_speed, wind_dir_deg, 
 	 precip_total, precip_rate, solradiation)
 SELECT station_id, date_trunc('hour', timestamp),
-	AVG(temperature), AVG(humidity), AVG(pressure), 0.278 * AVG(wind_speed),
+	AVG(temperature), AVG(humidity), AVG(pressure), AVG(wind_speed),
 	AVG(wind_dir_deg), AVG(precip_total), AVG(precip_rate), AVG(solradiation)
 FROM wunderground_observations 
 GROUP BY 1, 2
@@ -350,12 +359,6 @@ SELECT id
 FROM meteo_stations
 WHERE source = 'wunderground'
 );
-
-/*
-Transforming wind direction measurements into continuous-valued representations
-*/
-UPDATE meteo_observations 
-SET wind_dir = 0.5 * SIN(2 * PI() * wind_dir_deg / 360) + 0.5;
 
 /*
 Copy meteo data from observations in order to make
@@ -458,9 +461,9 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0.001, 0.96);
-SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0.001, 0.98);
-SELECT delete_percentile_outliers('observations', 'pm2_5', 0.001, 0.99);
+SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0, 0.99);
+SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0, 0.99);
+SELECT delete_percentile_outliers('observations', 'pm2_5', 0, 0.99);
 
 UPDATE observations AS obs
 SET temperature = NULL
@@ -551,8 +554,6 @@ FROM (
 ) AS dist
 );
 
-select * from meteo_distance
-
 ALTER TABLE meteo_distance ADD PRIMARY KEY (id);
 CREATE INDEX ON meteo_distance(station_id1);
 CREATE INDEX ON meteo_distance(station_id2);
@@ -630,17 +631,7 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
--- SELECT create_empty_records();
-
-select * from observations where station_id = 'airly_205' and pm2_5 is null order by timestamp;
-select station_id, count(*) from observations 
---where pm2_5 is not null
-group by 1
-order by 2 desc, 1
-
-select * from observations 
-where station_id = 'looko2_5CCF7FC125EC'
-order by timestamp;
+SELECT create_empty_records();
 
 /*
 A function filling missing values by 
@@ -751,6 +742,7 @@ WHERE EXTRACT(DOW FROM timestamp) = 0
 ALTER TABLE observations DROP COLUMN IF EXISTS period_of_day;
 ALTER TABLE observations ADD COLUMN period_of_day INT;
 
+-- Winter is split into two periods: January - Match and December
 UPDATE observations 
 SET period_of_day = 0
 WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
@@ -770,17 +762,20 @@ ALTER TABLE observations DROP COLUMN IF EXISTS season;
 ALTER TABLE observations ADD COLUMN season INT;
 
 UPDATE observations 
-SET season = 1
+SET season = 0
 WHERE to_char(timestamp::date, 'MM-dd') < '03-21' OR to_char(timestamp::date, 'MM-dd') > '12-21';
 UPDATE observations 
-SET season = 2
+SET season = 1
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '03-21' AND '06-21';
 UPDATE observations 
-SET season = 3
+SET season = 2
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '06-22' AND '09-22';
 UPDATE observations
-SET season = 4
+SET season = 3
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
+UPDATE observations 
+SET season = 4
+WHERE to_char(timestamp::date, 'MM-dd') > '12-21';
 
 -- ===================================
 

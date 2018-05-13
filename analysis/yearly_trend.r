@@ -36,7 +36,7 @@ save_histogram <- function (df, factor, plot_path, title) {
   
   fact_col <- df[,factor] 
   bw <- 2 * IQR(fact_col, na.rm = TRUE) / length(fact_col) ^ 0.33
-  outlier_thresholds <- quantile(fact_col, c(.001, .995), na.rm = TRUE)
+  outlier_thresholds <- quantile(fact_col, c(0, .99), na.rm = TRUE)
   
   plot <- ggplot(data = df, aes_string(fact_col)) +
     geom_histogram(colour = 'white', fill = 'blue', binwidth = bw) +
@@ -62,10 +62,10 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   # Fetch all observations
-  table_name <- 'observations'
-  # table_name <- 'meteo_observations'
+  # table_name <- 'observations'
+  table_name <- 'meteo_observations'
   excluded <- c('id', 'station_id')
-  query = paste('SELECT timestamp, pm2_5 FROM',
+  query = paste('SELECT timestamp, temperature, pressure, solradiation FROM',
                  table_name,
                 # "WHERE station_id = 'airly_172'",
                  sep = ' ')

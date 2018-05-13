@@ -15,6 +15,8 @@ CREATE TABLE looko2_observations (
     pm10 NUMERIC(8, 4),
     station_name CHAR(50)
 );
+-- run this command in the psql shell (running COPY in script results in access denial)
+-- psql -d pollution
 \copy looko2_observations (date, hour, day, month, year, station_id, pm1, pm2_5, pm10, station_name) FROM 'looko2.csv' WITH HEADER DELIMITER ',' CSV;
 
 
@@ -47,3 +49,8 @@ WHERE station_name NOT IN
 (
 	SELECT station_name FROM looko2_stations
 );
+
+select * from looko2_stations;
+select * from looko2_observations limit 1000;
+
+-- Now run the update_geo_coordinates.py script to update the geographical coordinates of stations!

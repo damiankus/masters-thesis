@@ -45,6 +45,5 @@ if __name__ == '__main__':
     parser.add_argument('--skip_headers', action='store_true',
                         help='Do the merged files have headers to skip?')
     args = vars(parser.parse_args())
-    print(args)
     merger = FileMerger(args['dir'], args['out'], args['skip_headers'])
     merger.merge()
