@@ -30,12 +30,6 @@ def setup_logger(fpath='import.log'):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Parsing GIOS files \
-        and importing data to a database')
-    parser.add_argument('--dir', '-d', help='Path to directory containing \
-        the responses grouped in subdirectories named after the station IDs',
-                        default=os.path.join('responses'))
-    args = vars(parser.parse_args())
     logger = setup_logger()
 
     config = None

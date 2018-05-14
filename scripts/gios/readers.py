@@ -41,14 +41,16 @@ class AbstractDataReader(ABC):
             col_indexes = self.get_var_indexes(header)
 
             for row in reader:
-                record = {'timestamp':  row[0]}
                 for s in self.station_ids:
-                    record['station_id'] = s
+                    record = {
+                        'timestamp':  row[0],
+                        'station_id': s
+                    }
                     for v in self.var_names:
                         idx = col_indexes[s][v]
                         if idx is not None and row[idx]:
                             record[v] = row[idx].translate(TRANS_NUM)
-                append(record)
+                    append(record)
         return lines
 
     def map_to_object(self, record):
