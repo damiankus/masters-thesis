@@ -463,7 +463,18 @@ $$  LANGUAGE plpgsql;
 
 SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0, 0.99);
 SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0, 0.99);
-SELECT delete_percentile_outliers('observations', 'pm2_5', 0, 0.99);
+-- SELECT delete_percentile_outliers('observations', 'pm2_5', 0, 0.99);
+
+/*
+DELETE FROM observations
+WHERE station_id NOT IN (
+	SELECT id FROM gios_stations
+);
+DELETE FROM stations
+WHERE id NOT IN (
+	SELECT id FROM gios_stations
+);
+*/
 
 UPDATE observations AS obs
 SET temperature = NULL
@@ -486,6 +497,7 @@ saves an empty record (probably because of
 the maintanance) which should be removed.
 */
 
+/*
 DELETE FROM meteo_observations
 WHERE temperature IS NULL
 AND humidity IS NULL
@@ -495,6 +507,7 @@ AND wind_dir_deg IS NULL
 AND precip_total IS NULL
 AND precip_rate IS NULL
 AND solradiation IS NULL;
+*/
 
 CREATE INDEX ON meteo_observations(timestamp);
 CREATE INDEX ON meteo_observations(station_id);
@@ -744,16 +757,16 @@ ALTER TABLE observations ADD COLUMN period_of_day INT;
 
 -- Winter is split into two periods: January - Match and December
 UPDATE observations 
-SET period_of_day = 0
+SET period_of_day = 1
 WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
 UPDATE observations 
-SET period_of_day = 1
+SET period_of_day = 2
 WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
 UPDATE observations 
-SET period_of_day = 2
+SET period_of_day = 3
 WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
 UPDATE observations
-SET period_of_day = 3
+SET period_of_day = 4
 WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
 
 -- ===================================
@@ -762,19 +775,19 @@ ALTER TABLE observations DROP COLUMN IF EXISTS season;
 ALTER TABLE observations ADD COLUMN season INT;
 
 UPDATE observations 
-SET season = 0
+SET season = 1
 WHERE to_char(timestamp::date, 'MM-dd') < '03-21' OR to_char(timestamp::date, 'MM-dd') > '12-21';
 UPDATE observations 
-SET season = 1
+SET season = 2
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '03-21' AND '06-21';
 UPDATE observations 
-SET season = 2
+SET season = 3
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '06-22' AND '09-22';
 UPDATE observations
-SET season = 3
+SET season = 4
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
 UPDATE observations 
-SET season = 4
+SET season = 5
 WHERE to_char(timestamp::date, 'MM-dd') > '12-21';
 
 -- ===================================
@@ -785,6 +798,18 @@ UPDATE observations
 SET is_heating_season = 1
 WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
 OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS month;
+ALTER TABLE observations ADD COLUMN month INT;
+UPDATE observations 
+SET month = EXTRACT(MONTH FROM timestamp);
+
+ALTER TABLE observations DROP COLUMN IF EXISTS year;
+ALTER TABLE observations ADD COLUMN year INT;
+UPDATE observations 
+SET year = EXTRACT(YEAR FROM timestamp);
 
 -- ===================================
 
@@ -843,7 +868,6 @@ DROP INDEX "observations_wind_dir_deg_idx";
 DROP INDEX "observations_precip_total_idx";
 DROP INDEX "observations_precip_rate_idx";
 DROP INDEX "observations_solradiation_idx";
-
 
 -- ===================================
 -- Adding time-lagged PM level values

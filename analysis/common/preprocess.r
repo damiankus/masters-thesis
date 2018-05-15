@@ -127,24 +127,18 @@ split_with_day_ratio <- function (d, ratio = 0.75) {
 # The split is based on the astronomical seasons in Poland
 # 1 - winter, 2 - spring, 3 - summer, 4 - autumn
 generate_ts_by_season <- function (season_idx, year) {
-  if (season_idx < 1 || season_idx > 4) {
-    stop('Season index should take value between 1 (winter) and 4 (autumn)')
+  if (season_idx < 1 || season_idx > 5) {
+    stop('Season index should take value between 1 (end of last year\'s winter) and 5 (beginning of this year\'s winter)')
   }
   from_date <- ''
   to_date <- ''
-  series <- c()
   
   # It is necessary to specify the tz parameters in as.POSIXct
   # without them the final timestamps will be shifted (conversion
   # from localtime to UTC)
   if (season_idx == 1) {
-    from_date <- paste(year, '-01-01 00:00', sep = '')
-    to_date <- paste(year, '-03-20 23:00', sep = '')
-    series <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
-                  to = as.POSIXct(to_date, tz = 'UTC'),
-                  by = 'hour')
-    from_date <- '12-22 00:00'
-    to_date <- '12-31 23:00'
+    from_date <- '01-01 00:00'
+    to_date <- '03-20 23:00'
   } else if (season_idx == 2) {
     from_date <- '03-21 00:00'
     to_date <- '06-21 23:00'
@@ -154,22 +148,16 @@ generate_ts_by_season <- function (season_idx, year) {
   } else if (season_idx == 4) {
     from_date <- '09-23 00:00'
     to_date <- '12-21 23:00'
+  } else if (season_idx == 5) {
+    from_date <- '12-22 00:00'
+    to_date <- '12-31 23:00'
   }
   
-  from_date <- paste(year, '-', from_date, sep = '')
-  to_date <- paste(year, '-', to_date, sep = '')
-  
-  # Appending timestamps to an empty vector causes 
-  # conversion to the number of seconds since 1970-01-01
-  # Thus the if-else workaround
-  s <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
+  from_date <- paste(year, from_date, sep = '-')
+  to_date <- paste(year, to_date, sep = '-')
+  series <- seq(from = as.POSIXct(from_date, tz = 'UTC'),
            to = as.POSIXct(to_date, tz = 'UTC'),
            by = 'hour')
-  if (length(series) == 0) {
-    series <- s
-  } else {
-    series <- c(series, s)
-  }
   attr(series, 'tzone') <- 'UTC'
   series
 }
@@ -177,7 +165,7 @@ generate_ts_by_season <- function (season_idx, year) {
 # ===========================================
 # Imputing missing values with MICE package
 # ===========================================
-impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, iters = 5) {
+impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, iters = 5, plot_path = '') {
   
   # POSIX timestamp cannot be imputed with MICE 
   # (and there is no point in doing so)
@@ -192,23 +180,30 @@ impute_for_ts <- function (df, ts_seq, method = 'cart', imputation_count = 5, it
     present_rows_mask <- present_rows_mask | !is.na(df[, var]) 
   }
   
-  imputed <- data.frame(df)
+  data <- data.frame(df)
   present_ts <- df[present_rows_mask, 'timestamp']
   missing_ts <- as.POSIXct(c(setdiff(ts_seq, present_ts)), origin = '1970-01-01', tz = 'UTC')
+  
   if (length(missing_ts) > 0) {
     missing_obs <- data.frame(timestamp = missing_ts)
     for (col in variables) {
       missing_obs[, col] <- NA
     }
-    imputed <- rbind(imputed, missing_obs)
+    data <- rbind(data, missing_obs)
   }
   
-  imputed <- imputed[order(imputed$timestamp),]
-  ts <- imputed$timestamp
-  temp_data <- mice(imputed[, variables], m = imputation_count,
+  data <- data[order(data$timestamp),]
+  ts <- data$timestamp
+  temp_data <- mice(data[, variables], m = imputation_count,
                     maxit = iters, method = method , seed = 500)
   imputed <- complete(temp_data, 1)
   imputed$timestamp <- ts
+  
+  # if (nchar(plot_path) > 0) {
+  #   png(filename = plot_path, width = 1366, height = 768, pointsize = 25)
+  #   plot(densityplot(temp_data))
+  #   dev.off()
+  # }
   
   # Return imputed data
   imputed
@@ -241,7 +236,7 @@ divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_va
   if (past_lag > 0) {
     past_seq <- seq(past_lag, 1)
     past_var_cols <- unlist(lapply(vars, function (v) {
-      c(paste(v, paste('prev', past_seq, sep = '_'), sep = '_'), v)
+      c(paste(v, paste('past', past_seq, sep = '_'), sep = '_'), v)
     }))
   }
   
@@ -285,3 +280,64 @@ skip_colinear_variables <- function (res_formula, df, model = NA) {
   explanatory <- explanatory[!(explanatory %in% lin_dep)]
   as.formula(paste(vars[1], '~', paste(explanatory, collapse = '+'), sep = ' '))
 } 
+
+skip_constant_variables <- function (res_formula, df) {
+  vars <- all.vars(res_formula)
+  explanatory <- vars[2:length(vars)]
+  which_vary <- sapply(df[, explanatory], function (col) {
+    var(col, na.rm = TRUE) != 0
+  })
+  explanatory <- explanatory[which_vary]
+  as.formula(paste(vars[1], '~', paste(explanatory, collapse = '+'), sep = ' '))
+}
+
+decompose_ts <- function (df, vars) {
+  
+}
+
+# vars and excluded store names of base variables (without the past_ and future_ prefixes)
+add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
+  which_present <- c()
+  if (length(vars) == 0) {
+    # Find all base var names (not past and not future ones)
+    vars <- colnames(windows)
+    which_past <- grepl('past', vars)
+    which_future <- grepl('future', vars)
+    which_present <- (!which_past) & (!which_future)
+    vars <- vars[which_present]
+    vars <- vars[!(vars %in% excluded)]
+  }
+  
+  all_vars <- colnames(windows)
+  which_future <- grepl('future', all_vars)
+  aggr_vars <- unlist(lapply(vars, function (v) {
+    which_selected <- grepl(v, all_vars)
+    aggr_vars <- all_vars[which_selected & (!which_future)]
+  }))
+  
+  aggr_types <- c('min', 'mean', 'max')
+  aggr_funs <- sapply(aggr_types, get)
+  
+  all_stats <- lapply(vars, function (v) {
+    which_vars <- aggr_vars[grepl(v, aggr_vars)]
+    
+    aggr_names <- sapply(aggr_types, function (t) {
+      paste(t, (past_lag + 1), v, sep = '_')
+    })
+    sliced <- windows[, which_vars]
+    stats <- apply(sliced, 1, function (row, aggr_names, aggr_funs) {
+      row_stats <- unlist(lapply(aggr_funs, function (f) {
+        f(row)
+      }))
+      row_stats
+    }, aggr_names = aggr_names, aggr_funs = aggr_funs)
+    stats <- data.frame(t(stats))
+    colnames(stats) <- aggr_names
+    stats
+  })
+  cbind(windows, all_stats)
+}
+
+skip_past <- function (windows) {
+  windows[, !grepl('past', colnames(windows))]
+}

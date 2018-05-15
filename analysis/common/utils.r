@@ -5,10 +5,7 @@ import <- function (packages) {
   lapply(packages, library, character.only = TRUE)
 }
 
-load_observations <- function (table, variables = c('*'), stations = c(), na.omit = FALSE) {
-  # Timestamps in database are stored without the time zone
-  # It is assumed they represent UTC time
-  Sys.setenv(TZ = 'UTC')
+get_connection <- function () {
   driver <- dbDriver('PostgreSQL')
   passwd <- { 'pass' }
   con <- dbConnect(driver, dbname = 'pollution',
@@ -17,8 +14,21 @@ load_observations <- function (table, variables = c('*'), stations = c(), na.omi
                    user = 'damian',
                    password = passwd)
   rm(passwd)
-  on.exit(dbDisconnect(con))
+  con
+}
+
+load_observations <- function (table, variables = c('*'), stations = c(),
+                               na.omit = FALSE, con = NULL) {
+  if (is.null(con)) {
+    con <- get_connection()
+    on.exit(dbDisconnect(con))
+  }
   
+  # Timestamps in database are stored without the time zone
+  # It is assumed they represent UTC time
+  Sys.setenv(TZ = 'UTC')
+  con <- get_connection()
+  on.exit(dbDisconnect(con))
   query = paste('SELECT', paste(variables, collapse = ','),
                 'FROM', table, sep = ' ')
   if (length(stations) > 0) {
@@ -33,6 +43,29 @@ load_observations <- function (table, variables = c('*'), stations = c(), na.omi
     df <- df[order(df$timestamp),]
   }
   df
+}
+
+create_table_from_schema <- function (source_tab, target_tab, con = NULL) {
+  if (is.null(con)) {
+    con <- get_connection()
+    on.exit(dbDisconnect(con))
+  }
+  if (dbExistsTable(con, target_tab)) {
+    dbRemoveTable(con, target_tab)
+  }
+  # Copy schema without any data 
+  dbGetQuery(con, paste('SELECT * INTO', target_tab,
+                        'FROM', source_tab,
+                        'WHERE 1 = 0'))
+}
+
+write_table <- function (df, tab_name, con = NULL) {
+  if (is.null(con)) {
+    con <- get_connection()
+    on.exit(dbDisconnect(con))
+  }
+  Sys.setenv(TZ = 'UTC')
+  dbWriteTable(con, tab_name, df, row.names=FALSE, append=TRUE)
 }
 
 cap <- function (s) {
@@ -83,6 +116,6 @@ pretty_var <- function (var) {
 
 mkdir <- function (path) {
   if (!dir.exists(path)) {
-    dir.create(path, showWarnings = FALSE)
+    dir.create(path, showWarnings = TRUE)
   }
 }
