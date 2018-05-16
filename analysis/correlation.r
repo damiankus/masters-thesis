@@ -27,7 +27,7 @@ main <- function () {
   
   target_root_dir <- file.path(getwd(), 'correlation')
   mkdir(target_root_dir)
-  table <- 'observations'
+  table <- 'complete_observations'
   
   # Fetch all data
   target_dir <- target_root_dir

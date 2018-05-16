@@ -37,20 +37,19 @@ main <- function () {
   test_count <- 24 * test_days
   offset_step <- 24 * offset_days
   
-  seasons <- c('winter-remainder', 'spring', 'summer', 'autumn', 'winter-beginning')
-  pred_models <- c( mlr = fit_mlr, lasso_mlr = fit_lasso_mlr, log_mlr = fit_log_mlr, svr = fit_svr)
-    # c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr
+  seasons <- c('winter', 'spring', 'summer', 'autumn')
+  pred_models <- c(mlr = fit_mlr, lasso_mlr = fit_lasso_mlr, log_mlr = fit_log_mlr, neural = fit_mlp)
+  # c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr
     #                log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp, arima = fit_arima)
 
   training_base <- data.matrix(obs[obs$year %in% training_years, ])
   training_base <- divide_into_windows(training_base, past_lag, future_lag,
-                                       vars = aggr_vars,
                                        future_vars = c(base_res_var, 'timestamp'),
                                        excluded_vars = c())
   training_base <- add_aggregated(training_base, past_lag, vars = aggr_vars)
   training_base <- skip_past(training_base)
   
-  var_dir <- file.path(getwd(), base_res_var)
+  var_dir <- file.path(getwd(), base_res_var, 'whole_year')
   mkdir(var_dir)
   
   lapply(seq(1, 4), function (season) {
@@ -59,7 +58,6 @@ main <- function () {
     
     seasonal_data <- data.matrix(obs[obs$season == season & obs$year == test_year, ])
     windows <- divide_into_windows(seasonal_data, past_lag, future_lag,
-                                   vars = aggr_vars,
                                    future_vars = c(base_res_var, 'timestamp'),
                                    excluded_vars = c())
     windows <- add_aggregated(windows, past_lag, vars = aggr_vars)
@@ -76,9 +74,10 @@ main <- function () {
     total_obs <- 24 * floor(length(windows[, 1]) / 24)
     offset_seq <- seq(1, total_obs - (training_count + test_count) + 1, offset_step)
     
-    lapply(names(pred_models), function (model_name) {
+    season_results <- lapply(names(pred_models), function (model_name) {
       fit_model <- pred_models[[model_name]]
-      results <- lapply(offset_seq, function (offset) {
+      print(paste('Fitting a', model_name, 'model'))
+      model_results <- lapply(offset_seq, function (offset) {
         # offset_dir <- file.path(season_dir, offset)
         # mkdir(offset_dir)
         
@@ -89,31 +88,24 @@ main <- function () {
         training_set <- rbind(training_base, windows[training_seq, ])
         test_set <- windows[test_seq, ]
         
-        # tr_base_len <- length(training_base[, 1])
-        # global_tr_seq <- c(1:tr_base_len, tr_base_len + training_seq)
-        # global_test_seq <- test_seq + tr_base_len
         # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
-        # save_data_split(windows, res_var, global_tr_seq, global_test_seq, plot_path)
+        # save_data_split(windows, base_res_var, training_set, test_set, plot_path)
         
-        # model_dir <- file.path(offset_dir, model_name)
-        # mkdir(model_dir)
         fit_model(res_formula, training_set, test_set, '')
       })
-      results <- do.call(rbind, results)
-      min_pred <- min(results$predicted)
-
-      # Elevate the negative part above 0
-      if (min_pred < 0) {
-        negative <- results$predicted < 0
-        results[negative, 'predicted'] <- results[negative, 'predicted'] + abs(min_pred)
-      }
       
-      results$timestamp <- as.POSIXct(results$timestamp,  origin = '1970-01-01', tz = 'UTC')
+      model_results <- do.call(rbind, model_results)
+      model_results$timestamp <- as.POSIXct(model_results$timestamp,  origin = '1970-01-01', tz = 'UTC')
+      
       plot_path <- file.path(season_dir, paste('comparison_plot_', model_name, '.png', sep = ''))
-      save_comparison_plot(results, res_var, plot_path)
-      goodness_path <- file.path(season_dir, paste('goodness_', model_name, '.txt', sep = ''))
-      save_prediction_goodness(results, goodness_path)
+      save_comparison_plot(model_results, res_var, plot_path)
+      calc_prediction_goodness(model_results, model_name)
     })
+    
+    season_results <- do.call(rbind, season_results)
+    file_path <- file.path(var_dir, 'prediction_goodness.txt')
+    write(seasons[season], file = file_path, append = TRUE)
+    save_prediction_goodness(season_results, file_path)
   })
 }
 main()

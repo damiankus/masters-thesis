@@ -228,6 +228,7 @@ impute_missing <- function (df, method = 'cart', imputation_count = 5, iters = 5
 # (there are records for every hourly measurment between the first and last
 # measurement)
 divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_vars = c(), excluded_vars = c()) {
+  present_vars <- colnames(df)
   if (length(vars) == 0) {
     vars <- colnames(df)
     vars <- vars[!(vars %in% excluded_vars)]
@@ -291,10 +292,6 @@ skip_constant_variables <- function (res_formula, df) {
   as.formula(paste(vars[1], '~', paste(explanatory, collapse = '+'), sep = ' '))
 }
 
-decompose_ts <- function (df, vars) {
-  
-}
-
 # vars and excluded store names of base variables (without the past_ and future_ prefixes)
 add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
   which_present <- c()
@@ -338,6 +335,12 @@ add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
   cbind(windows, all_stats)
 }
 
-skip_past <- function (windows) {
-  windows[, !grepl('past', colnames(windows))]
+skip_past <- function (windows, excluded = c()) {
+  vars <- colnames(windows)
+  past_vars <- vars[grepl('past', vars)]
+  excluded <- unlist(
+    lapply(excluded, function (e) { past_vars[grepl(e, past_vars)] })
+  )
+  past_vars <- setdiff(past_vars, excluded)
+  windows[, setdiff(vars, past_vars)]
 }

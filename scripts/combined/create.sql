@@ -776,7 +776,8 @@ ALTER TABLE observations ADD COLUMN season INT;
 
 UPDATE observations 
 SET season = 1
-WHERE to_char(timestamp::date, 'MM-dd') < '03-21' OR to_char(timestamp::date, 'MM-dd') > '12-21';
+WHERE to_char(timestamp::date, 'MM-dd') < '03-21'
+OR to_char(timestamp::date, 'MM-dd') > '12-21';
 UPDATE observations 
 SET season = 2
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '03-21' AND '06-21';
@@ -789,6 +790,10 @@ WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
 UPDATE observations 
 SET season = 5
 WHERE to_char(timestamp::date, 'MM-dd') > '12-21';
+
+ALTER TABLE complete_observations  DROP COLUMN IF EXISTS season;
+ALTER TABLE complete_observations  ADD COLUMN season INT;
+
 
 -- ===================================
 

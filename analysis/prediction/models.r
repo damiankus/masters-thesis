@@ -18,7 +18,6 @@ to_results <- function (res_formula, test_set, predicted) {
 
 # Predicted value is the last registered value
 fit_persistence <- function (res_formula, training_set, test_set, target_dir) {
-  print('Fitting a persistence model')
   res_var <- all.vars(res_formula)[[1]]
   base_var <- gsub('future_', '', res_var)
   pred_vals <- test_set[, base_var]
@@ -26,7 +25,6 @@ fit_persistence <- function (res_formula, training_set, test_set, target_dir) {
 }
 
 fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
-  print('Fitting a linear regression model')
   res_var <- all.vars(res_formula)[[1]]
   model <- lm(res_formula,
             data = training_set)
@@ -58,7 +56,6 @@ fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
 }
 
 fit_log_mlr <- function (res_formula, training_set, test_set, target_dir) {
-  print('Fitting a log-linear regression model')
   vars <- all.vars(res_formula)
   res_var <- vars[1]
   explanatory <- vars[2:length(vars)]
@@ -81,8 +78,6 @@ fit_lasso_mlr <- function (res_formula, training_set, test_set, target_dir) {
 
 svr_factory <- function (kernel, gamma, cost) {
   fit_custom_svr <- function (res_formula, training_set, test_set, target_dir) {
-    print('Fitting a support vector regression model')
-    
     # Constant columns can't be scaled to unit variance by a SVM
     res_formula <- skip_constant_variables(res_formula, training_set)
     model <- svm(res_formula, training_set,
@@ -120,7 +115,6 @@ fit_best_svr <- function (res_formula, training_set, test_set, target_dir) {
 
 arima_factory <- function (order, seas_order, seas_period, method) {
   fit_custom_arima <- function (res_formula, training_set, test_set, target_dir) {
-    print('Fitting ARIMA model')
     # res_var - future_pm2_5
     # base_var - pm2_5
     res_var <- all.vars(res_formula)[[1]]
@@ -163,7 +157,6 @@ fit_arima <- function (res_formula, training_set, test_set, target_dir) {
 }
 
 fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
-  print('Fitting a multilayer perceptron')
   all_vars <- all.vars(res_formula)
   res_var <- all.vars(res_formula)[[1]]
   expl_vars <- all_vars[2:length(all_vars)]
@@ -172,20 +165,26 @@ fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
   all_data <- rbind(training_set, test_set)
   mins <- apply(all_data, 2, min)
   maxs <- apply(all_data, 2, max)
+  means <- apply(all_data, 2, mean)
+  sds <- apply(all_data, 2, sd)
   rm(all_data)
   
+  # training_set <- standardize_with(training_set, means, sds)
   training_set <- normalize_with(training_set, mins, maxs)
+  # test_set <- standardize_with(test_set, means, sds)
   test_set <- normalize_with(test_set, mins, maxs)
   
   nn <- neuralnet(res_formula,
                   data = training_set,
-                  hidden = c(10, 8, 5),
+                  hidden = c(10, 8),
                   stepmax = 1e+04,
-                  threshold = 0.05,
+                  threshold = 0.2,
                   linear.output = TRUE)
   # plot(nn)
   pred_vals <- c(compute(nn, test_set[, expl_vars])$net.result)
-  results$predicted <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
+  pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
+  # pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
+  results$predicted <- pred_vals
   results
 }
 

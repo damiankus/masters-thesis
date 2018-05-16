@@ -18,11 +18,9 @@ get_connection <- function () {
 }
 
 load_observations <- function (table, variables = c('*'), stations = c(),
-                               na.omit = FALSE, con = NULL) {
-  if (is.null(con)) {
-    con <- get_connection()
-    on.exit(dbDisconnect(con))
-  }
+                               na.omit = FALSE) {
+  con <- get_connection()
+  on.exit(dbDisconnect(con))
   
   # Timestamps in database are stored without the time zone
   # It is assumed they represent UTC time
@@ -96,26 +94,28 @@ pretty_var <- function (var) {
          wind_dir = 'wind direction', wind_dir_deg = 'wind direction',
          {
            delim <- ' '
-           join_str <- ' ' 
-           if (grepl('plus', var)) {
-             delim <- '_plus_'
-             join_str <- '+'
-           } else if (grepl('minus', var)) {
-             delim <- '_minus_'
+           join_str <- ' '
+           var_idx <- 1
+           if (grepl('future', var)) {
+             delim <- 'future_'
+             join_str <- ''
+             var_idx <- 2
+           } else if (grepl('past', var)) {
+             delim <- '_past_'
              join_str <- '-'
            }     
            split_var <- strsplit(var, delim)[[1]]
-           pvar <- split_var[1]
+           pvar <- split_var[var_idx]
            if (length(split_var) > 1) {
              pvar <- pretty_var(pvar)
-             pvar <- paste(pvar, 'at t', join_str, split_var[2], 'h', sep = ' ')
+             pvar <- paste(pvar, join_str, paste(split_var[-var_idx], collapse = ' '), sep = ' ')
            }
-           pvar
+           trimws(pvar)
          })
 }
 
 mkdir <- function (path) {
   if (!dir.exists(path)) {
-    dir.create(path, showWarnings = TRUE)
+    dir.create(path, showWarnings = TRUE, recursive = TRUE)
   }
 }

@@ -1,6 +1,6 @@
 source('utils.r')
 source('preprocess.r')
-import(c('ggplot2', 'reshape', 'car'))
+import(c('ggplot2', 'reshape', 'car', 'scales'))
 
 # Based on http://r-statistics.co/Linear-Regression.html
 
@@ -20,7 +20,7 @@ save_comparison_plot <- function (df, res_var, plot_path) {
   line_plot <- ggplot(data = melted, aes(x = timestamp, y = value, colour = variable)) +
     geom_line() +
     xlab('Date') +
-    ylab(cap(res_var)) +
+    ylab(paste(pretty_var(res_var), units(res_var))) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
@@ -49,11 +49,15 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multiple_vars_plot <- function (df, res_var, id_var, plot_path) {
-  plot <- ggplot(data = df, aes_string(x = 'timestamp', y = res_var, fill = id_var)) +
+save_multiple_vars_plot <- function (df, res_var, id_var, plot_path) { 
+  copy <- data.frame(df[, c('timestamp', res_var, id_var)])
+  copy$timestamp <- as.POSIXlt(copy$timestamp, origin = '1970-01-01', tz = 'UTC')
+  plot <- ggplot(data = copy, aes_string(x = 'timestamp', y = res_var, fill = id_var)) +
     geom_bar(stat = 'identity') +
     xlab('Date') +
-    ylab('Value')
+    ylab(paste(pretty_var(res_var), units(res_var))) +
+    scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
+                     breaks = date_breaks('2 months'))
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
@@ -82,13 +86,11 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_data_split <- function (df, res_var, training_seq, test_seq, plot_path) {
-  data_split <- data.frame(df[, res_var])
-  colnames(data_split) <- c(res_var)
-  data_split$timestamp <- df$future_timestamp
-  data_split$type <- 'not used'
-  data_split[training_seq, 'type'] <- 'training'
-  data_split[test_seq, 'type'] <- 'test'
-  
-  save_multiple_vars_plot(data_split, res_var, id_var = 'type', plot_path = plot_path)
+save_data_split <- function (df, res_var, training_set, test_set, plot_path) {
+  training_vals <- training_set[, c('timestamp', res_var)]
+  training_vals$type <- 'training'
+  test_vals <- test_set[, c('timestamp', res_var)]
+  test_vals$type <- 'test'
+  merged <- rbind(training_vals, test_vals)
+  save_multiple_vars_plot(merged, res_var, id_var = 'type', plot_path = plot_path)
 }

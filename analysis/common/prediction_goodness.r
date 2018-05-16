@@ -2,6 +2,9 @@ source('utils.r')
 source('plotting.r')
 import(c('hydroGOF'))
 
+packages <- c('xtable', 'knitr')
+import(packages)
+
 # Measure formulas are based on the article by Selva Prabhakaran
 # Source: http://r-statistics.co/Linear-Regression.html
 # The results object is a data frame with columns: 
@@ -21,6 +24,11 @@ sse <- function (results) {
 # Mean Squared Error
 mse <- function (results) {
   sse(results) / length(results$predicted)
+}
+
+# Root Mean Square Error
+rmse <- function (results) {
+  sqrt(mse(results))
 }
 
 # Sum Squared Total
@@ -48,6 +56,14 @@ mae <- function (results) {
   hydroGOF::mae(sim = results$predicted, obs = results$actual, na.rm = TRUE)
 }
 
+# Coefficient of determination
+r2 <- function (results) {
+  (cor(results[, c('actual', 'predicted')],
+       use = 'complete.obs',
+       method = c('pearson'))[1, 2]
+  ) ^ 2
+} 
+
 nrmse <- function (results) {
   hydroGOF::nrmse(sim = results$predicted, obs = results$actual, na.rm = TRUE)
 }
@@ -67,28 +83,20 @@ adj_se <- function (results, model) {
   sqrt( sse(results) / ( length(results) - length(model$coefficients) ))
 }
 
-prediction_goodness <- function (results) {
-  results <- na.omit(results)
-  hline <- '----------------------------------------------'
-  paste(
-    hline,
-    ' Goodness of prediction',
-    hline,
-    paste(' MSE:', mse(results), sep = ' '),
-    paste(' RMSE', sqrt(mse(results)), sep = ' '),
-    paste(' MAE:', mae(results), sep = ' '),
-    paste(' MAPE:', mape(results), sep = ' '),
-    paste(' MAXPE:', maxpe(results), sep = ' '),
-    paste(' Standard Error:', se(results), sep = ' '),
-    paste(' Index of Agreement:', ia(results), sep = ' '),
-    paste(' Coefficient of Determination ^ 2 (Pearson):', toString(
-      (cor(results[, c('actual', 'predicted')],
-          use = 'complete.obs',
-          method = c('pearson'))[1, 2]
-      ) ^ 2
-    ), sep = ' '),
-    hline, '\n',
-  sep = '\n')
+calc_prediction_goodness <- function (results, model_name) {
+  results$residuals <- results$predicted - results$actual
+  measures <- c('mse', 'rmse', 'mae', 'mape', 'maxpe', 'se', 'ia', 'r2')
+  goodness <- data.frame(model = model_name)
+  goodness <- cbind(goodness, t(sapply(measures, function (meas) { get(meas)(results) })))
+  goodness
+}
+
+save_prediction_goodness <- function (goodness, file_path) {
+  goodness <- goodness[order(goodness$rmse), ]
+  colnames(goodness) <- sapply(colnames(goodness), toupper)
+  pretty <- knitr::kable(goodness)
+  write(pretty, file = file_path, append = TRUE)
+  write('\r\n', file = file_path, append = TRUE)
 }
 
 save_summary <- function(model, results, file_path, summary_funs = c(summary)) {
@@ -100,15 +108,6 @@ save_summary <- function(model, results, file_path, summary_funs = c(summary)) {
   })
 }
 
-save_prediction_goodness <- function (results, file_path) {
-  results$residuals <- results$predicted - results$actual
-  goodness <- prediction_goodness(results)
-  cat(goodness)
-  
-  f <- file(file_path, open = 'a')
-  write(paste('', goodness, sep = '\n'), f)
-  close(f)
-}
 
 # This method accepts a @results parameter of the following form 
 # @resuts: $timestamp, $actual, $predicted
