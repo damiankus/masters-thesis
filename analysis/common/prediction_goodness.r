@@ -83,16 +83,20 @@ adj_se <- function (results, model) {
   sqrt( sse(results) / ( length(results) - length(model$coefficients) ))
 }
 
+get_all_measure_names <- function () {
+  c('mse', 'rmse', 'mae', 'mape', 'maxpe', 'se', 'ia', 'r2')
+} 
+
 calc_prediction_goodness <- function (results, model_name) {
   results$residuals <- results$predicted - results$actual
-  measures <- c('mse', 'rmse', 'mae', 'mape', 'maxpe', 'se', 'ia', 'r2')
+  measures <- get_all_measure_names()
   goodness <- data.frame(model = model_name)
   goodness <- cbind(goodness, t(sapply(measures, function (meas) { get(meas)(results) })))
   goodness
 }
 
 save_prediction_goodness <- function (goodness, file_path) {
-  goodness <- goodness[order(goodness$rmse), ]
+  # goodness <- goodness[order(goodness$rmse), ]
   colnames(goodness) <- sapply(colnames(goodness), toupper)
   pretty <- knitr::kable(goodness)
   write(pretty, file = file_path, append = TRUE)

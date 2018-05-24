@@ -39,7 +39,8 @@ main <- function () {
   offset_step <- 7
   
   seasons <- c('winter', 'spring', 'summer', 'autumn')
-  pred_models <- c(mlr = fit_mlr, lasso_mlr = fit_lasso_mlr, log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp)
+  pred_models <- c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
+                   log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp)
     # c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr
     #                log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp, arima = fit_arima)
 
@@ -84,18 +85,14 @@ main <- function () {
         res_formula <- skip_colinear_variables(res_formula, windows)
         
         total_obs <- length(windows[, 1])
-        offset_seq <- seq(1, total_obs - (training_count + test_count) + 1, offset_step)
+        offset_seq <- seq(training_count + 1, total_obs - test_count + 1, offset_step)
       
         results <- lapply(offset_seq, function (offset) {
-          # offset_dir <- file.path(season_dir, offset)
-          # mkdir(offset_dir)
+          training_set <- rbind(training_base, windows[1:(offset - 1), ])
+          test_set <- windows[offset:(offset + test_count - 1), ]
           
-          last_training_idx <- offset + training_count - 1
-          training_seq <- (offset):last_training_idx
-          test_seq <- (last_training_idx + 1):(last_training_idx + test_count)
-          
-          training_set <- rbind(training_base, windows[training_seq, ])
-          test_set <- windows[test_seq, ]
+          # plot_path <- file.path(season_dir, paste('data_split_', offset, '_hour_', hour, '.png', sep = ''))
+          # save_data_split(res_var, training_set, test_set, plot_path)
           
           fit_model(res_formula, training_set, test_set, '')
         })

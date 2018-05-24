@@ -105,10 +105,12 @@ pretty_var <- function (var) {
              join_str <- '-'
            }     
            split_var <- strsplit(var, delim)[[1]]
-           pvar <- split_var[var_idx]
+           pvar <- ''
            if (length(split_var) > 1) {
-             pvar <- pretty_var(pvar)
+             pvar <- pretty_var(split_var[var_idx])
              pvar <- paste(pvar, join_str, paste(split_var[-var_idx], collapse = ' '), sep = ' ')
+           } else {
+             pvar <- toupper(var)
            }
            trimws(pvar)
          })

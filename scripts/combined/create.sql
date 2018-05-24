@@ -791,9 +791,6 @@ UPDATE observations
 SET season = 5
 WHERE to_char(timestamp::date, 'MM-dd') > '12-21';
 
-ALTER TABLE complete_observations  DROP COLUMN IF EXISTS season;
-ALTER TABLE complete_observations  ADD COLUMN season INT;
-
 
 -- ===================================
 

@@ -49,15 +49,34 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multiple_vars_plot <- function (df, res_var, id_var, plot_path) { 
-  copy <- data.frame(df[, c('timestamp', res_var, id_var)])
-  copy$timestamp <- as.POSIXlt(copy$timestamp, origin = '1970-01-01', tz = 'UTC')
-  plot <- ggplot(data = copy, aes_string(x = 'timestamp', y = res_var, fill = id_var)) +
-    geom_bar(stat = 'identity') +
-    xlab('Date') +
-    ylab(paste(pretty_var(res_var), units(res_var))) +
-    scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
-                     breaks = date_breaks('2 months'))
+save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '') { 
+  copy <- data.frame(df[, c(x_var, y_var, id_var)])
+  
+  # After passing timestamps to forecasting models,
+  # they may be cast to numeric values
+  timestamp_present <- FALSE
+  if (grepl('timestamp', x_var)) {
+    copy$timestamp <- as.POSIXlt(copy$timestamp, origin = '1970-01-01', tz = 'UTC')
+    timestamp_present <- TRUE
+  }
+  
+  if (nchar(x_lab) == 0) {
+    x_lab <- pretty_var(x_var)
+  }
+  if (nchar(y_lab) == 0) {
+    y_lab <- pretty_var(y_var)
+  }
+  
+  plot <- ggplot(data = copy, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
+    geom_line() +
+    xlab(x_lab) +
+    ylab(y_lab)
+  
+  if (timestamp_present) {
+    plot <- plot +
+      scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
+                       breaks = date_breaks('2 months'))
+  }
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
@@ -86,11 +105,11 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_data_split <- function (df, res_var, training_set, test_set, plot_path) {
+save_data_split <- function (res_var, training_set, test_set, plot_path) {
   training_vals <- training_set[, c('timestamp', res_var)]
   training_vals$type <- 'training'
   test_vals <- test_set[, c('timestamp', res_var)]
   test_vals$type <- 'test'
   merged <- rbind(training_vals, test_vals)
-  save_multiple_vars_plot(merged, res_var, id_var = 'type', plot_path = plot_path)
+  save_multiple_vars_plot(merged, 'timestamp', res_var, id_var = 'type', plot_path = plot_path)
 }

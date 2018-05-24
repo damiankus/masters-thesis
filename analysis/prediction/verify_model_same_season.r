@@ -40,11 +40,11 @@ main <- function () {
   seasons <- c('winter', 'spring', 'summer', 'autumn')
   pred_models <- c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
                    log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp)
-  # c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr
+  # c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
     #                log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp, arima = fit_arima)
 
   
-  var_dir <- file.path(getwd(), base_res_var, 'whole_year')
+  var_dir <- file.path(getwd(), base_res_var, 'same_season')
   mkdir(var_dir)
   
   lapply(seq(1, 4), function (season) {
@@ -54,13 +54,14 @@ main <- function () {
     
     lag_results <- lapply(future_lags, function (future_lag) {
       print(paste('Prediction of values', future_lag, ' hours in advance'))
-      
-      training_base <- data.matrix(obs[obs$year %in% training_years, ])
+      training_base <- data.matrix(obs[obs$year %in% training_years
+                                       & obs$season == season, ])
       training_base <- divide_into_windows(training_base, past_lag, future_lag,
                                            future_vars = c(base_res_var, 'timestamp'),
                                            excluded_vars = c())
       training_base <- add_aggregated(training_base, past_lag, vars = aggr_vars)
       training_base <- skip_past(training_base)
+      
       
       windows <- divide_into_windows(seasonal_data, past_lag, future_lag,
                                      future_vars = c(base_res_var, 'timestamp'),
@@ -78,15 +79,20 @@ main <- function () {
       
       # Number of days with all 24 observations 
       total_obs <- 24 * floor(length(windows[, 1]) / 24)
-      offset_seq <- seq(training_count + 1, total_obs - test_count + 1, offset_step)
+      offset_seq <- seq(1, total_obs - (training_count + test_count) + 1, offset_step)
       
       season_results <- lapply(names(pred_models), function (model_name) {
         fit_model <- pred_models[[model_name]]
         print(paste('Fitting a', model_name, 'model'))
         model_results <- lapply(offset_seq, function (offset) {
-          training_set <- rbind(training_base, windows[1:(offset - 1), ])
-          test_set <- windows[offset:(offset + test_count), ]
-
+          
+          last_training_idx <- offset + training_count - 1
+          training_seq <- (offset):last_training_idx
+          test_seq <- (last_training_idx + 1):(last_training_idx + test_count)
+          
+          training_set <- rbind(training_base, windows[training_seq, ])
+          test_set <- windows[test_seq, ]
+          
           # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
           # save_data_split(base_res_var, training_set, test_set, plot_path)
           
@@ -95,7 +101,7 @@ main <- function () {
         
         model_results <- do.call(rbind, model_results)
         model_results$timestamp <- as.POSIXct(model_results$timestamp,  origin = '1970-01-01', tz = 'UTC')
-
+  
         plot_path <- file.path(season_dir, paste('comparison_plot_', model_name, '_lag_', future_lag, '.png', sep = ''))
         save_comparison_plot(model_results, res_var, plot_path)
         calc_prediction_goodness(model_results, model_name)
@@ -109,11 +115,11 @@ main <- function () {
       season_results
     })
     
-    # lag_results <- do.call(rbind, lag_results)
-    # lapply(get_all_measure_names(), function (measure_name) {
-    #   plot_path <- file.path(season_dir, paste(measure_name, 'for_lag.png', sep = '_'))
-    #   save_multiple_vars_plot(lag_results, 'future_lag', measure_name, id_var = 'model', plot_path)
-    # })
+    lag_results <- do.call(rbind, lag_results)
+    lapply(get_all_measure_names(), function (measure_name) {
+      plot_path <- file.path(season_dir, paste(measure_name, 'for_lag.png', sep = '_'))
+      save_multiple_vars_plot(lag_results, 'future_lag', measure_name, id_var = 'model', plot_path)
+    })
   })
 }
 main()

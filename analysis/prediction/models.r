@@ -78,23 +78,58 @@ fit_lasso_mlr <- function (res_formula, training_set, test_set, target_dir) {
 
 svr_factory <- function (kernel, gamma, cost) {
   fit_custom_svr <- function (res_formula, training_set, test_set, target_dir) {
-    # Constant columns can't be scaled to unit variance by a SVM
+    
+    # Standardization requires dividing by the standard deviation
+    # of a column. If the column contains constant values it becomes
+    # division by 0!
+    
     res_formula <- skip_constant_variables(res_formula, training_set)
+    all_vars <- all.vars(res_formula)
+    res_var <- all.vars(res_formula)[[1]]
+    expl_vars <- all_vars[2:length(all_vars)]
+    results <- data.frame(actual = test_set[, res_var], timestamp = test_set$future_timestamp)
+    
+    training_set <- training_set[, c(res_var, expl_vars)] 
+    test_set <- test_set[, c(res_var, expl_vars)]
+    
+    # Normalization and standardization of the data
+    all_data <- rbind(training_set, test_set)
+    means <- apply(all_data, 2, mean)
+    sds <- apply(all_data, 2, sd)
+    rm(all_data)
+    training_set <- standardize_with(training_set, means, sds)
+    test_set <- standardize_with(test_set, means, sds)
+    
+    all_data <- rbind(training_set, test_set)
+    mins <- apply(all_data, 2, min)
+    maxs <- apply(all_data, 2, max)
+    rm(all_data)
+    training_set <- normalize_with(training_set, mins, maxs)
+    test_set <- normalize_with(test_set, mins, maxs)
+    
     model <- svm(res_formula, training_set,
                  kernel = kernel, gamma = gamma, cost = cost)
     pred_vals <- predict(model, test_set)
+    
+    # Reverse the initial transformations
+    pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
+    pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
+    results$predicted <- pred_vals
     
     # file_path <- file.path(target_dir, 'svr_summary.txt')
     # save_summary(model, results, file_path)
     # save_prediction_goodness(results, file_path)
     # save_prediction_comparison(results, res_var, 'svr', target_dir)
-    to_results(res_formula, test_set, pred_vals)
+    results
   }
 }
 
 fit_svr <- function (res_formula, training_set, test_set, target_dir) {
   # Values found running best svm for winter data
-  fit_svr <- svr_factory(kernel = 'radial', gamma = 0.0085, cost = 50)
+  fit_svr <- svr_factory(kernel = 'radial', 
+                         gamma = if (is.vector(training_set)) 1 
+                         else 1 / ncol(training_set), 
+                         cost = 1)
   fit_svr(res_formula, training_set, test_set, target_dir)
 }
 
@@ -134,17 +169,18 @@ arima_factory <- function (order, seas_order, seas_period, method) {
              function (i) {
                model <- Arima(ts(test_seq[1:i], frequency = 24), model = model)
                tail(forecast(model, h = 24)$mean, n = 1)
-             }))
+             })
+      )
     
     results <- data.frame(actual = test_set[, res_var], 
                predicted = pred_vals,
                timestamp = test_set$future_timestamp)
     
-    file_path <- file.path(target_dir, 'arima_summary.txt')
-    save_summary(model, results, file_path)
-    save_prediction_goodness(results, file_path)
-    save_prediction_comparison(results, res_var, 'arima', target_dir)
-    # decomposed = stl(res_ts, s.window = 'periodic')
+    plot_path <- file.path(target_dir, paste('comparison_plot_arima.png', sep = ''))
+    save_comparison_plot(results, res_var, plot_path)
+    print(calc_prediction_goodness(results, 'arima'))
+    
+    # decomposed = stl(training_ts, s.window = 'periodic', )
     # trend <- decomposed$time.series[, 'trend']
     # seasonal <- decomposed$time.series[, 'seasonal']
     # remainder <- decomposed$time.series[, 'remainder']
@@ -153,37 +189,53 @@ arima_factory <- function (order, seas_order, seas_period, method) {
 }
 
 fit_arima <- function (res_formula, training_set, test_set, target_dir) {
-  arima_factory(order = c(1, 1, 2), seas_order = c(2, 0, 0), seas_period = 24, method = 'CSS')
+  arima_fun <- arima_factory(order = c(1, 1, 2), seas_order = c(2, 0, 0), seas_period = 24, method = 'CSS')
+  arima_fun(res_formula, training_set, test_set, target_dir)
 }
 
 fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
+  # Standardization requires dividing by the standard deviation
+  # of a column. If the column contains constant values it becomes
+  # division by 0!
+  res_formula <- skip_constant_variables(res_formula, training_set)
   all_vars <- all.vars(res_formula)
   res_var <- all.vars(res_formula)[[1]]
   expl_vars <- all_vars[2:length(all_vars)]
-  
   results <- data.frame(actual = test_set[, res_var], timestamp = test_set$future_timestamp)
+  
+  training_set <- training_set[, c(res_var, expl_vars)] 
+  test_set <- test_set[, c(res_var, expl_vars)]
+  
+  # First we standardize the data, then 
+  # we normalize the data, using min and max
+  # values of the standardized set (not the original one!)
   all_data <- rbind(training_set, test_set)
-  mins <- apply(all_data, 2, min)
-  maxs <- apply(all_data, 2, max)
   means <- apply(all_data, 2, mean)
   sds <- apply(all_data, 2, sd)
   rm(all_data)
+  training_set <- standardize_with(training_set, means, sds)
+  test_set <- standardize_with(test_set, means, sds)
   
-  # training_set <- standardize_with(training_set, means, sds)
+  all_data <- rbind(training_set, test_set)
+  mins <- apply(all_data, 2, min)
+  maxs <- apply(all_data, 2, max)
+  rm(all_data)
   training_set <- normalize_with(training_set, mins, maxs)
-  # test_set <- standardize_with(test_set, means, sds)
   test_set <- normalize_with(test_set, mins, maxs)
   
   nn <- neuralnet(res_formula,
                   data = training_set,
-                  hidden = c(10, 8),
+                  hidden = c(8, 5),
                   stepmax = 1e+04,
-                  threshold = 0.2,
+                  threshold = 0.5,
                   linear.output = TRUE)
   # plot(nn)
   pred_vals <- c(compute(nn, test_set[, expl_vars])$net.result)
+  
+  # Reverse the initial transformations
   pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
-  # pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
+  pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
+  
   results$predicted <- pred_vals
   results
 }

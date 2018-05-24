@@ -255,6 +255,7 @@ divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_va
   # A-2, B-2, A-1, B-1, A, B, future_A
   new_colnames <- c(past_var_cols, future_var_cols)
   
+  df <- data.matrix(df)
   rows <- sapply(seq(past_lag + 1, length(df[, 1]) - future_lag), function (i) {
     row <- c(df[(i - past_lag):i, vars],
              df[i + future_lag, future_vars],
@@ -294,6 +295,10 @@ skip_constant_variables <- function (res_formula, df) {
 
 # vars and excluded store names of base variables (without the past_ and future_ prefixes)
 add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
+  if (past_lag <= 0) {
+    windows
+  }
+  
   which_present <- c()
   if (length(vars) == 0) {
     # Find all base var names (not past and not future ones)
@@ -321,7 +326,10 @@ add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
     aggr_names <- sapply(aggr_types, function (t) {
       paste(t, (past_lag + 1), v, sep = '_')
     })
-    sliced <- windows[, which_vars]
+    
+    # If the past lag was 0 $sliced would become a 1D vector
+    # thus causing error in apply
+    sliced <- data.frame(windows[, which_vars])
     stats <- apply(sliced, 1, function (row, aggr_names, aggr_funs) {
       row_stats <- unlist(lapply(aggr_funs, function (f) {
         f(row)
