@@ -13,14 +13,10 @@ class TestYearlyReader(unittest.TestCase):
         self.reader = YearlyDataReader(
             self.station_ids, self.station_uuids, self.var_names)
 
-        self.header = """,12,13,14,37,38,39,40,41,42
-,MpKrakAlKras,MpKrakBujaka,MpKrakBulwar,MpKrakAlKras,MpKrakBujaka,MpKrakBulwar,MpKrakDietla,MpKrakOsPias,MpKrakZloRog
-,PM2.5,PM2.5,PM2.5,PM10,PM10,PM10,PM10,PM10,PM10
-,1g,1g,1g,1g,1g,1g,1g,1g,1g
-,ug/m3,ug/m3,ug/m3,ug/m3,ug/m3,ug/m3,ug/m3,ug/m3,ug/m3
-Czas pomiaru,MpKrakAlKras-PM2.5-1g,MpKrakBujaka-PM2.5-1g,MpKrakBulwar-PM2.5-1g,MpKrakAlKras-PM10-1g,MpKrakBujaka-PM10-1g,MpKrakBulwar-PM10-1g,MpKrakDietla-PM10-1g,MpKrakOsPias-PM10-1g,MpKrakZloRog-PM10-1g
-"""
-        self.header = [row.split(',') for row in self.header.split()]
+        self.header = """Kod stacji,MpKrakAlKras,MpKrakBujaka,MpKrakBulwar,MpKrakAlKras,MpKrakBujaka,MpKrakBulwar,MpKrakDietla,MpKrakOsPias,MpKrakZloRog
+Wskaźnik,PM2.5,PM2.5,PM2.5,PM10,PM10,PM10,PM10,PM10,PM10
+Czas uśredniania,1g,1g,1g,1g,1g,1g,1g,1g,1g"""
+        self.header = [row.split(',') for row in self.header.split('\n')]
         self.col_indexes = [3]
         self.records = self.reader.read_from_file(self.fpath)
         self.observations = [
@@ -28,6 +24,7 @@ Czas pomiaru,MpKrakAlKras-PM2.5-1g,MpKrakBujaka-PM2.5-1g,MpKrakBulwar-PM2.5-1g,M
 
     def test_yearly_getVarIndexes_firstStation_firstVar(self):
         col_indexes = self.reader.get_var_indexes(self.header)
+        print(self.header)
         self.assertEqual(
             col_indexes[self.station_ids[0]][self.var_names[0]],
             1)

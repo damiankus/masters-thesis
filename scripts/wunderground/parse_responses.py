@@ -35,6 +35,8 @@ if __name__ == '__main__':
     parser.add_argument('--dir', '-d', help='Path to directory containing \
         the responses grouped in subdirectories named after the station IDs',
                         default=os.path.join('responses'))
+    parser.add_argument('--new-tables', '-n', help='Drop old tables and create new \
+        ones from scratch (flag)', action='store_true')
     args = vars(parser.parse_args())
 
     global_config = None
@@ -50,37 +52,38 @@ if __name__ == '__main__':
         DbSession.bind = engine
         session = DbSession()
 
-        # Recreate all the necessary tables
-        # Observation.__table__.drop(engine, checkfirst=True)
-        # Station.__table__.drop(engine, checkfirst=True)
-        # SqlBase.metadata.create_all(engine)
+        # Create all the necessary tables if needed
+        if args['new_tables']:
+            Observation.__table__.drop(engine, checkfirst=True)
+            Station.__table__.drop(engine, checkfirst=True)
+            SqlBase.metadata.create_all(engine)
 
-        # with open(config['stations-file']) as stations_file:
-        #     stations = [Station(**s) for s in
-        #                 json.load(stations_file)['stations']]
-        #     session.add_all(stations)
-        #     session.commit()
-
-    padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
-    timestamp_format = '{year}-{mon}-{mday} {hour}:{min}'
-    for dirpath in glob.glob(os.path.join(args['dir'], '*')):
-        station_id = dirpath.split(os.path.sep)[-1]
-        print('Saving data for station: ' + station_id)
-
-        for fpath in glob.glob(os.path.join(dirpath, '*')):
-            with open(fpath, 'r') as in_file:
-                observations = []
-                append = observations.append
-                for o in json.load(in_file)['history']['observations']:
-                    time = o['utcdate']
-                    time = time['hour'] + ':' + time['min']
-                    record = map_keys(o, api_to_db_field)
-                    for key, val in record.items():
-                        if val in padding_vals:
-                            record[key] = None
-                    record['station_id'] = station_id
-                    record['timestamp'] = timestamp_format.format(
-                        **o['utcdate'])
-                    append(Observation(**record))
-                session.add_all(observations)
+            with open(config['stations-file']) as stations_file:
+                stations = [Station(**s) for s in
+                            json.load(stations_file)['stations']]
+                session.add_all(stations)
                 session.commit()
+
+        padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
+        timestamp_format = '{year}-{mon}-{mday} {hour}:{min}'
+        for dirpath in glob.glob(os.path.join(args['dir'], '*')):
+            station_id = dirpath.split(os.path.sep)[-1]
+            print('Saving data for station: ' + station_id)
+
+            for fpath in glob.glob(os.path.join(dirpath, '*')):
+                with open(fpath, 'r') as in_file:
+                    observations = []
+                    append = observations.append
+                    for o in json.load(in_file)['history']['observations']:
+                        time = o['utcdate']
+                        time = time['hour'] + ':' + time['min']
+                        record = map_keys(o, api_to_db_field)
+                        for key, val in record.items():
+                            if val in padding_vals:
+                                record[key] = None
+                        record['station_id'] = station_id
+                        record['timestamp'] = timestamp_format.format(
+                            **o['utcdate'])
+                        append(Observation(**record))
+                    session.add_all(observations)
+                    session.commit()

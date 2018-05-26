@@ -109,11 +109,11 @@ main <- function () {
       season_results
     })
     
-    # lag_results <- do.call(rbind, lag_results)
-    # lapply(get_all_measure_names(), function (measure_name) {
-    #   plot_path <- file.path(season_dir, paste(measure_name, 'for_lag.png', sep = '_'))
-    #   save_multiple_vars_plot(lag_results, 'future_lag', measure_name, id_var = 'model', plot_path)
-    # })
+    lag_results <- do.call(rbind, lag_results)
+    lapply(get_all_measure_names(), function (measure_name) {
+      plot_path <- file.path(season_dir, paste(measure_name, 'for_lag.png', sep = '_'))
+      save_multiple_vars_plot(lag_results, 'future_lag', measure_name, id_var = 'model', plot_path)
+    })
   })
 }
 main()

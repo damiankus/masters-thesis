@@ -67,17 +67,6 @@ main <- function () {
   }
   
   for (factor in factors) {
-    target_dir <- file.path(target_root_dir, factor)
-    mkdir(target_dir)
-    
-    for (month in seq(1, 12)) {
-      which <- obs[obs$month == month,]
-      plot_name <- paste(factor, '_', month, '.png', sep = '')
-      plot_path <- file.path(target_dir, plot_name)
-      title <- paste(pretty_var(factor), '  during ', month_names[month])
-      save_boxplot(which, factor, plot_path, title)
-    }
-    
     stats <- as.data.frame(aggregate(obs[,factor], by = list(obs$date),
                                      FUN = mean, na.rm = TRUE))
     names(stats) <- c('date', factor)

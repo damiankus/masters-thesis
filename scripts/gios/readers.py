@@ -74,11 +74,11 @@ class YearlyDataReader(AbstractDataReader):
                  delimiter=',', quotechar='"'):
         super().__init__(station_ids, station_uuids, var_names,
                          delimiter, quotechar)
-        self.data_line_no = 6
+        self.data_line_no = 3
 
     def get_var_indexes(self, header):
-        all_uuids = [s.lower() for s in header[1]]
-        all_var_names = [v.lower().translate(TRANS_DOT) for v in header[2]]
+        all_uuids = [s.lower() for s in header[0]]
+        all_var_names = [v.lower().translate(TRANS_DOT) for v in header[1]]
         uuids = dict([(u, i) for i, u in enumerate(self.station_uuids)])
         var_names = set(self.var_names)
 

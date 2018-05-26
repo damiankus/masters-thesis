@@ -83,16 +83,8 @@ CREATE TABLE observations (
 	id SERIAL PRIMARY KEY,
 	station_id CHAR(20) REFERENCES stations(id),
 	timestamp TIMESTAMP,
-	-- pm1 NUMERIC(9, 5),
 	pm2_5 NUMERIC(9, 5),
 	pm10 NUMERIC(9, 5),
-/*
-	co NUMERIC(22, 15),
-	no2 NUMERIC(22, 15), 
-	o3 NUMERIC(22, 15), 
-	so2 NUMERIC(22, 15), 
-	c6h6 NUMERIC(22, 15),
-*/
 	wind_speed NUMERIC(7, 3),
 	wind_dir_deg NUMERIC(6, 3),
 	precip_total NUMERIC(7, 3),
@@ -147,6 +139,9 @@ INSERT INTO observations (
 SELECT station_id, timestamp, pm2_5, pm10
 FROM gios_observations
 ORDER BY station_id, timestamp;
+
+UPDATE observations 
+SET timestamp = date_trunc('hour', timestamp);
 
 /* 
 There might be duplicated rows for the same station and timestamp
@@ -331,7 +326,7 @@ INSERT INTO meteo_observations(station_id, timestamp, temperature,
 SELECT 'agh_meteo', time, ta_hour_avg, ua_hour_avg, pa_hour_avg,
 	sm_hour_avg, dm_hour_avg, rc_hour_avg,
 	ri_hour_avg
-FROM meteo_agh_observations
+FROM agh_meteo_observations
 ORDER BY time;
 
 INSERT INTO meteo_observations(station_id, timestamp, temperature,
@@ -411,6 +406,23 @@ SET humidity = NULL
 WHERE humidity <= 0
 OR humidity > 100;
 
+UPDATE meteo_observations 
+SET precip_rate = NULL
+WHERE precip_rate < 0;
+
+UPDATE meteo_observations 
+SET precip_total = NULL
+WHERE precip_total < 0;
+
+UPDATE meteo_observations 
+SET wind_dir_deg = NULL
+WHERE wind_dir_deg < 0
+OR wind_dir_deg > 360;
+
+UPDATE meteo_observations 
+SET wind_speed = NULL
+WHERE wind_speed < 0;
+
 /*
 Based on the number of row with wind speed equal to 0 it seems
 it can be a value meaning the lack of measurement.
@@ -419,10 +431,9 @@ possible that a large portion of measurements is 0-valued
 (there might be no rain for long periods of time).
 */
 
--- Deleting outliers based on the percentile thresholds
-
-DROP FUNCTION IF EXISTS delete_percentile_outliers(text, text, real, real);
-CREATE OR REPLACE FUNCTION delete_percentile_outliers(
+-- Deleting outliers based on the percentile thresholds for a single hour
+DROP FUNCTION IF EXISTS delete_hourly_percentile_outliers(text, text, real, real);
+CREATE OR REPLACE FUNCTION delete_hourly_percentile_outliers(
 	tabname text, colname text, lower_threshold real, upper_threshold real)
 RETURNS VOID AS $$
 DECLARE
@@ -461,9 +472,61 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT delete_percentile_outliers('meteo_observations', 'temperature', 0, 0.99);
-SELECT delete_percentile_outliers('meteo_observations', 'pressure', 0, 0.99);
--- SELECT delete_percentile_outliers('observations', 'pm2_5', 0, 0.99);
+-- SELECT delete_hourly_percentile_outliers('meteo_observations', 'temperature', 0, 0.99);
+-- SELECT delete_hourly_percentile_outliers('meteo_observations', 'pressure', 0, 0.99);
+
+
+-- Deleting outliers based on the monthly percentile thresholds
+DROP FUNCTION IF EXISTS delete_monthly_percentile_outliers(text, text, int, int, real, real);
+CREATE OR REPLACE FUNCTION delete_monthly_percentile_outliers(
+	tabname text, colname text, year int, month int, lower_threshold real, upper_threshold real)
+RETURNS VOID AS $$
+DECLARE
+	query text;
+	temp_table_query text;
+BEGIN
+	DROP TABLE IF EXISTS thresholds;
+	temp_table_query := format('
+	CREATE TEMP TABLE thresholds AS(
+	SELECT date_trunc(''month'', timestamp) as month,
+	percentile_cont(%1$s) WITHIN GROUP (ORDER BY %3$s) AS lower,
+	percentile_cont(%2$s) WITHIN GROUP (ORDER BY %3$s) AS upper
+	FROM %4$s
+	GROUP BY 1
+	)', lower_threshold, upper_threshold, colname, tabname);
+
+	RAISE NOTICE '%', temp_table_query;
+	EXECUTE temp_table_query;
+	CREATE INDEX ON thresholds(month);
+	
+	query := format('
+	UPDATE %1$s
+	SET %2$s = NULL
+	WHERE id IN (
+		SELECT obs.id
+		FROM %1$s as obs
+		JOIN thresholds AS th ON th.month = date_trunc(''month'', obs.timestamp)
+		WHERE EXTRACT(year FROM obs.timestamp) = %3$s 
+		AND EXTRACT(month FROM obs.timestamp) = %4$s
+		AND (obs.%2$s < th.lower OR obs.%2$s > th.upper)
+	)', tabname, colname, year, month);
+	
+	RAISE NOTICE 'Deleting outlier values from column %', colname;
+	RAISE NOTICE '%', query;
+	EXECUTE query;
+	DROP TABLE thresholds;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2016, 12, 0, 0.99);
+SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2017, 1, 0, 0.98);
+SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2017, 2, 0, 0.98);
+SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2017, 3, 0, 0.98);
+
+
+-- SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 0, 0.99);
+-- SELECT delete_monthly_percentile_outliers('meteo_observations', 'pressure', 0, 0.99);
+-- SELECT delete_monthly_percentile_outliers('observations', 'pm2_5', 0, 0.99);
 
 /*
 DELETE FROM observations
@@ -600,6 +663,7 @@ ALTER TABLE air_quality_distance ADD PRIMARY KEY (id);
 CREATE INDEX ON air_quality_distance(station_id1);
 CREATE INDEX ON air_quality_distance(station_id2);
 CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
+
 
 /*
 A function creating empty records for timestamps not

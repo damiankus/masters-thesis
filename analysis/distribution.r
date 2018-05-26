@@ -14,7 +14,7 @@ save_histogram <- function (df, factor, plot_path, title) {
   
   fact_col <- df[,factor] 
   bw <- 2 * IQR(fact_col, na.rm = TRUE) / length(fact_col) ^ 0.33
-  outlier_thresholds <- quantile(fact_col, c(0, .99), na.rm = TRUE)
+  outlier_thresholds <- quantile(fact_col, c(0.01, .99), na.rm = TRUE)
   
   plot <- ggplot(data = df, aes_string(fact_col)) +
     geom_histogram(colour = 'white', fill = 'blue', binwidth = bw) +
@@ -40,37 +40,43 @@ main <- function () {
   on.exit(dbDisconnect(con))
   
   # Fetch all observations
-  table_name <- 'observations'
-  # table_name <- 'meteo_observations'
+  # table_name <- 'observations'
+  table_name <- 'meteo_observations'
   excluded <- c('id', 'station_id')
-  query = paste('SELECT * FROM',
-                 table_name,
-                # "WHERE station_id = 'airly_172'",
-                 sep = ' ')
+  query = paste('SELECT * FROM', table_name, "where timestamp > '2017-01-01' AND timestamp <'2017-04-01'", sep = ' ')
   obs <- dbGetQuery(con, query)
   obs <- obs[, !(colnames(obs) %in% excluded)]
   obs[,'date'] <- factor(as.Date(obs$timestamp))
   obs[,'month'] <- as.numeric(format(as.Date(obs$date), '%m'))
+  
   factors <- colnames(obs)
   factors <- factors[!(factors %in% c('timestamp', 'date', 'month'))]
   month_names <- c('January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December')
+  obs$year <- sapply(obs$timestamp, function (ts) { as.POSIXlt(ts, origin = '1970-01-01', tz = 'UTC')$year + 1900 })
   
   target_root_dir <- file.path(getwd(), 'distribution')
   mkdir(target_root_dir)
   target_root_dir <- file.path(target_root_dir, strsplit(table_name, '_')[[1]][1])
   mkdir(target_root_dir)
-  
-  for (factor in factors) {
-    target_dir <- file.path(target_root_dir, factor)
-    mkdir(target_dir)
+
+  for (year in seq(2015, 2018)) {
+    year_dir <- file.path(target_root_dir, year)
+    mkdir(year_dir)
+    yearly <- obs[obs$year == year, ]
     
     for (month in seq(1, 12)) {
-      which <- obs[obs$month == month,]
-      plot_name <- paste('histogram', factor, '_', month, '.png', sep = '')
-      plot_path <- file.path(target_dir, plot_name)
-      title <- paste('Distribution of ', pretty_var(factor), ' during ', month_names[month])
-      save_histogram(which, factor, plot_path, title)
+      monthly <- yearly[yearly$month == month, ]
+      
+      for (factor in factors) {
+        target_dir <- file.path(year_dir, factor)
+        mkdir(target_dir)
+      
+        plot_name <- paste('histogram_', factor, '_', month, '.png', sep = '')
+        plot_path <- file.path(target_dir, plot_name)
+        title <- paste('Distribution of ', pretty_var(factor), ' during ', month_names[month])
+        save_histogram(monthly, factor, plot_path, title)
+      }
     }
   }
 }
