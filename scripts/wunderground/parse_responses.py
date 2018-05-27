@@ -54,6 +54,7 @@ if __name__ == '__main__':
 
         # Create all the necessary tables if needed
         if args['new_tables']:
+            print('Creating tables')
             Observation.__table__.drop(engine, checkfirst=True)
             Station.__table__.drop(engine, checkfirst=True)
             SqlBase.metadata.create_all(engine)

@@ -43,7 +43,7 @@ main <- function () {
   # table_name <- 'observations'
   table_name <- 'meteo_observations'
   excluded <- c('id', 'station_id')
-  query = paste('SELECT * FROM', table_name, "where timestamp > '2017-01-01' AND timestamp <'2017-04-01'", sep = ' ')
+  query = paste('SELECT * FROM', table_name, sep = ' ')
   obs <- dbGetQuery(con, query)
   obs <- obs[, !(colnames(obs) %in% excluded)]
   obs[,'date'] <- factor(as.Date(obs$timestamp))
@@ -60,12 +60,12 @@ main <- function () {
   target_root_dir <- file.path(target_root_dir, strsplit(table_name, '_')[[1]][1])
   mkdir(target_root_dir)
 
-  for (year in seq(2015, 2018)) {
+  for (year in seq(min(obs$year), max(obs$year))) {
     year_dir <- file.path(target_root_dir, year)
     mkdir(year_dir)
     yearly <- obs[obs$year == year, ]
     
-    for (month in seq(1, 12)) {
+    for (month in seq(min(yearly$month), max(yearly$month))) {
       monthly <- yearly[yearly$month == month, ]
       
       for (factor in factors) {

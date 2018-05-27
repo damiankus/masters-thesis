@@ -201,6 +201,18 @@ SET humidity = NULL
 WHERE humidity < 0
 OR humidity > 100;
 
+UPDATE observations 
+SET wind_speed = NULL
+WHERE wind_speed < 0;
+
+UPDATE observations 
+SET precip_rate = NULL
+WHERE precip_rate < 0;
+
+UPDATE observations 
+SET precip_total = NULL
+WHERE precip_total < 0;
+
 -- Deleting empty records
 
 /*
@@ -379,6 +391,17 @@ OR pressure IS NOT NULL
 OR humidity IS NOT NULL
 ORDER BY station_id, timestamp;
 
+/* Only for GIOS stations there are pre-2017 observations */
+
+DELETE FROM observations
+WHERE station_id NOT IN (
+	SELECT id FROM gios_stations
+);
+DELETE FROM stations
+WHERE id NOT IN (
+	SELECT id FROM gios_stations
+);
+
 /*
 Deleting outliers
 */
@@ -523,36 +546,6 @@ SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2
 SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2017, 2, 0, 0.98);
 SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 2017, 3, 0, 0.98);
 
-
--- SELECT delete_monthly_percentile_outliers('meteo_observations', 'temperature', 0, 0.99);
--- SELECT delete_monthly_percentile_outliers('meteo_observations', 'pressure', 0, 0.99);
--- SELECT delete_monthly_percentile_outliers('observations', 'pm2_5', 0, 0.99);
-
-/*
-DELETE FROM observations
-WHERE station_id NOT IN (
-	SELECT id FROM gios_stations
-);
-DELETE FROM stations
-WHERE id NOT IN (
-	SELECT id FROM gios_stations
-);
-*/
-
-UPDATE observations AS obs
-SET temperature = NULL
-FROM meteo_observations AS met
-WHERE met.station_id = obs.station_id
-AND met.timestamp = obs.timestamp
-AND met.temperature IS NULL;
-
-UPDATE observations AS obs
-SET pressure = NULL
-FROM meteo_observations AS met
-WHERE met.station_id = obs.station_id
-AND met.timestamp = obs.timestamp
-AND met.pressure IS NULL;
-
 /*
 Deleting empty records
 Note: Each day at 10 p.m. the AGH station 
@@ -663,7 +656,6 @@ ALTER TABLE air_quality_distance ADD PRIMARY KEY (id);
 CREATE INDEX ON air_quality_distance(station_id1);
 CREATE INDEX ON air_quality_distance(station_id2);
 CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
-
 
 /*
 A function creating empty records for timestamps not
@@ -911,7 +903,6 @@ ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ew;
 ALTER TABLE observations ADD COLUMN wind_dir_ew FLOAT;
 UPDATE observations 
 SET wind_dir_ew = COS(wind_dir_rad);
-
 
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ns;
 ALTER TABLE observations ADD COLUMN wind_dir_ns FLOAT;

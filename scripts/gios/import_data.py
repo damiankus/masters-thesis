@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # Yearly data
     reader = YearlyDataReader(station_ids, uuids, config['var-names'])
-    for fpath in config['yearly-paths']:
+    for fpath in sorted(config['yearly-paths']):
         logger.debug('Reading file {}'.format(fpath))
         observations = reader.read_data(fpath)
         session.add_all(observations)

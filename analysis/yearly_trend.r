@@ -67,7 +67,7 @@ main <- function () {
   }
   
   for (factor in factors) {
-    stats <- as.data.frame(aggregate(obs[,factor], by = list(obs$date),
+    stats <- as.data.frame(aggregate(obs[, factor], by = list(obs$date),
                                      FUN = mean, na.rm = TRUE))
     names(stats) <- c('date', factor)
     stats[,'date'] <- as.Date(stats$date)

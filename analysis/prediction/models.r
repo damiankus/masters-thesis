@@ -70,9 +70,9 @@ fit_lasso_mlr <- function (res_formula, training_set, test_set, target_dir) {
   res_var <- vars[[1]]
   expl_vars <- vars[2:length(vars)]
   training_mat <- model.matrix(res_formula, data = training_set)
-  fit <- cv.glmnet(x = training_mat, y = training_set[, res_var], type.measure = 'mse', nfolds = 5, alpha = .5)
+  fit <- cv.glmnet(x = training_mat, y = training_set[, res_var], alpha = 1)
   test_mat <- model.matrix(res_formula, data = test_set)
-  pred_vals <- c(predict(fit, s = c('lambda.1se'), test_mat, type = 'response'))
+  pred_vals <- c(predict(fit, s = 'lambda.1se', newx = test_mat, type = 'response'))
   to_results(res_formula, test_set, pred_vals)
 }
 
@@ -142,7 +142,6 @@ fit_best_svr <- function (res_formula, training_set, test_set, target_dir) {
                                  epsilon <- seq(0, 1, 0.25),
                                  kernel = c('radial')))
   plot(best_svm)
-  
   model <- best_svm$best.model
   pred_vals <- predict(model, test_set)
   to_results(res_formula, test_set, pred_vals)
@@ -193,51 +192,61 @@ fit_arima <- function (res_formula, training_set, test_set, target_dir) {
   arima_fun(res_formula, training_set, test_set, target_dir)
 }
 
-fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
-  # Standardization requires dividing by the standard deviation
-  # of a column. If the column contains constant values it becomes
-  # division by 0!
-  res_formula <- skip_constant_variables(res_formula, training_set)
-  all_vars <- all.vars(res_formula)
-  res_var <- all.vars(res_formula)[[1]]
-  expl_vars <- all_vars[2:length(all_vars)]
-  results <- data.frame(actual = test_set[, res_var], timestamp = test_set$future_timestamp)
-  
-  training_set <- training_set[, c(res_var, expl_vars)] 
-  test_set <- test_set[, c(res_var, expl_vars)]
-  
-  # First we standardize the data, then 
-  # we normalize the data, using min and max
-  # values of the standardized set (not the original one!)
-  all_data <- rbind(training_set, test_set)
-  means <- apply(all_data, 2, mean)
-  sds <- apply(all_data, 2, sd)
-  rm(all_data)
-  training_set <- standardize_with(training_set, means, sds)
-  test_set <- standardize_with(test_set, means, sds)
-  
-  all_data <- rbind(training_set, test_set)
-  mins <- apply(all_data, 2, min)
-  maxs <- apply(all_data, 2, max)
-  rm(all_data)
-  training_set <- normalize_with(training_set, mins, maxs)
-  test_set <- normalize_with(test_set, mins, maxs)
-  
-  nn <- neuralnet(res_formula,
-                  data = training_set,
-                  hidden = c(8, 5),
-                  stepmax = 1e+04,
-                  threshold = 0.5,
-                  linear.output = TRUE)
-  # plot(nn)
-  pred_vals <- c(compute(nn, test_set[, expl_vars])$net.result)
-  
-  # Reverse the initial transformations
-  pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
-  pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
-  
-  results$predicted <- pred_vals
-  results
+mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5) {
+  fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
+    # Standardization requires dividing by the standard deviation
+    # of a column. If the column contains constant values it becomes
+    # division by 0!
+    res_formula <- skip_constant_variables(res_formula, training_set)
+    all_vars <- all.vars(res_formula)
+    res_var <- all.vars(res_formula)[[1]]
+    expl_vars <- all_vars[2:length(all_vars)]
+    results <- data.frame(actual = test_set[, res_var], timestamp = test_set$future_timestamp)
+    
+    training_set <- training_set[, c(res_var, expl_vars)] 
+    test_set <- test_set[, c(res_var, expl_vars)]
+    
+    # First we standardize the data, then 
+    # we normalize the data, using min and max
+    # values of the standardized set (not the original one!)
+    all_data <- rbind(training_set, test_set)
+    means <- apply(all_data, 2, mean)
+    sds <- apply(all_data, 2, sd)
+    rm(all_data)
+    training_set <- standardize_with(training_set, means, sds)
+    test_set <- standardize_with(test_set, means, sds)
+    
+    all_data <- rbind(training_set, test_set)
+    mins <- apply(all_data, 2, min)
+    maxs <- apply(all_data, 2, max)
+    rm(all_data)
+    training_set <- normalize_with(training_set, mins, maxs)
+    test_set <- normalize_with(test_set, mins, maxs)
+    
+    # Create an ensemble of neural networks
+    # and get the final prediction by calculating
+    # the average values
+    
+    nns <- lapply(seq(ensemble_size), function (i) {
+      neuralnet(res_formula,
+                data = training_set,
+                hidden = hidden,
+                stepmax = stepmax,
+                threshold = threshold,
+                linear.output = TRUE)
+    })
+    pred_vals_list <- lapply (nns, function (nn) {
+      c(compute(nn, test_set[, expl_vars])$net.result)
+    })
+    pred_vals <- apply(do.call(cbind, pred_vals_list), 1, mean)
+    
+    # Reverse the initial transformations
+    pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
+    pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
+    
+    results$predicted <- pred_vals
+    results
+  }
 }
 
 fit_lstm <- function (res_formula, training_set, test_set, target_dir) {

@@ -18,17 +18,17 @@ Sys.setenv(LANG = 'en')
 main <- function () {
   obs <- load_observations('complete_observations',
                            variables = c('timestamp', 'pm2_5', 'wind_speed', 'pressure', 'precip_rate',
-                                         'humidity', 'temperature', 'season', 'is_holiday', 'month', 'year'),
+                                         'humidity', 'temperature', 'season', 'hour_of_day', 'day_of_year', 'is_holiday', 'year'),
                            stations = c('gios_krasinskiego'))
   test_year <- max(obs$year)
   training_years <- unique(obs$year)
   training_years <- training_years[training_years != test_year]
   
   base_res_var <- 'pm2_5'
-  aggr_vars <- c('pm2_5', 'wind_speed', 'pressure', 'humidity', 'temperature', 'precip_rate')
+  aggr_vars <- c('pm2_5', 'wind_speed', 'humidity', 'pressure', 'temperature', 'precip_rate')
     
   # For calculating aggregated values
-  past_lag <- 6
+  past_lag <- 23
   future_lags <- c(24)
   training_days <- 7 * 4
   test_days <- 7
@@ -38,16 +38,18 @@ main <- function () {
   offset_step <- 24 * offset_days
   
   seasons <- c('winter', 'spring', 'summer', 'autumn')
-  pred_models <- c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
-                   log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp)
+  pred_models <- c(
+                   ann_5_th_04 = mlp_factory(c(5), 0.4),
+                   ann_3_10_th_04 = mlp_factory(c(3, 10), 0.4),
+                   ann_3_5_10_th_04 = mlp_factory(c(3, 5, 10), 0.4)
+                   )
   # c(persistence = fit_persistence, mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
-    #                log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp, arima = fit_arima)
+  #                log_mlr = fit_log_mlr, svr = fit_svr, neural = fit_mlp, arima = fit_arima)
 
-  
   var_dir <- file.path(getwd(), base_res_var, 'same_season')
   mkdir(var_dir)
   
-  lapply(seq(1, 4), function (season) {
+  lapply(seq(1, 1), function (season) {
     season_dir <- file.path(var_dir, seasons[season])
     mkdir(season_dir)
     seasonal_data <- data.matrix(obs[obs$season == season & obs$year == test_year, ])
@@ -79,19 +81,14 @@ main <- function () {
       
       # Number of days with all 24 observations 
       total_obs <- 24 * floor(length(windows[, 1]) / 24)
-      offset_seq <- seq(1, total_obs - (training_count + test_count) + 1, offset_step)
+      offset_seq <- seq(training_count + 1, total_obs - test_count + 1, offset_step)
       
       season_results <- lapply(names(pred_models), function (model_name) {
         fit_model <- pred_models[[model_name]]
         print(paste('Fitting a', model_name, 'model'))
         model_results <- lapply(offset_seq, function (offset) {
-          
-          last_training_idx <- offset + training_count - 1
-          training_seq <- (offset):last_training_idx
-          test_seq <- (last_training_idx + 1):(last_training_idx + test_count)
-          
-          training_set <- rbind(training_base, windows[training_seq, ])
-          test_set <- windows[test_seq, ]
+          training_set <- rbind(training_base, windows[1:(offset - 1), ])
+          test_set <- windows[offset:(offset + test_count - 1), ]
           
           # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
           # save_data_split(base_res_var, training_set, test_set, plot_path)
@@ -109,6 +106,7 @@ main <- function () {
       
       season_results <- do.call(rbind, season_results)
       season_results$future_lag <- future_lag
+      season_results$season <- seasons[[season]]
       file_path <- file.path(var_dir, 'prediction_goodness.txt')
       write(seasons[season], file = file_path, append = TRUE)
       save_prediction_goodness(season_results, file_path)

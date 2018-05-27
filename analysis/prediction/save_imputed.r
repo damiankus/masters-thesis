@@ -8,13 +8,9 @@ packages <- c('RPostgreSQL')
 import(packages)
 Sys.setenv(LANG = 'en')
 
-con <- get_connection()
-on.exit(dbDisconnect(con))
-
 stations <- c('gios_krasinskiego', 'gios_bulwarowa', 'gios_bujaka')
 obs <- load_observations('observations',
-                         stations = stations,
-                         con = con)
+                         stations = stations)
 obs$station_id <- sapply(obs$station_id, trimws)
 create_table_from_schema('observations', 'complete_observations')
 
@@ -41,4 +37,3 @@ lapply(stations, function (station_id) {
   
   write_table(imputed, 'complete_observations')
 })
-

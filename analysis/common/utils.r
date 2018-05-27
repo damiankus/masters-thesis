@@ -33,6 +33,7 @@ load_observations <- function (table, variables = c('*'), stations = c(),
     query <- paste(query, " WHERE station_id IN ('", paste(stations, collapse = "','"), "')", sep = "")
   }
   df <- dbGetQuery(con, query)
+  dbDisconnect(con)
   if (na.omit) {
     df <- na.omit(df)
   }
@@ -91,7 +92,7 @@ units <- function (var) {
 pretty_var <- function (var) {
   switch(var,
          pm1 = 'PM1', pm2_5 = 'PM2.5', pm10 = 'PM10', solradiation = 'Solar irradiance', wind_speed = 'wind speed',
-         wind_dir = 'wind direction', wind_dir_deg = 'wind direction',
+         wind_dir = 'wind direction', wind_dir_deg = 'wind direction', precip_rate = 'Precipitation rate', precip_total = 'Total precipitation',
          {
            delim <- ' '
            join_str <- ' '
