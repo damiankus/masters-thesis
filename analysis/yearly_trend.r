@@ -1,34 +1,12 @@
 wd <- getwd()
 setwd(file.path(wd, 'common'))
 source('utils.r')
+source('plotting.r')
 setwd(wd)
 
 packages <- c('RPostgreSQL', 'reshape', 'ggplot2')
 import(packages)
 Sys.setenv(LANG = "en")
-
-save_boxplot <- function (df, factor, plot_path, title) {
-  plot <- ggplot(data = df) +
-    geom_boxplot(aes_string(x = 'date', y = factor)) +
-    ggtitle(title) +
-    xlab('Date') +
-    ylab(cap(paste(pretty_var(factor), '[', units(factor),']', sep = ' '))) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  ggsave(plot_path, width = 16, height = 10, dpi = 200)
-  print(paste('Plot saved in', plot_path, sep = ' '))
-}
-
-save_lineplot <- function (df, factor, plot_path, title) {
-  plot <- ggplot(data = df) +
-    geom_line(aes_string(x = 'date', y = factor)) +
-    ggtitle(title) +
-    xlab('Date') +
-    ylab(cap(
-      paste(pretty_var(factor), '[', units(factor), ']', sep = ' '))) +
-    scale_x_date(date_labels = "%b")
-  ggsave(plot_path, width = 16, height = 10, dpi = 200)
-  print(paste('Plot saved in', plot_path, sep = ' '))
-}
 
 main <- function () {
   driver <- dbDriver('PostgreSQL')
@@ -73,7 +51,7 @@ main <- function () {
     stats[,'date'] <- as.Date(stats$date)
     plot_path <- file.path(target_root_dir, paste(factor, '_yearly_trend.png', sep = ''))
     title <- paste(pretty_var(factor), '[', units(factor), ']', sep = '')
-    save_lineplot(stats, factor, plot_path, title)
+    save_line_plot(stats, 'date', factor, plot_path, title)
   }
 }
 main()

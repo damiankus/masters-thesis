@@ -4,11 +4,11 @@ import(c('ggplot2', 'reshape', 'car', 'scales'))
 
 # Based on http://r-statistics.co/Linear-Regression.html
 
-save_line_plot <- function(df, varx, vary, plot_path, title) {
-  line_plot <- ggplot(data = df, aes_string(x = varx, y = vary)) +
+save_line_plot <- function(df, var_x, var_y, plot_path, title) {
+  line_plot <- ggplot(data = df, aes_string(x = var_x, y = var_y)) +
     geom_line() +
-    xlab(varx) +
-    ylab(vary) +
+    xlab(var_x) +
+    ylab(var_y) +
     ggtitle(title) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
@@ -49,6 +49,22 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
+save_goodness_plot <- function (df, x_var, y_var, id_var, x_order, plot_path, x_lab = '', y_lab = '', title = '') {
+  if (nchar(x_lab) == 0) {
+    x_lab <- pretty_var(x_var)
+  }
+  if (nchar(y_lab) == 0) {
+    y_lab <- pretty_var(y_var)
+  }
+  plot <- ggplot(data = df, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
+    geom_bar(position = 'dodge', stat = 'identity') +
+    xlab(x_lab) +
+    ylab(y_lab) + 
+    scale_x_discrete(limits = x_order)
+  ggsave(plot_path, width = 16, height = 10, dpi = 200)
+  print(paste('Plot saved in', plot_path, sep = ' '))
+}
+
 save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '') { 
   copy <- data.frame(df[, c(x_var, y_var, id_var)])
   
@@ -75,7 +91,7 @@ save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab 
   if (timestamp_present) {
     plot <- plot +
       scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
-                       breaks = date_breaks('2 months'))
+                       breaks = date_breaks('3 months'))
   }
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))

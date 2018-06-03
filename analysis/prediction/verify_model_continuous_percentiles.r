@@ -30,30 +30,39 @@ main <- function () {
   # For calculating aggregated values
   past_lag <- 23
   future_lag <- 24
-  training_days <- 0
+  training_days <- 7
   test_days <- 7
   offset_days <- 7
   training_count <- 24 * training_days
   test_count <- 24 * test_days
   offset_step <- 24 * offset_days
   seasons <- c('winter', 'spring', 'summer', 'autumn')
-  
-  pred_models <- c(mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
-                   log_mlr = fit_log_mlr)
 
-  var_dir <- file.path(getwd(), base_res_var, 'continuous_data')
+  # pred_models <- generate_mlps(c(3, 5, 10), deltas = c(1, 1, 1), thresholds = seq(0.55, 0.45, -0.05))
+  expl_vars <- list(c(), c(), c(), c())
+  pred_models <- c(
+    mlp_3_th_0.5 = mlp_factory(c(3), threshold = 0.5),
+    mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
+    mlp_5_10_th_0.5 = mlp_factory(c(5, 10), threshold = 0.5),
+    mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
+    mlp_3_5_5_th_0.5 = mlp_factory(c(3, 5, 5), threshold = 0.5),
+    mlp_3_5_10_th_0.5 = mlp_factory(c(3, 5, 10), threshold = 0.5),
+    mlp_10_5_3_th_0.5 = mlp_factory(c(10, 5, 3), threshold = 0.5)
+  )
+
+  var_dir <- file.path(getwd(), base_res_var, 'continuous_percentiles')
   mkdir(var_dir)
+  
+  print(paste('Prediction of values', future_lag, 'hours in advance'))
+  windows <- divide_into_windows(obs, past_lag, future_lag,
+                                 future_vars = c(base_res_var, 'timestamp'),
+                                 excluded_vars = c())
+  windows <- add_aggregated(windows, past_lag, vars = aggr_vars)
+  windows <- skip_past(windows)
   
   all_seasons_results <- lapply(seq(1, 4), function (season) {
     season_dir <- file.path(var_dir, seasons[season])
     mkdir(season_dir)
-    
-    print(paste('Prediction of values', future_lag, 'hours in advance'))
-    windows <- divide_into_windows(obs, past_lag, future_lag,
-                                   future_vars = c(base_res_var, 'timestamp'),
-                                   excluded_vars = c())
-    windows <- add_aggregated(windows, past_lag, vars = aggr_vars)
-    windows <- skip_past(windows)
     
     training_base <- windows[windows$year %in% training_years
                              | windows$season < season, ]
@@ -77,8 +86,14 @@ main <- function () {
       print(paste('Fitting a', model_name, 'model'))
 
       model_results <- lapply(offset_seq, function (offset) {
-        training_set <- rbind(training_base, seasonal_windows[1:(offset - 1), ])
-        test_set <- seasonal_windows[offset:(offset + test_count), ]
+        training_set <- seasonal_windows[1:(offset - 1), ]
+        upper_threshold <- quantile(training_set$pm2_5, 0.99)
+        lower_threshold <- quantile(training_set$pm2_5, 0.25)
+        criterion_vals <- training_base[, base_res_var] 
+        which <- criterion_vals >= lower_threshold & criterion_vals <= upper_threshold
+        
+        training_set <- rbind(training_base[which, ], training_set)
+        test_set <- seasonal_windows[offset:(offset + test_count - 1), ]
         
         # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
         # save_data_split(base_res_var, training_set, test_set, plot_path)

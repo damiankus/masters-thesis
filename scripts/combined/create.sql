@@ -843,10 +843,6 @@ WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '06-22' AND '09-22';
 UPDATE observations
 SET season = 4
 WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
-UPDATE observations 
-SET season = 5
-WHERE to_char(timestamp::date, 'MM-dd') > '12-21';
-
 
 -- ===================================
 

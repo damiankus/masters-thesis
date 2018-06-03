@@ -47,11 +47,6 @@ fit_mlr <- function (res_formula, training_set, test_set, target_dir) {
                     "')", sep = '')
       print(info)
     })
-  
-  # file_path <- file.path(target_dir, 'regression_summary.txt')
-  # save_summary(model, results, file_path, summary_funs = summ_funs)
-  # save_prediction_goodness(results, file_path)
-  # save_prediction_comparison(results, res_var, 'regression', target_dir)
   to_results(res_formula, test_set, pred_vals)
 }
 
@@ -115,11 +110,6 @@ svr_factory <- function (kernel, gamma, cost) {
     pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
     pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
     results$predicted <- pred_vals
-    
-    # file_path <- file.path(target_dir, 'svr_summary.txt')
-    # save_summary(model, results, file_path)
-    # save_prediction_goodness(results, file_path)
-    # save_prediction_comparison(results, res_var, 'svr', target_dir)
     results
   }
 }
@@ -249,41 +239,30 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5) 
   }
 }
 
-fit_lstm <- function (res_formula, training_set, test_set, target_dir) {
-  res_var <- all.vars(res_formula)[[1]]
-  vars <- colnames(training_set)
-  vars <- vars[startsWith(vars, 'pm2_5')]
-  vars <- c(vars, res_var) 
-  batch_size <- length(training_set[, 1])
-  cols_count <- length(vars)
+# @archs - a vector vector containing numbers of neurons in hidden layers
+# @deltas - a vector of values to add / subtract from the original numbers
+# of neurons in @hidden (lengths must be the same!)
+# @thresholds - a vector of thresholds used as stop conditions in neuralnet package
+generate_mlps <- function (arch, deltas, thresholds) {
+  layer_sizes <- lapply(seq(length(arch)), function (i) {
+    c(arch[i] - deltas[i], arch[i] + deltas[i])
+  })
+  archs <- expand.grid(layer_sizes)
   
-  training_3d <- array(apply(training_set[1:10, vars], 1, function (row) {
-      a <- array(
-        lapply(row, function (x) { array(x, dim = c(1)) })
-        , dim = c(cols_count, 1)
-      )
-    }), dim = c(batch_size, cols_count, 1))
-  print(class(training_3d))
+  # Add the original architecture
+  archs <- rbind(archs, arch)
+  unlist(apply(archs, 1, function (arch) {
+    same_arch <- lapply(thresholds, function (th) {
+      mlp_factory(hidden = arch, threshold = th)
+    })
+    names(same_arch) <- sapply(thresholds, function (th) {
+      paste('mlp', paste(arch, collapse = '_'), 'th', th, sep = '_')
+    })
+    same_arch
+  }))
+}
+
+generate_svrs <- function (gammas, epsilons, costs) {
   
-  model <- keras_model_sequential()
-  model %>%
-    layer_lstm(12, input_shape = c(cols_count, 1)) %>%
-    layer_dense(10) %>%
-    layer_dense(1) %>%
-    layer_activation("linear")
-  
-  model %>% compile(
-    loss = "mse",
-    metrics = "mse",
-    optimizer = "adam"
-  )
-  
-  history <- model %>% fit(
-    training_3d[, 1:(cols_count - 1), ], training_3d[, cols_count, ],
-    batch_size = 128,
-    epochs = 20,
-    validation_split = 0.8,
-    verbose = TRUE
-  )
 }
 

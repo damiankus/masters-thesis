@@ -58,10 +58,7 @@ mae <- function (results) {
 
 # Coefficient of determination
 r2 <- function (results) {
-  (cor(results[, c('actual', 'predicted')],
-       use = 'complete.obs',
-       method = c('pearson'))[1, 2]
-  ) ^ 2
+  1 - sse(results) / sst(results)
 } 
 
 nrmse <- function (results) {
@@ -84,7 +81,7 @@ adj_se <- function (results, model) {
 }
 
 get_all_measure_names <- function () {
-  c('mse', 'rmse', 'mae', 'mape', 'maxpe', 'se', 'ia', 'r2')
+  c('rmse', 'mae', 'mape', 'r2')
 } 
 
 calc_prediction_goodness <- function (results, model_name) {
