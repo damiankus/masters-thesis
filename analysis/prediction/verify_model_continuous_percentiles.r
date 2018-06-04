@@ -15,6 +15,17 @@ packages <- c(
 import(packages)
 Sys.setenv(LANG = 'en')
 
+find_training_percentiles <- function (windows, varname, last_training_idx, sample_count, lower = 0.25, upper = 0.99) {
+  # Number of samples with consecutive indexes between M and N is N - M + 1
+  samples <- windows[(last_training_idx - sample_count + 1):last_training_idx, c(varname, 'timestamp')]
+  percentiles <- quantile(samples[, varname], c(lower, upper))
+  boundaries <- list(lower = percentiles[[1]],
+                     upper = percentiles[[2]],
+                     first_date = utcts(samples[1, 'timestamp']),
+                     last_date = utcts(samples[sample_count, 'timestamp']),
+                     samples_count = length(samples[, 1]))
+}
+
 main <- function () {
   obs <- load_observations('complete_observations',
                            variables = c('timestamp', 'pm2_5', 'wind_speed', 'pressure', 'precip_rate',
@@ -30,9 +41,12 @@ main <- function () {
   # For calculating aggregated values
   past_lag <- 23
   future_lag <- 24
-  training_days <- 7
+  percentile_days <- 7
+  training_days <- 0
   test_days <- 7
   offset_days <- 7
+  
+  percentile_count <- 24 * percentile_days
   training_count <- 24 * training_days
   test_count <- 24 * test_days
   offset_step <- 24 * offset_days
@@ -49,6 +63,7 @@ main <- function () {
     mlp_3_5_10_th_0.5 = mlp_factory(c(3, 5, 10), threshold = 0.5),
     mlp_10_5_3_th_0.5 = mlp_factory(c(10, 5, 3), threshold = 0.5)
   )
+  # pred_models <- c(mlr = fit_mlr, lasso_mlr = fit_lasso_mlr, log_mlr = fit_log_mlr)
 
   var_dir <- file.path(getwd(), base_res_var, 'continuous_percentiles')
   mkdir(var_dir)
@@ -64,9 +79,11 @@ main <- function () {
     season_dir <- file.path(var_dir, seasons[season])
     mkdir(season_dir)
     
-    training_base <- windows[windows$year %in% training_years
-                             | windows$season < season, ]
-    seasonal_windows <- windows[windows$year == test_year & windows$season == season, ]
+    which_seasonal <- windows$year == test_year & windows$season == season
+    first_seasonal_idx <- min(which(which_seasonal == TRUE))
+    seasonal_windows <- windows[which_seasonal, ]
+    training_base <- windows[1:(first_seasonal_idx - 1), ]
+    last_training_base_idx <- length(training_base[, 1])
     
     # Actual response variable has the 'future_' prefix
     res_var <- paste('future', base_res_var, sep = '_')
@@ -86,18 +103,20 @@ main <- function () {
       print(paste('Fitting a', model_name, 'model'))
 
       model_results <- lapply(offset_seq, function (offset) {
-        training_set <- seasonal_windows[1:(offset - 1), ]
-        upper_threshold <- quantile(training_set$pm2_5, 0.99)
-        lower_threshold <- quantile(training_set$pm2_5, 0.25)
+        
+        # Training set ends one observation before the test window
+        last_training_idx <- last_training_base_idx + offset - 1
+        boundaries <- find_training_percentiles(windows, base_res_var, last_training_idx, percentile_count)
         criterion_vals <- training_base[, base_res_var] 
-        which <- criterion_vals >= lower_threshold & criterion_vals <= upper_threshold
+        which_training <- criterion_vals >= boundaries$lower & criterion_vals <= boundaries$upper
         
-        training_set <- rbind(training_base[which, ], training_set)
+        training_set <- rbind(training_base[which_training, ],
+                              seasonal_windows[1:(offset - 1), ])
         test_set <- seasonal_windows[offset:(offset + test_count - 1), ]
-        
+
         # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
         # save_data_split(base_res_var, training_set, test_set, plot_path)
-        
+
         tryCatch({ fit_model(res_formula, training_set, test_set, '') },
                  warning = function (war) {
                    print(war)
@@ -112,7 +131,7 @@ main <- function () {
       })
       
       model_results <- do.call(rbind, model_results)
-      model_results$timestamp <- as.POSIXct(model_results$timestamp,  origin = '1970-01-01', tz = 'UTC')
+      model_results$timestamp <- utcts(model_results$timestamp)
       plot_path <- file.path(season_dir, paste('comparison_plot_', model_name, '_lag_', future_lag, '.png', sep = ''))
       save_comparison_plot(model_results, res_var, plot_path)
       calc_prediction_goodness(model_results, model_name)
@@ -123,16 +142,16 @@ main <- function () {
     season_results$season <- seasons[[season]]
     file_path <- file.path(var_dir, 'prediction_goodness.txt')
     save_prediction_goodness(season_results, file_path)
+    
+    lapply(get_all_measure_names(), function (measure_name) {
+      x_lab <- 'Seasons'
+      y_lab <- paste(toupper(measure_name), units(base_res_var))
+      season_name <- seasons[[season]]
+      plot_path <- file.path(var_dir, paste('results_', measure_name, '_', season_name, '.png', sep = ''))
+      save_goodness_plot(season_results, 'season', measure_name, 'model', x_order <- c(season_name), plot_path,
+                         x_lab = x_lab, y_lab = y_lab)
+    })
     season_results
-  })
-  
-  all_seasons_results <- do.call(rbind, all_seasons_results)
-  lapply(get_all_measure_names(), function (measure_name) {
-    x_lab <- 'Seasons'
-    y_lab <- paste(toupper(measure_name), units(base_res_var))
-    plot_path <- file.path(var_dir, paste('results_', measure_name, '.png', sep = ''))
-    save_goodness_plot(all_seasons_results, 'season', measure_name, 'model', x_order <- seasons, plot_path,
-                       x_lab = x_lab, y_lab = y_lab)
   })
 }
 main()

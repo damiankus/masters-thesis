@@ -52,7 +52,6 @@ main <- function () {
   # pred_models <- generate_mlps(c(5, 10), deltas = c(1, 1), thresholds = seq(0.5, 0.45, -0.05))
   
   pred_models <- c(
-    mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
     mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
     mlp_20_th_0.5 = mlp_factory(c(20), threshold = 0.5)
   )
@@ -119,7 +118,7 @@ main <- function () {
       })
       
       model_results <- do.call(rbind, model_results)
-      model_results$timestamp <- as.POSIXct(model_results$timestamp,  origin = '1970-01-01', tz = 'UTC')
+      model_results$timestamp <- utcts(model_results$timestamp)
       plot_path <- file.path(season_dir, paste('all_comparison_plot_', model_name, '_lag_', future_lag, '.png', sep = ''))
       save_comparison_plot(model_results, res_var, plot_path)
       calc_prediction_goodness(model_results, model_name)

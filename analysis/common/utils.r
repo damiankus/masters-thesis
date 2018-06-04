@@ -122,3 +122,7 @@ mkdir <- function (path) {
     dir.create(path, showWarnings = TRUE, recursive = TRUE)
   }
 }
+
+utcts <- function (datestring) {
+  as.POSIXct(datestring, origin = '1970-01-01', tz = 'UTC')
+}
