@@ -16,18 +16,12 @@ import(packages)
 Sys.setenv(LANG = 'en')
 
 main <- function () {
-  obs <- load_observations('complete_observations',
-                           stations = c('gios_krasinskiego'))
-  vars <- colnames(obs)
-  vars <- vars[!(vars %in% c('id', 'station_id', 'pm10', 'solradiation', 'wind_dir_deg'))]
-  obs <- obs[, vars]
-  
-  test_year <- max(obs$year)
-  training_years <- unique(obs$year)
+  load(file = 'time_windows.Rda')
+  test_year <- max(windows$year)
+  training_years <- unique(windows$year)
   training_years <- training_years[training_years != test_year]
   
   base_res_var <- 'pm2_5'
-  aggr_vars <- c('pm2_5', 'wind_speed', 'humidity', 'pressure', 'temperature', 'precip_rate', 'wind_dir_ns', 'wind_dir_ew')
     
   # For calculating aggregated values
   past_lag <- 23
@@ -41,30 +35,22 @@ main <- function () {
   seasons <- c('winter', 'spring', 'summer', 'autumn')
   
   expl_vars <- list(c(), c(), c(), c())
-  
-  # winter ANNs
-  # pred_models <- generate_mlps(c(3, 5, 10), deltas = c(1, 1, 1), thresholds = seq(0.5, 0.45, -0.05))
-  # spring ANNs
-  # pred_models <- generate_mlps(c(5, 5), deltas = c(1, 1), thresholds = seq(0.5, 0.45, -0.05))
-  # summer ANNs
-  # pred_models <- generate_mlps(c(3), deltas = c(1), thresholds = seq(0.5, 0.45, -0.05))
-  # autumn ANNs
-  # pred_models <- generate_mlps(c(5, 10), deltas = c(1, 1), thresholds = seq(0.5, 0.45, -0.05))
-  
   pred_models <- c(
+    mlp_3_th_0.5 = mlp_factory(c(3), threshold = 0.5),
+    mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
+    mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
     mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
-    mlp_20_th_0.5 = mlp_factory(c(20), threshold = 0.5)
+    mlp_5_10_th_0.5 = mlp_factory(c(5, 10), threshold = 0.5),
+    mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
+    mlp_3_5_5_th_0.5 = mlp_factory(c(3, 5, 5), threshold = 0.5),
+    mlp_3_5_10_th_0.5 = mlp_factory(c(3, 5, 10), threshold = 0.5),
+    mlp_10_5_3_th_0.5 = mlp_factory(c(10, 5, 3), threshold = 0.5)
   )
+  
   var_dir <- file.path(getwd(), base_res_var, 'same_season')
   mkdir(var_dir)
   
-  windows <- divide_into_windows(obs, past_lag, future_lag,
-                                 future_vars = c(base_res_var, 'timestamp'),
-                                 excluded_vars = c())
-  windows <- add_aggregated(windows, past_lag, vars = aggr_vars)
-  windows <- skip_past(windows)
-  
-  all_seasons_results <- lapply(seq(1, 4), function (season) {
+  all_seasons_results <- lapply(seq(1, 1), function (season) {
     season_dir <- file.path(var_dir, seasons[season])
     mkdir(season_dir)
     

@@ -16,16 +16,11 @@ import(packages)
 Sys.setenv(LANG = 'en')
 
 main <- function () {
-  obs <- load_observations('complete_observations',
-                           variables = c('timestamp', 'pm2_5', 'wind_speed', 'pressure', 'precip_rate',
-                                         'humidity', 'temperature', 'season', 'hour_of_day', 'day_of_year', 'is_holiday', 'year'),
-                           stations = c('gios_krasinskiego'))
-  test_year <- max(obs$year)
-  training_years <- unique(obs$year)
+  load(file = 'time_windows.Rda')
+  test_year <- max(windows$year)
+  training_years <- unique(windows$year)
   training_years <- training_years[training_years != test_year]
-  
   base_res_var <- 'pm2_5'
-  aggr_vars <- c('pm2_5', 'wind_speed', 'humidity', 'pressure', 'temperature', 'precip_rate')
   
   # For calculating aggregated values
   past_lag <- 23
@@ -38,34 +33,49 @@ main <- function () {
   offset_step <- 24 * offset_days
   seasons <- c('winter', 'spring', 'summer', 'autumn')
   
-  pred_models <- c(mlr = fit_mlr, lasso_mlr = fit_lasso_mlr,
-                   log_mlr = fit_log_mlr)
-
+  expl_vars <- list(c(), c(), c(), c())
+  pred_models <- c(
+    mlp_3_th_0.5 = mlp_factory(c(3), threshold = 0.5),
+    mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
+    mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
+    mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
+    mlp_5_10_th_0.5 = mlp_factory(c(5, 10), threshold = 0.5),
+    mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
+    mlp_3_5_5_th_0.5 = mlp_factory(c(3, 5, 5), threshold = 0.5),
+    mlp_3_5_10_th_0.5 = mlp_factory(c(3, 5, 10), threshold = 0.5),
+    mlp_10_5_3_th_0.5 = mlp_factory(c(10, 5, 3), threshold = 0.5)
+  )
+  
   var_dir <- file.path(getwd(), base_res_var, 'continuous_data')
   mkdir(var_dir)
   
+  print(paste('Prediction of values', future_lag, 'hours in advance'))
   all_seasons_results <- lapply(seq(1, 4), function (season) {
     season_dir <- file.path(var_dir, seasons[season])
     mkdir(season_dir)
     
-    print(paste('Prediction of values', future_lag, 'hours in advance'))
-    windows <- divide_into_windows(obs, past_lag, future_lag,
-                                   future_vars = c(base_res_var, 'timestamp'),
-                                   excluded_vars = c())
-    windows <- add_aggregated(windows, past_lag, vars = aggr_vars)
-    windows <- skip_past(windows)
     
-    training_base <- windows[windows$year %in% training_years
-                             | windows$season < season, ]
-    seasonal_windows <- windows[windows$year == test_year & windows$season == season, ]
+    which_seasonal <- windows$year == test_year & windows$season == season
+    first_seasonal_idx <- min(which(which_seasonal == TRUE))
+    seasonal_windows <- windows[which_seasonal, ]
+    training_base <- windows[1:(first_seasonal_idx - 1), ]
     
     # Actual response variable has the 'future_' prefix
     res_var <- paste('future', base_res_var, sep = '_')
-    explanatory_vars <- colnames(windows)
-    explanatory_vars <- explanatory_vars[explanatory_vars != res_var]
+    explanatory_vars <- c()
+    
+    explanatory_vars <- (function () {
+      if (length(expl_vars[[season]]) == 0) {
+        vars <- colnames(seasonal_windows)
+        vars[vars != res_var]
+      } else {
+        expl_vars[[season]]
+      }
+    })()
+    
     res_formula <- as.formula(paste(res_var, '~',
                                     paste(explanatory_vars, collapse = '+'), sep = ' '))
-    res_formula <- skip_colinear_variables(res_formula, windows)
+    res_formula <- skip_colinear_variables(res_formula, seasonal_windows)
     
     # Number of days with all 24 observations 
     total_obs <- 24 * floor(length(seasonal_windows[, 1]) / 24)
