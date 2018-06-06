@@ -1,0 +1,3806 @@
+[
+    {
+        "manufacturer": "Sensonar",
+        "uuid": "0041",
+        "initDate": 1488386570000,
+        "location": {
+            "latitude": 50.067959,
+            "longitude": 19.91266,
+            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": false,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1
+    },
+    {
+        "manufacturer": "Sensonar",
+        "uuid": "0050",
+        "initDate": 1488386570000,
+        "location": {
+            "latitude": 50.067959,
+            "longitude": 19.91266,
+            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": false,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 112
+    },
+    {
+        "manufacturer": "Sensonar",
+        "uuid": "0039",
+        "initDate": 1490191566000,
+        "location": {
+            "latitude": 50.067959,
+            "longitude": 19.91266,
+            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": false,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 232
+    },
+    {
+        "manufacturer": "Sensonar",
+        "uuid": "0040",
+        "initDate": 1490191566000,
+        "location": {
+            "latitude": 50.067873,
+            "longitude": 21,
+            "address": "Unnamed Road, 33-140, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": false,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 233
+    },
+    {
+        "manufacturer": "Sensonar",
+        "uuid": "0042",
+        "label": "Kawiory 42",
+        "initDate": 1490191566000,
+        "location": {
+            "latitude": 50.067873,
+            "longitude": 19.912719,
+            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": false,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 234
+    },
+    {
+        "manufacturer": "Sensonar",
+        "uuid": "0044",
+        "label": "Kawiory 44",
+        "initDate": 1490191566000,
+        "location": {
+            "latitude": 50.067873,
+            "longitude": 19.912719,
+            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": false,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 236
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "236",
+        "label": "BiałaP-Orzechowa",
+        "initDate": 1510146524924,
+        "location": {
+            "latitude": 52.029194,
+            "longitude": 23.149389,
+            "address": "Leszczynowa 15, 21-500 Biała Podlaska, Polska",
+            "city": "Biała Podlaska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1872
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "605",
+        "label": "Białystok-Miejska",
+        "initDate": 1510146524937,
+        "location": {
+            "latitude": 53.126689,
+            "longitude": 23.155869,
+            "address": "Sucha 6, 15-283 Białystok, Polska",
+            "city": "Białystok"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1873
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "606",
+        "label": "Białystok-Podmiejska",
+        "initDate": 1510146525306,
+        "location": {
+            "latitude": 53.138614,
+            "longitude": 23.229903,
+            "address": "Warzywna, 15-197 Białystok, Polska",
+            "city": "Białystok"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1874
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "950",
+        "label": "Borowiec-Drapalka",
+        "initDate": 1510146525314,
+        "location": {
+            "latitude": 52.276794,
+            "longitude": 17.074114,
+            "address": "Drapałka 4, 62-023 Borówiec, Polska",
+            "city": "Borówiec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1875
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9000",
+        "label": "Czerwionka-Leszczyny, ul. Kopalniana",
+        "initDate": 1510146525643,
+        "location": {
+            "latitude": 50.16385,
+            "longitude": 18.659977,
+            "address": "Długosza 13, 44-230 Czerwionka-Leszczyny, Polska",
+            "city": "Czerwionka-Leszczyny"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1876
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "16",
+        "label": "Dzierżoniów - Piłsudskiego",
+        "initDate": 1510146525649,
+        "location": {
+            "latitude": 50.732817,
+            "longitude": 16.64805,
+            "address": "Marszałka Józefa Piłsudskiego 26, Dzierżoniów, Polska",
+            "city": "Dzierżoniów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1877
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9153",
+        "label": "Jelenia Góra - Ogińskiego",
+        "initDate": 1510146525654,
+        "location": {
+            "latitude": 50.913433,
+            "longitude": 15.765608,
+            "address": "Wiejska 80, Jelenia Góra, Polska",
+            "city": "Jelenia Góra"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1878
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "208",
+        "label": "Toruń, KASZOWNIK",
+        "initDate": 1510146525659,
+        "location": {
+            "latitude": 53.017628,
+            "longitude": 18.612808,
+            "address": "Przy Kaszowniku 17, Toruń, Polska",
+            "city": "Toruń"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1879
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "145",
+        "label": "Toruń Airpointer",
+        "initDate": 1510146525663,
+        "location": {
+            "latitude": 53.012261,
+            "longitude": 18.606203,
+            "address": "Dominikańska 5, 87-100 Toruń, Polska",
+            "city": "Toruń"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1880
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "117",
+        "label": "Wrocław - Korzeniowskiego",
+        "initDate": 1510146525668,
+        "location": {
+            "latitude": 51.129378,
+            "longitude": 17.02925,
+            "address": "Wybrzeże Conrada-Korzeniowskiego 18, 50-226 Wrocław, Polska",
+            "city": "Wrocław"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1881
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "813",
+        "label": "Katowice, ul. Plebiscytowa/A4",
+        "initDate": 1510146525977,
+        "location": {
+            "latitude": 50.246795,
+            "longitude": 19.019469,
+            "address": "Górnośląska 118, 40-018 Katowice, Polska",
+            "city": "Katowice"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1882
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "568",
+        "label": "K-Koźle automat 1",
+        "initDate": 1510146525982,
+        "location": {
+            "latitude": 50.349608,
+            "longitude": 18.236575,
+            "address": "Bolesława Śmiałego 5, Kędzierzyn-Koźle, Polska",
+            "city": "Kędzierzyn-Koźle"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1883
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "902",
+        "label": "Konin-Wyszynskiego",
+        "initDate": 1510146525986,
+        "location": {
+            "latitude": 52.225633,
+            "longitude": 18.269036,
+            "address": "Kard. Wyszyńskiego 3A, 62-500 Konin, Polska",
+            "city": "Konin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1884
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10121",
+        "label": "Kraków, ul. Dietla",
+        "initDate": 1510146526010,
+        "location": {
+            "latitude": 50.057447,
+            "longitude": 19.946008,
+            "address": "Dietla 84, 31-031 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1885
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9175",
+        "label": "Krempna-MPN-WIOS",
+        "initDate": 1510146526313,
+        "location": {
+            "latitude": 49.511297,
+            "longitude": 21.498606,
+            "address": "Krempna 59, 38-232 Krempna, Polska",
+            "city": "Krempna"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1886
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "52",
+        "label": "Legnica - Rzeczypospolitej",
+        "initDate": 1510146526599,
+        "location": {
+            "latitude": 51.204503,
+            "longitude": 16.180513,
+            "address": "aleja Rzeczypospolitej 6D, Legnica, Polska",
+            "city": "Legnica"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1887
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "750",
+        "label": "IMGW Łeba - Rąbka",
+        "initDate": 1510146526892,
+        "location": {
+            "latitude": 54.754139,
+            "longitude": 17.534528,
+            "address": "Rąbka 1A, 84-360 Łeba, Polska",
+            "city": "Łeba"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1888
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10058",
+        "label": "Łódź-Jana Pawła II 15",
+        "initDate": 1510146526896,
+        "location": {
+            "latitude": 51.754613,
+            "longitude": 19.434925,
+            "address": "Aleja Jana Pawła II, Łódź, Polska",
+            "city": "Łódź"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1889
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "67",
+        "label": "Nowa Ruda - Srebrna",
+        "initDate": 1510146526902,
+        "location": {
+            "latitude": 50.579914,
+            "longitude": 16.514422,
+            "address": "Srebrna 2, 57-400 Nowa Ruda, Polska",
+            "city": "Nowa Ruda"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1890
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "488",
+        "label": "Piastów-Pułaskiego",
+        "initDate": 1510146526907,
+        "location": {
+            "latitude": 52.191728,
+            "longitude": 20.837489,
+            "address": "Majora Waleriana Łukasińskiego 6, Piastów, Polska",
+            "city": "Piastów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1891
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "322",
+        "label": "Piotrków Tryb.-Krakowskie Przedmieście",
+        "initDate": 1510146526910,
+        "location": {
+            "latitude": 51.404406,
+            "longitude": 19.696956,
+            "address": "Krakowskie Przedmieście 26, 97-300 Piotrków Trybunalski, Polska",
+            "city": "Piotrków Trybunalski"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1892
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "671",
+        "label": "Rzeszów-Nowe Miasto",
+        "initDate": 1510146526913,
+        "location": {
+            "latitude": 50.024242,
+            "longitude": 22.010575,
+            "address": "Seniora 2/1, Rzeszów, Polska",
+            "city": "Rzeszów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1893
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "622",
+        "label": "Suwałki, ul. Pułaskiego 73",
+        "initDate": 1510146526917,
+        "location": {
+            "latitude": 54.117878,
+            "longitude": 22.934608,
+            "address": "Wincentego Witosa 3, 16-402 Suwałki, Polska",
+            "city": "Suwałki"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1894
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "986",
+        "label": "Szczecin_Andrzejewskiego",
+        "initDate": 1510146526920,
+        "location": {
+            "latitude": 53.380975,
+            "longitude": 14.663347,
+            "address": "Jerzego Andrzejewskiego 23, Szczecin, Polska",
+            "city": "Szczecin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1895
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10054",
+        "label": "Augustów - mobilne ",
+        "initDate": 1510146526923,
+        "location": {
+            "latitude": 53.859528,
+            "longitude": 23.00075,
+            "address": "Zdrojowa 3, 16-300 Augustów, Polska",
+            "city": "Augustów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1896
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "240",
+        "label": "Biały Słup (RPN)",
+        "initDate": 1510146527222,
+        "location": {
+            "latitude": 50.590806,
+            "longitude": 22.997889,
+            "address": "Biały Słup 10, 22-470 Zwierzyniec, Polska",
+            "city": "Zwierzyniec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1897
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10035",
+        "label": "Bolesławiec",
+        "initDate": 1510146527499,
+        "location": {
+            "latitude": 51.263245,
+            "longitude": 15.570354,
+            "address": "Polna 3, Bolesławiec, Polska",
+            "city": "Bolesławiec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1898
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "612",
+        "label": "Borsukowizna-Wiejska",
+        "initDate": 1510146527787,
+        "location": {
+            "latitude": 53.215492,
+            "longitude": 23.642153,
+            "address": "Unnamed Road, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1899
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "861",
+        "label": "WIOŚ Elbląg ul. Bażyńskiego",
+        "initDate": 1510146527792,
+        "location": {
+            "latitude": 54.167847,
+            "longitude": 19.410942,
+            "address": "Jana Bażyńskiego 6, Elbląg, Polska",
+            "city": "Elbląg"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1900
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "291",
+        "label": "Gajew",
+        "initDate": 1510146527801,
+        "location": {
+            "latitude": 52.14325,
+            "longitude": 19.233225,
+            "address": "Gajew 76, 99-335 Gajew, Polska",
+            "city": "Gajew"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1901
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "729",
+        "label": "AM1 Gdańsk Śródmieście",
+        "initDate": 1510146527806,
+        "location": {
+            "latitude": 54.353336,
+            "longitude": 18.635283,
+            "address": "Powstańców Warszawskich 5, 80-152 Gdańsk, Polska",
+            "city": "Gdańsk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1902
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "739",
+        "label": "AM10 Gdynia Śródmieście",
+        "initDate": 1510146527810,
+        "location": {
+            "latitude": 54.525274,
+            "longitude": 18.536382,
+            "address": "Marka Zygmunta, Gdynia, Polska",
+            "city": "Gdynia"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1903
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "248",
+        "label": "IMGW-Jarczew",
+        "initDate": 1510146528117,
+        "location": {
+            "latitude": 51.814367,
+            "longitude": 21.972375,
+            "address": "DW807 1A, 21-426 Jarczew, Polska",
+            "city": "Jarczew"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1904
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "842",
+        "label": "Ustroń, ul. Sanatoryjna 7",
+        "initDate": 1510146528122,
+        "location": {
+            "latitude": 49.719731,
+            "longitude": 18.826722,
+            "address": "Zdrojowa 10, 43-450 Ustroń, Polska",
+            "city": "Ustroń"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1905
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "544",
+        "label": "Warszawa-Marszałkowska",
+        "initDate": 1510146528126,
+        "location": {
+            "latitude": 52.225157,
+            "longitude": 21.014803,
+            "address": "Marszałkowska 68/70, Warszawa, Polska",
+            "city": "Warszawa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1906
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "961",
+        "label": "Widuchowa",
+        "initDate": 1510146528411,
+        "location": {
+            "latitude": 53.122325,
+            "longitude": 14.382222,
+            "address": "Bulwary Rybackie 1-2, Widuchowa, Polska",
+            "city": "Widuchowa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1907
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "379",
+        "label": "Wschowa ul. Kazimierza Wielkiego",
+        "initDate": 1510146528418,
+        "location": {
+            "latitude": 51.799722,
+            "longitude": 16.3175,
+            "address": "Strzelecka 9, 67-400 Wschowa, Polska",
+            "city": "Wschowa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1908
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "285",
+        "label": "Zamość ul. Hrubieszowska 69A",
+        "initDate": 1510146528423,
+        "location": {
+            "latitude": 50.716628,
+            "longitude": 23.290247,
+            "address": "Hrubieszowska 69A, Zamość, Polska",
+            "city": "Zamość"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1909
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "856",
+        "label": "Żywiec, ul. Kopernika  83 a",
+        "initDate": 1510146528426,
+        "location": {
+            "latitude": 49.671602,
+            "longitude": 19.234446,
+            "address": "Kopernika 83a, Żywiec, Polska",
+            "city": "Żywiec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1910
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10119",
+        "label": "Kaszów",
+        "initDate": 1510146528751,
+        "location": {
+            "latitude": 50.025028,
+            "longitude": 19.726833,
+            "address": "Kaszów 638, 32-060 Kaszów, Polska",
+            "city": "Kaszów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1911
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "761",
+        "label": "Kielce, ul. Jagiellońska",
+        "initDate": 1510146528754,
+        "location": {
+            "latitude": 50.872549,
+            "longitude": 20.604998,
+            "address": "Jagiellońska 68, Kielce, Polska",
+            "city": "Kielce"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1912
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "266",
+        "label": "Lublin ul. Obywatelska",
+        "initDate": 1510146528759,
+        "location": {
+            "latitude": 51.259431,
+            "longitude": 22.569133,
+            "address": "Kleniewskich 3, 20-093 Lublin, Polska",
+            "city": "Lublin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1913
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10794",
+        "label": "Małogoszcz, ul. Słoneczna",
+        "initDate": 1510146529073,
+        "location": {
+            "latitude": 50.809563,
+            "longitude": 20.266099,
+            "address": "Osiedle Malogoszcz 12, 28-366 Małogoszcz, Polska",
+            "city": "Małogoszcz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1914
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "769",
+        "label": "Nowiny, ul. Parkowa",
+        "initDate": 1510146529084,
+        "location": {
+            "latitude": 50.823108,
+            "longitude": 20.533506,
+            "address": "Parkowa 5, 26-052 Nowiny, Polska",
+            "city": "Nowiny"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1915
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "314",
+        "label": "Pabianice-Polfa",
+        "initDate": 1510146529087,
+        "location": {
+            "latitude": 51.667981,
+            "longitude": 19.368683,
+            "address": "Konstantynowska 38, Pabianice, Polska",
+            "city": "Pabianice"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1916
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "501",
+        "label": "Płock-Reja",
+        "initDate": 1510146529091,
+        "location": {
+            "latitude": 52.550938,
+            "longitude": 19.709791,
+            "address": "Mikołaja Reja 28, Płock, Polska",
+            "city": "Płock"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1917
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "497",
+        "label": "Płock-Gimnazjum",
+        "initDate": 1510146529406,
+        "location": {
+            "latitude": 52.556279,
+            "longitude": 19.687672,
+            "address": "aleja Antoniego Roguckiego, 09-400 Płock, Polska",
+            "city": "Płock"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1918
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "437",
+        "label": "Skawina, os. Ogrody",
+        "initDate": 1510146529413,
+        "location": {
+            "latitude": 49.971047,
+            "longitude": 19.830422,
+            "address": "Ogrody 6D, 32-050 Skawina, Polska",
+            "city": "Skawina"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1919
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "725",
+        "label": "AM11 Słupsk Kniaziewicza",
+        "initDate": 1510146529415,
+        "location": {
+            "latitude": 54.463611,
+            "longitude": 17.046722,
+            "address": "Kniaziewicza 30, 76-200 Słupsk, Polska",
+            "city": "Słupsk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1920
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "736",
+        "label": "AM8 Gdańsk Wrzeszcz",
+        "initDate": 1510146529420,
+        "location": {
+            "latitude": 54.380279,
+            "longitude": 18.620274,
+            "address": "Doktora Franciszka Kubacza 5, Gdańsk, Polska",
+            "city": "Gdańsk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1921
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "733",
+        "label": "AM5 Gdańsk Szadółki",
+        "initDate": 1510146529757,
+        "location": {
+            "latitude": 54.328336,
+            "longitude": 18.557781,
+            "address": "Ostrzycka 6, Gdańsk, Polska",
+            "city": "Gdańsk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1922
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "732",
+        "label": "AM4 Gdynia Pogórze",
+        "initDate": 1510146529763,
+        "location": {
+            "latitude": 54.560836,
+            "longitude": 18.493331,
+            "address": "Gen. Kleeberga 2D, 81-175 Gdynia, Polska",
+            "city": "Gdynia"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1923
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "870",
+        "label": "WIOŚ Gołdap ul. Jaćwieska",
+        "initDate": 1510146530060,
+        "location": {
+            "latitude": 54.305908,
+            "longitude": 22.307681,
+            "address": "Partyzantów 8, 19-500 Gołdap, Polska",
+            "city": "Gołdap"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1924
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "361",
+        "label": "Gorzów Wlkp. ul. Kosynierów Gdyńskich",
+        "initDate": 1510146530062,
+        "location": {
+            "latitude": 52.738214,
+            "longitude": 15.228667,
+            "address": "Kosynierów Gdyńskich 71A, Gorzów Wielkopolski, Polska",
+            "city": "Gorzów Wielkopolski"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1925
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "109",
+        "label": "Wałbrzych - Wysockiego",
+        "initDate": 1510146530067,
+        "location": {
+            "latitude": 50.768729,
+            "longitude": 16.269677,
+            "address": "Nowy Świat 5D, Wałbrzych, Polska",
+            "city": "Wałbrzych"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1926
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9202",
+        "label": "Airpointer Włocławek",
+        "initDate": 1510146530071,
+        "location": {
+            "latitude": 52.672648,
+            "longitude": 19.079261,
+            "address": "Chełmicka 29A, 87-801 Włocławek, Polska",
+            "city": "Włocławek"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1927
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "459",
+        "label": "Zakopane, ul. Sienkiewicza",
+        "initDate": 1510146530075,
+        "location": {
+            "latitude": 49.293564,
+            "longitude": 19.960083,
+            "address": "Henryka Sienkiewicza 24i, Zakopane, Polska",
+            "city": "Zakopane"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1928
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "600",
+        "label": "Zdzieszowice automat 2",
+        "initDate": 1510146530077,
+        "location": {
+            "latitude": 50.423533,
+            "longitude": 18.120739,
+            "address": "Piastów 7, 47-330 Zdzieszowice, Polska",
+            "city": "Zdzieszowice"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1929
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "382",
+        "label": "Żary, ul. Szymanowskiego 8",
+        "initDate": 1510146530081,
+        "location": {
+            "latitude": 51.642656,
+            "longitude": 15.127808,
+            "address": "Karola Szymanowskiego 8, Żary, Polska",
+            "city": "Żary"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1930
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9233",
+        "label": "Łódź-Kilińskiego 102/102a",
+        "initDate": 1510146530089,
+        "location": {
+            "latitude": 51.763801,
+            "longitude": 19.467132,
+            "address": "Jana Kilińskiego 102/102A, Łódź, Polska",
+            "city": "Łódź"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1932
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "590",
+        "label": "Opole manualna 4",
+        "initDate": 1510146530382,
+        "location": {
+            "latitude": 50.676856,
+            "longitude": 17.950278,
+            "address": "46-020 Opole, Polska",
+            "city": "Opole"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1933
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10030",
+        "label": "WIOŚ Ostróda Piłsudskiego",
+        "initDate": 1510146530387,
+        "location": {
+            "latitude": 53.694628,
+            "longitude": 19.968892,
+            "address": "Piłsudskiego 15, Ostróda, Polska",
+            "city": "Ostróda"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1934
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "331",
+        "label": "Radomsko-Rolna2",
+        "initDate": 1510146530390,
+        "location": {
+            "latitude": 51.067439,
+            "longitude": 19.448694,
+            "address": "Rolna 4C, Radomsko, Polska",
+            "city": "Radomsko"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1935
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "834",
+        "label": "Rybnik, ul. Borki 37 d",
+        "initDate": 1510146530396,
+        "location": {
+            "latitude": 50.111181,
+            "longitude": 18.516139,
+            "address": "Borki 37D, 44-200 Rybnik, Polska",
+            "city": "Rybnik"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1936
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10414",
+        "label": "Rymanów-Zdrój-Samorząd",
+        "initDate": 1510146530402,
+        "location": {
+            "latitude": 49.546539,
+            "longitude": 21.851006,
+            "address": "Parkowa 5, 38-481 Rymanów-Zdrój, Polska",
+            "city": "Rymanów-Zdrój"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1937
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "789",
+        "label": "Bielsko-Biała, ul. Kossak-Szczuckiej 19",
+        "initDate": 1510146530406,
+        "location": {
+            "latitude": 49.813464,
+            "longitude": 19.027318,
+            "address": "Kazimierza Przerwy-Tetmajera 19, Bielsko-Biała, Polska",
+            "city": "Bielsko-Biała"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1938
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "795",
+        "label": "Cieszyn, ul. Mickiewicza 13",
+        "initDate": 1510146530413,
+        "location": {
+            "latitude": 49.738136,
+            "longitude": 18.639069,
+            "address": "Adama Mickiewicza 13, 43-400 Cieszyn, Polska",
+            "city": "Cieszyn"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1939
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "206",
+        "label": "Toruń POLICJA",
+        "initDate": 1510146530416,
+        "location": {
+            "latitude": 53.028647,
+            "longitude": 18.666103,
+            "address": "Buszczyńskich 10D, 87-100 Toruń, Polska",
+            "city": "Toruń"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1940
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "530",
+        "label": "Warszawa-Komunikacyjna",
+        "initDate": 1510146530423,
+        "location": {
+            "latitude": 52.219298,
+            "longitude": 21.004724,
+            "address": "aleja Niepodległości 229, 02-087 Warszawa, Polska",
+            "city": "Warszawa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1941
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "282",
+        "label": "Lublin-Podmiejska",
+        "initDate": 1510146530719,
+        "location": {
+            "latitude": 51.163542,
+            "longitude": 22.598608,
+            "address": "Dominów 143A, 20-388 Dominów, Polska",
+            "city": "Dominów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1942
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "740",
+        "label": "AM12 Kościerzyna Targowa",
+        "initDate": 1510146531011,
+        "location": {
+            "latitude": 54.120694,
+            "longitude": 17.975861,
+            "address": "Targowa 2, 83-400 Kościerzyna, Polska",
+            "city": "Kościerzyna"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1943
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "402",
+        "label": "Kraków, ul. Bulwarowa",
+        "initDate": 1510146531014,
+        "location": {
+            "latitude": 50.069308,
+            "longitude": 20.053492,
+            "address": "Bulwarowa 30, 31-751 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1944
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10034",
+        "label": "Kudowa-Zdrój",
+        "initDate": 1510146531019,
+        "location": {
+            "latitude": 50.447096,
+            "longitude": 16.238509,
+            "address": "Tadeusza Kościuszki 16, Kudowa-Zdrój, Polska",
+            "city": "Kudowa-Zdrój"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1945
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "429",
+        "label": "Olkusz, ul. Francesco Nullo",
+        "initDate": 1510146531021,
+        "location": {
+            "latitude": 50.277569,
+            "longitude": 19.569869,
+            "address": "Francesco Nullo 29A, Olkusz, Polska",
+            "city": "Olkusz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1946
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "943",
+        "label": "Poznan-Polanka",
+        "initDate": 1510146531026,
+        "location": {
+            "latitude": 52.398175,
+            "longitude": 16.959519,
+            "address": "Polanka 20E, Poznań, Polska",
+            "city": "Poznań"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1947
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9179",
+        "label": "Szarów, ul. Spokojna",
+        "initDate": 1510146531313,
+        "location": {
+            "latitude": 50.0075,
+            "longitude": 20.259167,
+            "address": "Szarów 189, 32-014 Szarów, Polska",
+            "city": "Szarów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1948
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "983",
+        "label": "Szczecinek_Przemysłowa",
+        "initDate": 1510146531317,
+        "location": {
+            "latitude": 53.6989,
+            "longitude": 16.704572,
+            "address": "Przemysłowa 5, Szczecinek, Polska",
+            "city": "Szczecinek"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1949
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "805",
+        "label": "Dąbrowa Górnicza, ul. Tysiąclecia 25a",
+        "initDate": 1510146531320,
+        "location": {
+            "latitude": 50.329111,
+            "longitude": 19.231222,
+            "address": "Tysiąclecia 25A, Dąbrowa Górnicza, Polska",
+            "city": "Dąbrowa Górnicza"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1950
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "738",
+        "label": "AM9 Gdynia Dąbrowa",
+        "initDate": 1510146531322,
+        "location": {
+            "latitude": 54.465758,
+            "longitude": 18.464911,
+            "address": "Szafranowa 15A, 81-591 Gdynia, Polska",
+            "city": "Gdynia"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1951
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "466",
+        "label": "Granica-KPN",
+        "initDate": 1510146531614,
+        "location": {
+            "latitude": 52.285858,
+            "longitude": 20.454653,
+            "address": "Granica 3, 05-085 Granica, Polska",
+            "city": "Granica"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1952
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "143",
+        "label": "Inowrocław Airpointer",
+        "initDate": 1510146531617,
+        "location": {
+            "latitude": 52.793122,
+            "longitude": 18.241044,
+            "address": "Inowrocław, Polska",
+            "city": "Inowrocław"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1953
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "444",
+        "label": "Tarnów, ul. Bitwy pod Studziankami",
+        "initDate": 1510146531621,
+        "location": {
+            "latitude": 50.020169,
+            "longitude": 21.004167,
+            "address": "Bitwy pod Studziankami 5, Tarnów, Polska",
+            "city": "Tarnów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1954
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "552",
+        "label": "Warszawa-Targówek",
+        "initDate": 1510146531623,
+        "location": {
+            "latitude": 52.290864,
+            "longitude": 21.042458,
+            "address": "Chodecka 8, Warszawa, Polska",
+            "city": "Warszawa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1955
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "129",
+        "label": "Wrocław - Wiśniowa",
+        "initDate": 1510146531627,
+        "location": {
+            "latitude": 51.086225,
+            "longitude": 17.012689,
+            "address": "aleja Wiśniowa 1A, Wrocław, Polska",
+            "city": "Wrocław"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1956
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "114",
+        "label": "Wrocław - Bartnicza",
+        "initDate": 1510146531949,
+        "location": {
+            "latitude": 51.115933,
+            "longitude": 17.141125,
+            "address": "Bartnicza, 51-513 Wrocław, Polska",
+            "city": "Wrocław"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1957
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "132",
+        "label": "Ząbkowice Śląskie",
+        "initDate": 1510146531953,
+        "location": {
+            "latitude": 50.592325,
+            "longitude": 16.819786,
+            "address": "Władysława Orkana 29, Ząbkowice Śląskie, Polska",
+            "city": "Ząbkowice Śląskie"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1958
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "355",
+        "label": "Zgierz-Śródmieście",
+        "initDate": 1510146531957,
+        "location": {
+            "latitude": 51.856692,
+            "longitude": 19.421231,
+            "address": "Mielczarskiego 1, 95-100 Zgierz, Polska",
+            "city": "Zgierz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1959
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "134",
+        "label": "Zgorzelec - Bohaterów Getta",
+        "initDate": 1510146532254,
+        "location": {
+            "latitude": 51.150391,
+            "longitude": 15.008175,
+            "address": "Bohaterów Getta 1B, 59-900 Zgorzelec, Polska",
+            "city": "Zgorzelec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1960
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "38",
+        "label": "Kłodzko - Szkolna",
+        "initDate": 1510146532257,
+        "location": {
+            "latitude": 50.433493,
+            "longitude": 16.65366,
+            "address": "Dunikowskiego 3E, Kłodzko, Polska",
+            "city": "Kłodzko"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1961
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10435",
+        "label": "Kraków, ul. Telimeny",
+        "initDate": 1510146532261,
+        "location": {
+            "latitude": 50.019036,
+            "longitude": 20.016822,
+            "address": "Telimeny 7, 33-332 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1962
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "743",
+        "label": "AM17 Liniewko Kościerskie",
+        "initDate": 1510146532535,
+        "location": {
+            "latitude": 54.104111,
+            "longitude": 18.182972,
+            "address": "Liniewko Kościerskie 10, 83-420 Liniewko Kościerskie, Polska",
+            "city": "Liniewko Kościerskie"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1963
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "618",
+        "label": "Lomza Sikorskiego 48/94",
+        "initDate": 1510146532538,
+        "location": {
+            "latitude": 53.181394,
+            "longitude": 22.054381,
+            "address": "Waleriana Łukasińskiego 2, Łomża, Polska",
+            "city": "Łomża"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1964
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "295",
+        "label": "Łódź-Widzew",
+        "initDate": 1510146532543,
+        "location": {
+            "latitude": 51.75805,
+            "longitude": 19.529786,
+            "address": "Aleksandra Tansmana 2, Łódź, Polska",
+            "city": "Łódź"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1965
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "74",
+        "label": "Osieczów",
+        "initDate": 1510146532810,
+        "location": {
+            "latitude": 51.31763,
+            "longitude": 15.431719,
+            "address": "Unnamed Road, 59-724, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1966
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "778",
+        "label": "Połaniec, ul. Ruszczańska",
+        "initDate": 1510146532814,
+        "location": {
+            "latitude": 50.429014,
+            "longitude": 21.277367,
+            "address": "Ruszczańska 29, 28-230 Połaniec, Polska",
+            "city": "Połaniec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1967
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "944",
+        "label": "Poznan-Dabrowskiego",
+        "initDate": 1510146532819,
+        "location": {
+            "latitude": 52.420319,
+            "longitude": 16.877289,
+            "address": "Dąbrowskiego 165, 60-575 Poznań, Polska",
+            "city": "Poznań"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1968
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9593",
+        "label": "Puławy ul. Karpińskiego",
+        "initDate": 1510146533130,
+        "location": {
+            "latitude": 51.419047,
+            "longitude": 21.961089,
+            "address": "Franciszka Karpińskiego 1A, Puławy, Polska",
+            "city": "Puławy"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1969
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "987",
+        "label": "Szczecin_Piłsudskiego",
+        "initDate": 1510146533134,
+        "location": {
+            "latitude": 53.432169,
+            "longitude": 14.5539,
+            "address": "Marszałka Józefa Piłsudskiego 1A, Szczecin, Polska",
+            "city": "Szczecin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1970
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "989",
+        "label": "Szczecin_Łączna",
+        "initDate": 1510146533140,
+        "location": {
+            "latitude": 53.470889,
+            "longitude": 14.55625,
+            "address": "Łączna 3B, 71-781 Szczecin, Polska",
+            "city": "Szczecin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1971
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "609",
+        "label": "Białystok-Warszawska",
+        "initDate": 1510146533142,
+        "location": {
+            "latitude": 53.129306,
+            "longitude": 23.181744,
+            "address": "Warszawska 75A, Białystok, Polska",
+            "city": "Białystok"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1972
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "158",
+        "label": "Bydgoszcz Warszawska",
+        "initDate": 1510146533147,
+        "location": {
+            "latitude": 53.134083,
+            "longitude": 17.995708,
+            "address": "Jana III Sobieskiego 10, Bydgoszcz, Polska",
+            "city": "Bydgoszcz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1973
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "164",
+        "label": "Ciechocinek",
+        "initDate": 1510146533485,
+        "location": {
+            "latitude": 52.888422,
+            "longitude": 18.780908,
+            "address": "Sportowa 4, Ciechocinek, Polska",
+            "city": "Ciechocinek"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1974
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "11",
+        "label": "Czerniawa",
+        "initDate": 1510146533775,
+        "location": {
+            "latitude": 50.912475,
+            "longitude": 15.31219,
+            "address": "Strażacka 26, Świeradów-Zdrój, Polska",
+            "city": "Świeradów-Zdrój"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1975
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "14",
+        "label": "Działoszyn",
+        "initDate": 1510146533778,
+        "location": {
+            "latitude": 50.972167,
+            "longitude": 14.941319,
+            "address": "Droga Wojewódzka 352, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1976
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10005",
+        "label": "WIOŚ Ełk",
+        "initDate": 1510146534074,
+        "location": {
+            "latitude": 53.828455,
+            "longitude": 22.34845,
+            "address": "Marszałka Józefa Piłsudskiego 27, Ełk, Polska",
+            "city": "Ełk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1977
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "531",
+        "label": "Warszawa-Podleśna",
+        "initDate": 1510146534389,
+        "location": {
+            "latitude": 52.280939,
+            "longitude": 20.962156,
+            "address": "Podleśna 61, Warszawa, Polska",
+            "city": "Warszawa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1978
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "550",
+        "label": "Warszawa-Ursynów",
+        "initDate": 1510146534395,
+        "location": {
+            "latitude": 52.160772,
+            "longitude": 21.033819,
+            "address": "Zamiany 73, 00-001 Warszawa, Polska",
+            "city": "Warszawa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1979
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "562",
+        "label": "Żyrardów-Roosevelta",
+        "initDate": 1510146534399,
+        "location": {
+            "latitude": 52.053811,
+            "longitude": 20.429892,
+            "address": "Roosevelta 2, 96-300 Żyrardów, Polska",
+            "city": "Żyrardów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1980
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "814",
+        "label": "Katowice, ul. Kossutha 6",
+        "initDate": 1510146534403,
+        "location": {
+            "latitude": 50.264611,
+            "longitude": 18.975028,
+            "address": "Sławka 5, Katowice, Polska",
+            "city": "Katowice"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1981
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "966",
+        "label": "Koszalin_ArmiiKrajowej",
+        "initDate": 1510146534407,
+        "location": {
+            "latitude": 54.193986,
+            "longitude": 16.172544,
+            "address": "Aleja Armii Krajowej, 75-204 Koszalin, Polska",
+            "city": "Koszalin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1982
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10447",
+        "label": "Kraków, os. Wadów",
+        "initDate": 1510146534411,
+        "location": {
+            "latitude": 50.100569,
+            "longitude": 20.122561,
+            "address": "Jaskrowa 9A, 31-990 Kraków-Nowa Huta, Polska",
+            "city": "Kraków-Nowa Huta"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1983
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "946",
+        "label": "Piaski-Krzyzowka",
+        "initDate": 1510146534683,
+        "location": {
+            "latitude": 52.501389,
+            "longitude": 17.773464,
+            "address": "Piaski 10, 62-230 Piaski, Polska",
+            "city": "Piaski"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1984
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "471",
+        "label": "Legionowo-Zegrzyńska",
+        "initDate": 1510146534686,
+        "location": {
+            "latitude": 52.407578,
+            "longitude": 20.955928,
+            "address": "Meteorologiczna 7468, Legionowo, Polska",
+            "city": "Legionowo"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1985
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "296",
+        "label": "Łódź-Gdańska 16",
+        "initDate": 1510146534688,
+        "location": {
+            "latitude": 51.775411,
+            "longitude": 19.4509,
+            "address": "Legionów 14A, Łódź, Polska",
+            "city": "Łódź"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1986
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10438",
+        "label": "Mielec-Biernackiego-WIOS",
+        "initDate": 1510146534692,
+        "location": {
+            "latitude": 50.299128,
+            "longitude": 21.440942,
+            "address": "Biernackiego 8, Mielec, Polska",
+            "city": "Mielec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1987
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "659",
+        "label": "Nisko-Szklarniowa-WIOS",
+        "initDate": 1510146534697,
+        "location": {
+            "latitude": 50.529892,
+            "longitude": 22.112467,
+            "address": "Szklarniowa 2B, 37-400 Nisko, Polska",
+            "city": "Nisko"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1988
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "426",
+        "label": "Nowy Sącz, ul. Nadbrzeżna",
+        "initDate": 1510146534700,
+        "location": {
+            "latitude": 49.619281,
+            "longitude": 20.714403,
+            "address": "Nadbrzeżna 36, 33-300 Nowy Sącz, Polska",
+            "city": "Nowy Sącz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1989
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "584",
+        "label": "Olesno automat 4",
+        "initDate": 1510146534703,
+        "location": {
+            "latitude": 50.876983,
+            "longitude": 18.416878,
+            "address": "Słowackiego 4, 46-300 Olesno, Polska",
+            "city": "Olesno"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1990
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "485",
+        "label": "Otwock-Brzozowa",
+        "initDate": 1510146534707,
+        "location": {
+            "latitude": 52.115725,
+            "longitude": 21.237297,
+            "address": "Brzozowa 2, Otwock, Polska",
+            "city": "Otwock"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1991
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "748",
+        "label": "POLPHARMA Starogard Gdański - Lubichowska",
+        "initDate": 1510146534994,
+        "location": {
+            "latitude": 53.965664,
+            "longitude": 18.527636,
+            "address": "Lubichowska 1, 83-250 Starogard Gdański, Polska",
+            "city": "Starogard Gdański"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1992
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "443",
+        "label": "Szymbark",
+        "initDate": 1510146535263,
+        "location": {
+            "latitude": 49.633714,
+            "longitude": 21.116833,
+            "address": "Unnamed Road, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1993
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "730",
+        "label": "AM2 Gdańsk Stogi",
+        "initDate": 1510146535268,
+        "location": {
+            "latitude": 54.367778,
+            "longitude": 18.701111,
+            "address": "Kaczeńce 129, 80-603 Gdańsk, Polska",
+            "city": "Gdańsk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1994
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "449",
+        "label": "Trzebinia, os. Związku Walki Młodych",
+        "initDate": 1510146535272,
+        "location": {
+            "latitude": 50.159406,
+            "longitude": 19.477464,
+            "address": "Wiśniowa 9, Trzebinia, Polska",
+            "city": "Trzebinia"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1995
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "841",
+        "label": "Tychy, ul. Tołstoja 1",
+        "initDate": 1510146535282,
+        "location": {
+            "latitude": 50.099903,
+            "longitude": 18.990236,
+            "address": "Sikorskiego, Tychy, Polska",
+            "city": "Tychy"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1996
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "225",
+        "label": "Włocławek OKRZEI",
+        "initDate": 1510146535287,
+        "location": {
+            "latitude": 52.658467,
+            "longitude": 19.059314,
+            "address": "Stefana Okrzei 75, Włocławek, Polska",
+            "city": "Włocławek"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1997
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "845",
+        "label": "Wodzisław Śląski, ul. Gałczyńskiego 1",
+        "initDate": 1510146535290,
+        "location": {
+            "latitude": 50.007629,
+            "longitude": 18.455548,
+            "address": "Gałczyńskiego 1, 44-286 Wodzisław Śląski, Polska",
+            "city": "Wodzisław Śląski"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1998
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "387",
+        "label": "Zielona Góra ul. Krótka",
+        "initDate": 1510146535293,
+        "location": {
+            "latitude": 51.939783,
+            "longitude": 15.518861,
+            "address": "Krótka 11, Zielona Góra, Polska",
+            "city": "Zielona Góra"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1999
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "853",
+        "label": "Złoty Potok, Leśniczówka",
+        "initDate": 1510146535296,
+        "location": {
+            "latitude": 50.710889,
+            "longitude": 19.458797,
+            "address": "Kosynierów, 42-253 Ponik, Polska",
+            "city": "Ponik"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2000
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10554",
+        "label": "Żory, Os. Gen. Władysława Sikorskiego 52_(2)",
+        "initDate": 1510146535588,
+        "location": {
+            "latitude": 50.029416,
+            "longitude": 18.689527,
+            "address": "Aleja Otto Sterna, Żory, Polska",
+            "city": "Żory"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2001
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "952",
+        "label": "Kalisz-Wyszynskiego",
+        "initDate": 1510146535593,
+        "location": {
+            "latitude": 51.749053,
+            "longitude": 18.048389,
+            "address": "Księdza Wacława Blizińskiego 4, 62-800 Kalisz, Polska",
+            "city": "Kalisz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2002
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "84",
+        "label": "Śnieżka",
+        "initDate": 1510146535908,
+        "location": {
+            "latitude": 50.736389,
+            "longitude": 15.739722,
+            "address": "Droga Przyjaźni Polsko-Czeskiej, 58-540 Karpacz, Polska",
+            "city": "Karpacz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2003
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "190",
+        "label": "Koniczynka",
+        "initDate": 1510146536175,
+        "location": {
+            "latitude": 53.080647,
+            "longitude": 18.684258,
+            "address": "Koniczynka 5, 87-148 Koniczynka, Polska",
+            "city": "Koniczynka"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2004
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10434",
+        "label": "Konstancin-Jeziorna-Mostowa",
+        "initDate": 1510146536178,
+        "location": {
+            "latitude": 52.082817,
+            "longitude": 21.111121,
+            "address": "Szpitalna 14/16, 05-510 Konstancin-Jeziorna, Polska",
+            "city": "Konstancin-Jeziorna"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2005
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10139",
+        "label": "Kraków, os. Piastów",
+        "initDate": 1510146536183,
+        "location": {
+            "latitude": 50.099361,
+            "longitude": 20.018317,
+            "address": "Popielidów, 31-626 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2006
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "401",
+        "label": "Kraków, ul. Bujaka",
+        "initDate": 1510146536187,
+        "location": {
+            "latitude": 50.010575,
+            "longitude": 19.949189,
+            "address": "Porucznika Halszki 16, 30-611 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2007
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10374",
+        "label": "Opole automat 5",
+        "initDate": 1510146536189,
+        "location": {
+            "latitude": 50.666736,
+            "longitude": 17.899137,
+            "address": "Niemodlińska 36E, 46-020 Opole, Polska",
+            "city": "Opole"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2008
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "920",
+        "label": "Pila, ul. Kusocinkiego",
+        "initDate": 1510146536191,
+        "location": {
+            "latitude": 53.154408,
+            "longitude": 16.759572,
+            "address": "Kadetów 94, Piła, Polska",
+            "city": "Piła"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2009
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "665",
+        "label": "Przemysl-Grunwaldzka-WIOS",
+        "initDate": 1510146536471,
+        "location": {
+            "latitude": 49.784339,
+            "longitude": 22.756239,
+            "address": "Ignacego Krasickiego, 37-700 Przemyśl, Polska",
+            "city": "Przemyśl"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2010
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "515",
+        "label": "Radom-Tochtermana",
+        "initDate": 1510146536475,
+        "location": {
+            "latitude": 51.399084,
+            "longitude": 21.147474,
+            "address": "Mikołaja Kopernika 14, Radom, Polska",
+            "city": "Radom"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2011
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10455",
+        "label": "Solec-Zdrój, MOBILNA",
+        "initDate": 1510146536780,
+        "location": {
+            "latitude": 50.358659,
+            "longitude": 20.886184,
+            "address": "0098T, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2012
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "734",
+        "label": "AM6 Sopot",
+        "initDate": 1510146536783,
+        "location": {
+            "latitude": 54.431667,
+            "longitude": 18.579722,
+            "address": "Bitwy pod Płowcami 60A, Sopot, Polska",
+            "city": "Sopot"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2013
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "837",
+        "label": "Sosnowiec, ul. Lubelska 51",
+        "initDate": 1510146536790,
+        "location": {
+            "latitude": 50.285956,
+            "longitude": 19.184399,
+            "address": "Lubelska 51, 41-219 Sosnowiec, Polska",
+            "city": "Sosnowiec"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2014
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "156",
+        "label": "Bydgoszcz Plac Poznański",
+        "initDate": 1510146536792,
+        "location": {
+            "latitude": 53.121764,
+            "longitude": 17.987906,
+            "address": "Grudziądzka 45, Bydgoszcz, Polska",
+            "city": "Bydgoszcz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2015
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "798",
+        "label": "Częstochowa, ul. AK/Jana Pawła II",
+        "initDate": 1510146536794,
+        "location": {
+            "latitude": 50.817676,
+            "longitude": 19.117426,
+            "address": "aleja Jana Pawła II 52, Częstochowa, Polska",
+            "city": "Częstochowa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2016
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "800",
+        "label": "Częstochowa, ul. Baczyńskiego 2",
+        "initDate": 1510146536797,
+        "location": {
+            "latitude": 50.836389,
+            "longitude": 19.130111,
+            "address": "Bronisława Czecha 15, Częstochowa, Polska",
+            "city": "Częstochowa"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2017
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "882",
+        "label": "KMŚ Puszcza Borecka",
+        "initDate": 1510146537069,
+        "location": {
+            "latitude": 54.124819,
+            "longitude": 22.038056,
+            "address": "Diabla Góra 1, 11-612 Diabla Góra, Polska",
+            "city": "Diabla Góra"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2018
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "731",
+        "label": "AM3 Gdańsk Nowy Port",
+        "initDate": 1510146537071,
+        "location": {
+            "latitude": 54.400833,
+            "longitude": 18.657497,
+            "address": "Wyzwolenia 19D, Gdańsk, Polska",
+            "city": "Gdańsk"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2019
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "809",
+        "label": "Gliwice, ul. Mewy 34",
+        "initDate": 1510146537075,
+        "location": {
+            "latitude": 50.279333,
+            "longitude": 18.655764,
+            "address": "Mewy 34, Gliwice, Polska",
+            "city": "Gliwice"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2020
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "142",
+        "label": "Grudziądz Airpointer",
+        "initDate": 1510146537083,
+        "location": {
+            "latitude": 53.49355,
+            "longitude": 18.762139,
+            "address": "Marszałka Józefa Piłsudskiego 53, 86-302 Grudziądz, Polska",
+            "city": "Grudziądz"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2021
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "638",
+        "label": "Jaslo-Sikorskiego-WIOS",
+        "initDate": 1510146537085,
+        "location": {
+            "latitude": 49.744886,
+            "longitude": 21.454617,
+            "address": "Władysława Sikorskiego 85, Jasło, Polska",
+            "city": "Jasło"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2022
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10120",
+        "label": "Tarnów, ul. Ks. Romana Sitko",
+        "initDate": 1510146537088,
+        "location": {
+            "latitude": 50.017875,
+            "longitude": 20.993,
+            "address": "aleja Matki Boskiej Fatimskiej 27, Tarnów, Polska",
+            "city": "Tarnów"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2023
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "848",
+        "label": "Zabrze, ul. M. Curie-Skłodowskiej 34",
+        "initDate": 1510146537090,
+        "location": {
+            "latitude": 50.3165,
+            "longitude": 18.772375,
+            "address": "Marii Skłodowskiej-Curie 34, Zabrze, Polska",
+            "city": "Zabrze"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2024
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10123",
+        "label": "Kraków, ul. Złoty Róg",
+        "initDate": 1510146537098,
+        "location": {
+            "latitude": 50.081197,
+            "longitude": 19.895358,
+            "address": "Racheli 13640, 30-121 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2025
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "742",
+        "label": "AM16 Lębork Malczewskiego",
+        "initDate": 1510146537100,
+        "location": {
+            "latitude": 54.546167,
+            "longitude": 17.746194,
+            "address": "Malczewskiego 31A, 84-300 Lębork, Polska",
+            "city": "Lębork"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2026
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "741",
+        "label": "AM15 Malbork Mickiewicza",
+        "initDate": 1510146537103,
+        "location": {
+            "latitude": 54.031247,
+            "longitude": 19.032899,
+            "address": "Adama Mickiewicza 49, Malbork, Polska",
+            "city": "Malbork"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2027
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "10254",
+        "label": "Nowy Targ, Plac Słowackiego",
+        "initDate": 1510146537106,
+        "location": {
+            "latitude": 49.483597,
+            "longitude": 20.028992,
+            "address": "Kościelna 2, Nowy Targ, Polska",
+            "city": "Nowy Targ"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2028
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "877",
+        "label": "WIOŚ Olsztyn ul. Puszkina",
+        "initDate": 1510146537111,
+        "location": {
+            "latitude": 53.789233,
+            "longitude": 20.486075,
+            "address": "Aleksandra Puszkina 16, 11-041 Olsztyn, Polska",
+            "city": "Olsztyn"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2029
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "70",
+        "label": "Oława - Żołnierzy AK",
+        "initDate": 1510146537388,
+        "location": {
+            "latitude": 50.942073,
+            "longitude": 17.291333,
+            "address": "Żołnierzy Armii Krajowej 9, 55-200 Oława, Polska",
+            "city": "Oława"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2030
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "319",
+        "label": "Parzniewice",
+        "initDate": 1510146537723,
+        "location": {
+            "latitude": 51.291175,
+            "longitude": 19.517556,
+            "address": "Unnamed Road, 97-371, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2031
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "517",
+        "label": "Siedlce-Konarskiego",
+        "initDate": 1510146537727,
+        "location": {
+            "latitude": 52.172145,
+            "longitude": 22.282001,
+            "address": "Stanisława Konarskiego 11, 08-110 Siedlce, Polska",
+            "city": "Siedlce"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2032
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "374",
+        "label": "Smolary Bytnickie",
+        "initDate": 1510146538013,
+        "location": {
+            "latitude": 52.172222,
+            "longitude": 15.206667,
+            "address": "Bytnica 45A, 66-630 Bytnica, Polska",
+            "city": "Bytnica"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2033
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "376",
+        "label": "Sulęcin ul. Dudka",
+        "initDate": 1510146538016,
+        "location": {
+            "latitude": 52.437722,
+            "longitude": 15.122444,
+            "address": "Paska, 69-200 Sulęcin, Polska",
+            "city": "Sulęcin"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2034
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "9913",
+        "label": "Guty Duże",
+        "initDate": 1510146538296,
+        "location": {
+            "latitude": 52.943172,
+            "longitude": 21.288167,
+            "address": "Guty Duże 1, 06-232 Guty Duże, Polska",
+            "city": "Guty Duże"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2035
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "232",
+        "label": "Bory Tucholskie",
+        "initDate": 1510233166994,
+        "location": {
+            "latitude": 53.662117,
+            "longitude": 17.934017,
+            "address": "Unnamed Road, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2041
+    },
+    {
+        "manufacturer": "GIOS",
+        "uuid": "460",
+        "label": "Belsk-IGFPAN",
+        "initDate": 1510233167352,
+        "location": {
+            "latitude": 51.83512,
+            "longitude": 20.791556,
+            "address": "Wilczogóra 42, 05-622 Wilczogóra, Polska",
+            "city": "Wilczogóra"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": true
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2042
+    },
+    {
+        "manufacturer": "SmokSensor",
+        "uuid": "612765",
+        "label": "SmokSensor-612765",
+        "description": "SmokSensor-612765",
+        "initDate": 1508757033164,
+        "location": {
+            "latitude": 50.037345,
+            "longitude": 19.682933,
+            "address": "Czułówek 168, Kasprzykówka 168, 32-061, Polska",
+            "city": "Polska"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 1813
+    },
+    {
+        "manufacturer": "SmokSensor",
+        "uuid": "612049",
+        "label": "SmokSensor-612049",
+        "description": "SmokSensor-612049",
+        "initDate": 1512505984365,
+        "location": {
+            "latitude": 50.067959,
+            "longitude": 19.91266,
+            "address": "Centrum Informatyki Akademii Górniczo-Hutniczej w Krakowie, Kawiory 21, 30-055 Kraków, Polska",
+            "city": "Kraków"
+        },
+        "configuration": {
+            "isPublic": true,
+            "isEnabled": true,
+            "useLabel": true,
+            "useDefaultPosition": false
+        },
+        "types": [
+            "dust"
+        ],
+        "id": 2269
+    }
+]
