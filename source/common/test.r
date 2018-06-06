@@ -1,5 +1,0 @@
-wd <- getwd()
-setwd('test')
-source('test_preprocessing.r')
-setwd(wd)
-test_results <- test_dir('test', reporter = 'summary')
