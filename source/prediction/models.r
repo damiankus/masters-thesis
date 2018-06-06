@@ -173,7 +173,7 @@ fit_arima <- function (res_formula, training_set, test_set, target_dir) {
   arima_fun(res_formula, training_set, test_set, target_dir)
 }
 
-mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5) {
+mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5, lifesign = 'none') {
   fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
     # Standardization requires dividing by the standard deviation
     # of a column. If the column contains constant values it becomes
@@ -187,22 +187,13 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5) 
     training_set <- training_set[, c(res_var, expl_vars)] 
     test_set <- test_set[, c(res_var, expl_vars)]
     
-    # First we standardize the data, then 
-    # we normalize the data, using min and max
-    # values of the standardized set (not the original one!)
+    # Data standardization (mean = 0, sd = 1)
     all_data <- rbind(training_set, test_set)
     means <- apply(all_data, 2, mean)
     sds <- apply(all_data, 2, sd)
     rm(all_data)
     training_set <- standardize_with(training_set, means, sds)
     test_set <- standardize_with(test_set, means, sds)
-    
-    all_data <- rbind(training_set, test_set)
-    mins <- apply(all_data, 2, min)
-    maxs <- apply(all_data, 2, max)
-    rm(all_data)
-    training_set <- normalize_with(training_set, mins, maxs)
-    test_set <- normalize_with(test_set, mins, maxs)
     
     # Create an ensemble of neural networks
     # and get the final prediction by calculating
@@ -214,7 +205,8 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5) 
                 hidden = hidden,
                 stepmax = stepmax,
                 threshold = threshold,
-                linear.output = TRUE)
+                linear.output = TRUE, 
+                lifesign = lifesign)
     })
     pred_vals_list <- lapply (nns, function (nn) {
       c(compute(nn, test_set[, expl_vars])$net.result)
@@ -222,7 +214,6 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5) 
     pred_vals <- apply(do.call(cbind, pred_vals_list), 1, mean)
     
     # Reverse the initial transformations
-    pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
     pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
     
     results$predicted <- pred_vals

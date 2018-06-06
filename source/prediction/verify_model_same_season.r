@@ -11,7 +11,7 @@ source('models.r')
 packages <- c(
   'RPostgreSQL', 'ggplot2', 'reshape',
   'caTools', 'glmnet', 'car',
-  'leaps')
+  'leaps', 'parallel')
 import(packages)
 Sys.setenv(LANG = 'en')
 
@@ -37,21 +37,30 @@ main <- function () {
   
   expl_vars <- list(c(), c(), c(), c())
   pred_models <- c(
-    mlp_3_th_0.5 = mlp_factory(c(3), threshold = 0.5),
-    mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
-    mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
-    mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
-    mlp_5_10_th_0.5 = mlp_factory(c(5, 10), threshold = 0.5),
-    mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
-    mlp_3_5_5_th_0.5 = mlp_factory(c(3, 5, 5), threshold = 0.5),
-    mlp_3_5_10_th_0.5 = mlp_factory(c(3, 5, 10), threshold = 0.5),
-    mlp_10_5_3_th_0.5 = mlp_factory(c(10, 5, 3), threshold = 0.5)
+    mlp_3_th_0.3 = mlp_factory(c(3), threshold = 0.3),
+    mlp_5_th_0.3 = mlp_factory(c(5), threshold = 0.3),
+    mlp_10_th_0.3 = mlp_factory(c(10), threshold = 0.3),
+    mlp_15_th_0.3 = mlp_factory(c(15), threshold = 0.3),
+    mlp_3_3_th_0.3 = mlp_factory(c(3, 3), threshold = 0.3),
+    mlp_3_5_th_0.3 = mlp_factory(c(3, 5), threshold = 0.3),
+    mlp_5_3_th_0.3 = mlp_factory(c(5, 3), threshold = 0.3),
+    mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
+    mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
+    mlp_5_10_th_0.3 = mlp_factory(c(5, 10), threshold = 0.3),
+    mlp_10_5_th_0.3 = mlp_factory(c(10, 5), threshold = 0.3),
+    mlp_3_5_5_th_0.3 = mlp_factory(c(3, 5, 5), threshold = 0.3),
+    mlp_3_5_10_th_0.3 = mlp_factory(c(3, 5, 10), threshold = 0.3),
+    mlp_5_5_5_th_0.3 = mlp_factory(c(5, 5, 5), threshold = 0.3),
+    mlp_10_5_3_th_0.3 = mlp_factory(c(10, 5, 3), threshold = 0.3)
   )
   
   var_dir <- file.path(getwd(), base_res_var, 'same_season')
   mkdir(var_dir)
   
-  all_seasons_results <- lapply(seq(1, 1), function (season) {
+  # cores_count <- detectCores() - 1
+  # clust <- makeForkCluster(cores_count, outfile = 'same_season.log')
+  
+  all_seasons_results <- lapply(seq(3, 4), function (season) {
     season_dir <- file.path(var_dir, seasons[season])
     mkdir(season_dir)
     
@@ -127,6 +136,6 @@ main <- function () {
     })
     season_results
   })
+  # stopCluster(clust)
 }
 main()
-
