@@ -1,3 +1,0 @@
-https://dane.imgw.pl/data/dane_pomiarowo_obserwacyjne/2017/dane_2017_od01_do06_150190340.csv.gz
-https://dane.imgw.pl/data/dane_pomiarowo_obserwacyjne/2017/dane_2017_od01_do06_250190470.csv.gz
-https://dane.imgw.pl/data/dane_pomiarowo_obserwacyjne/2017/dane_2017_od01_do06_350190566.csv.gz

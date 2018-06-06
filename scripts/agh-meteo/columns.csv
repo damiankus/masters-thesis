@@ -1,8 +1,0 @@
-Column name,Meaning,Aggr type
-dm_hour_avg,kierunek wiatru (średni),average
-pa_hour_avg,ciśnienie,average
-rc_hour_avg,opad,average
-ri_hour_avg,opad (intensywność),average
-sm_hour_avg,średnia prędkość wiatru,average
-ta_hour_avg,temp powietrza,average
-ua_hour_avg,wilgotność powietrza,average
