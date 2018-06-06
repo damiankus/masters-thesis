@@ -102,6 +102,7 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   # See: https://stats.stackexchange.com/questions/798/calculating-optimal-number-of-bins-in-a-histogram
   # Also: https://nxskok.github.io/blog/2017/06/08/histograms-and-bins/
   
+  df <- data.frame(df)
   fact_col <- df[,factor]
   bw <- 2 * IQR(fact_col, na.rm = TRUE) / length(fact_col) ^ 0.33
   
