@@ -42,9 +42,21 @@ all_imputed <- lapply(stations, function (station_id) {
 })
 
 all_imputed <- do.call(rbind, all_imputed)
-windows <- divide_into_windows(all_imputed, past_lag = 23,
-                               future_lag = 24,
-                               future_vars = c('pm2_5', 'timestamp'))
-windows <- skip_past(windows)
+cols <- colnames(all_imputed)
+cols <- cols[cols != 'station_id']
+
+windows <- lapply(stations, function (station_id) {
+  obs_for_station <- all_imputed[all_imputed$station_id == station_id, cols]
+  obs_for_station <- obs_for_station[order(obs_for_station$timestamp), ]
+  windows <- divide_into_windows(obs_for_station,
+                                 past_lag = 23,
+                                 future_lag = 24,
+                                 future_vars = c('pm2_5', 'timestamp'))
+  windows <- add_aggregated(windows, past_lag = 23, vars = c('pm2_5', 'wind_speed', 'temperature', 'humidity', 'pressure', 'precip_rate', 'wind_dir_ns', 'wind_dir_ew'))
+  windows <- skip_past(windows)
+  windows$station_id <- station_id
+  windows
+})
+
+windows <- do.call(rbind, windows)
 save(windows, file = 'time_windows.Rda')
-                               
