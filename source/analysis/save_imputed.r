@@ -11,6 +11,8 @@ Sys.setenv(LANG = 'en')
 stations <- c('gios_krasinskiego', 'gios_bulwarowa', 'gios_bujaka')
 obs <- load_observations('observations',
                          stations = stations)
+excluded <- c('pm10', 'solradiation', 'wind_dir_deg', 'id')
+obs <- obs[, !(names(obs) %in% excluded)]
 obs$station_id <- sapply(obs$station_id, trimws)
 create_table_from_schema('observations', 'complete_observations')
 
@@ -44,7 +46,6 @@ all_imputed <- lapply(stations, function (station_id) {
 all_imputed <- do.call(rbind, all_imputed)
 cols <- colnames(all_imputed)
 cols <- cols[cols != 'station_id']
-
 windows <- lapply(stations, function (station_id) {
   obs_for_station <- all_imputed[all_imputed$station_id == station_id, cols]
   obs_for_station <- obs_for_station[order(obs_for_station$timestamp), ]

@@ -14,6 +14,9 @@ Sys.setenv(LANG = 'en')
 main <- function () {
   # Loaded data frame will be saved in a variable called windows
   load(file = file.path('..', 'time_windows.Rda'))
+  windows <- windows[windows$station_id == 'gios_krasinskiego', ]
+  windows <- windows[, names(windows) != 'station_id']
+  
   test_year <- max(windows$year)
   training_years <- unique(windows$year)
   training_years <- training_years[training_years != test_year]
@@ -81,33 +84,33 @@ main <- function () {
     total_obs <- 24 * floor(length(seasonal_windows[, 1]) / 24)
     offset_seq <- seq(training_count + 1, total_obs - test_count + 1, offset_step)
     
-    season_results <- lapply(names(pred_models), function (model_name) {
+    season_results <- parLapply(clust, names(pred_models), function (model_name) {
       fit_model <- pred_models[[model_name]]
       print(paste('Fitting a', model_name, 'model'))
-      model_results <- parLapply(clust, offset_seq, function (offset) {
+      model_results <- lapply(offset_seq, function (offset) {
         training_set <- rbind(training_base, seasonal_windows[1:(offset - 1), ])
         test_set <- seasonal_windows[offset:(offset + test_count - 1), ]
         
         # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
         # save_data_split(base_res_var, training_set, test_set, plot_path)
-        
-        # If the there are any errors the errors will be 
-        # set to 0
+        # If the there are any errors the predicted values will be set to 0
         tryCatch({ fit_model(res_formula, training_set, test_set, '') },
                  warning = function (war) {
-                   print(war)
-                   results <- data.frame(actual = test_set[, res_var],
-                                         predicted = test_set[, res_var],
-                                         timestamp = test_set$future_timestamp)
-                   return(results)
-                 },
-                 error = function (err) {
-                   print(err)
-                   results <- data.frame(actual = test_set[, res_var],
-                                         predicted = test_set[, res_var],
-                                         timestamp = test_set$future_timestamp)
-                   return(results)
-                 })
+                     print(war)
+                     print("WARNING")
+                     results <- data.frame(actual = test_set[, res_var],
+                                           predicted = rep(0, length(test_set[, 1])),
+                                           timestamp = test_set$future_timestamp)
+                     return(results)
+                   },
+                   error = function (err) {
+                     print(err)
+                     print("WARNING")
+                     results <- data.frame(actual = test_set[, res_var],
+                                           predicted = rep(0, length(test_set[, 1])),
+                                           timestamp = test_set$future_timestamp)
+                     return(results)
+                   })
       })
       
       model_results <- do.call(rbind, model_results)
