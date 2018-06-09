@@ -65,6 +65,8 @@ main <- function () {
 
   var_dir <- file.path(getwd(), base_res_var, 'continuous_percentiles')
   mkdir(var_dir)
+  cores_count <- floor(detectCores() / 4)
+  clust <- makeForkCluster(cores_count, outfile = 'percentiles.log')
   
   print(paste('Prediction of values', future_lag, 'hours in advance'))
   all_seasons_results <- lapply(seq(1, 4), function (season) {
@@ -103,7 +105,7 @@ main <- function () {
       fit_model <- pred_models[[model_name]]
       print(paste('Fitting a', model_name, 'model'))
 
-      model_results <- lapply(offset_seq, function (offset) {
+      model_results <- parLapply(clust, offset_seq, function (offset) {
         # Training set ends one observation before the test window
         last_training_idx <- last_training_base_idx + offset - 1
         boundaries <- find_training_percentiles(windows, base_res_var, last_training_idx, percentile_count)
@@ -160,6 +162,7 @@ main <- function () {
     })
     season_results
   })
+  stopCluster(clust)
 }
 main()
 

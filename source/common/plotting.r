@@ -16,10 +16,16 @@ save_line_plot <- function(df, var_x, var_y, plot_path, title) {
 }
 
 save_comparison_plot <- function (df, res_var, plot_path) {
-  melted <- melt(df, id = 'timestamp')
+  # If the observations are separated by a period
+  # longer than a week, we plot them with two charts 
+  # to skip the missing values and thus save the space
+  
+  df$group <- c(0, cumsum(diff(df$timestamp) > 24 * 7))
+  melted <- melt(df, id = c('timestamp', 'group'))
   line_plot <- ggplot(data = melted, aes(x = timestamp, y = value, colour = variable)) +
     geom_line() +
-    xlab('Date') +
+    facet_grid(~ group, scales = 'free_x', space = 'free_x') +
+    xlab('sDate') +
     ylab(paste(pretty_var(res_var), units(res_var))) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   
@@ -30,6 +36,8 @@ save_comparison_plot <- function (df, res_var, plot_path) {
 save_scatter_plot <- function (df, res_var, plot_path) {
   scatter_plot <- ggplot(data = df, aes_string(x = 'actual', y = 'predicted')) +
     geom_point() +
+    geom_smooth(method = lm, se = FALSE, size = 1, color = hcl(h = 225, l = 65, c = 100)) +
+    geom_abline(slope = 1, size = 1, color = hcl(h = 15, l = 65, c = 100)) +
     xlab('Actual') +
     ylab('Predicted') +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))

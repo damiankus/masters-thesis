@@ -5,6 +5,9 @@ import <- function (packages) {
   lapply(packages, library, character.only = TRUE)
 }
 
+packages <- c('RPostgreSQL')
+import(packages)
+
 get_connection <- function () {
   driver <- dbDriver('PostgreSQL')
   passwd <- { 'pass' }
@@ -91,8 +94,9 @@ units <- function (var) {
 
 pretty_var <- function (var) {
   switch(var,
-         pm1 = 'PM1', pm2_5 = 'PM2.5', pm10 = 'PM10', solradiation = 'Solar irradiance', wind_speed = 'wind speed',
-         wind_dir = 'wind direction', wind_dir_deg = 'wind direction', precip_rate = 'Precipitation rate', precip_total = 'Total precipitation',
+         pm1 = 'PM1', pm2_5 = 'PM2.5', pm10 = 'PM10', solradiation = 'solar irradiance', wind_speed = 'wind speed',
+         wind_dir = 'wind direction', wind_dir_deg = 'wind direction', precip_rate = 'precipitation rate',
+         precip_total = 'total precipitation',
          {
            delim <- ' '
            join_str <- ' '
@@ -111,7 +115,7 @@ pretty_var <- function (var) {
              pvar <- pretty_var(split_var[var_idx])
              pvar <- paste(pvar, join_str, paste(split_var[-var_idx], collapse = ' '), sep = ' ')
            } else {
-             pvar <- toupper(var)
+             pvar <- var
            }
            trimws(pvar)
          })

@@ -49,6 +49,8 @@ main <- function () {
   
   var_dir <- file.path(getwd(), base_res_var, 'continuous_data')
   mkdir(var_dir)
+  cores_count <- floor(detectCores() / 4)
+  clust <- makeForkCluster(cores_count, outfile = 'continuous.log')
   
   print(paste('Prediction of values', future_lag, 'hours in advance'))
   all_seasons_results <- lapply(seq(1, 4), function (season) {
@@ -87,7 +89,7 @@ main <- function () {
       fit_model <- pred_models[[model_name]]
       print(paste('Fitting a', model_name, 'model'))
 
-      model_results <- lapply(offset_seq, function (offset) {
+      model_results <- parLapply(clust, offset_seq, function (offset) {
         training_set <- rbind(training_base, seasonal_windows[1:(offset - 1), ])
         test_set <- seasonal_windows[offset:(offset + test_count), ]
         
@@ -130,6 +132,7 @@ main <- function () {
     save_goodness_plot(all_seasons_results, 'season', measure_name, 'model', x_order <- seasons, plot_path,
                        x_lab = x_lab, y_lab = y_lab)
   })
+  stopCluster(clust)
 }
 main()
 

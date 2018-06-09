@@ -5,7 +5,7 @@ source('plotting.r')
 source('preprocess.r')
 setwd(wd)
 
-packages <- c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'keras', 'neuralnet')
+packages <- c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'neuralnet')
 import(packages)
 Sys.setenv(LANG = 'en')
 
@@ -173,7 +173,7 @@ fit_arima <- function (res_formula, training_set, test_set, target_dir) {
   arima_fun(res_formula, training_set, test_set, target_dir)
 }
 
-mlp_factory <- function (hidden, threshold, stepmax = 1e+05, ensemble_size = 5, lifesign = 'none') {
+mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, lifesign = 'minimal') {
   fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
     # Standardization requires dividing by the standard deviation
     # of a column. If the column contains constant values it becomes
