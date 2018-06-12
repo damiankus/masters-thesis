@@ -60,4 +60,7 @@ windows <- lapply(stations, function (station_id) {
 })
 
 windows <- do.call(rbind, windows)
+windows$timestamp <- utcts(windows$timestamp)
+windows$future_timestamp <- utcts(windows$future_timestamp)
 save(windows, file = 'time_windows.Rda')
+

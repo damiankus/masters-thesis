@@ -14,6 +14,7 @@ Sys.setenv(LANG = 'en')
 main <- function () {
   # Loaded data frame will be saved in a variable called windows
   load(file = file.path('..', 'time_windows.Rda'))
+  
   windows <- windows[windows$station_id == 'gios_krasinskiego', ]
   windows <- windows[, names(windows) != 'station_id']
   
@@ -27,8 +28,8 @@ main <- function () {
   future_lag <- 24
   training_days <- 0
   test_days <- 4 * 7
-  
   offset_days <- test_days
+
   training_count <- 24 * training_days
   test_count <- 24 * test_days
   offset_step <- 24 * offset_days
@@ -36,18 +37,17 @@ main <- function () {
   
   expl_vars <- list(c(), c(), c(), c())
   pred_models <- c(
-    # mlp_5_th_0.3 = mlp_factory(c(5), threshold = 0.3),
-    # mlp_10_th_0.3 = mlp_factory(c(10), threshold = 0.3),
-    # mlp_15_th_0.3 = mlp_factory(c(15), threshold = 0.3),
-    # mlp_3_3_th_0.3 = mlp_factory(c(3, 3), threshold = 0.3),
-    # mlp_5_3_th_0.3 = mlp_factory(c(5, 3), threshold = 0.3),
-    # mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
-    # mlp_10_5_th_0.3 = mlp_factory(c(10, 5), threshold = 0.3),
-    # mlp_3_5_10_th_0.3 = mlp_factory(c(3, 5, 10), threshold = 0.3),
-    # mlp_10_5_3_th_0.3 = mlp_factory(c(10, 5, 3), threshold = 0.3)
+    mlp_5_th_0.3 = mlp_factory(c(5), threshold = 0.3),
+    mlp_10_th_0.3 = mlp_factory(c(10), threshold = 0.3),
+    mlp_15_th_0.3 = mlp_factory(c(15), threshold = 0.3),
+    mlp_3_3_th_0.3 = mlp_factory(c(3, 3), threshold = 0.3),
+    mlp_3_5_5_th_1 = mlp_factory(c(3, 5, 5), threshold = 1),
+    mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
+    mlp_10_5_th_0.3 = mlp_factory(c(10, 5), threshold = 0.3),
+    mlp_3_5_10_th_0.3 = mlp_factory(c(3, 5, 10), threshold = 0.3),
+    mlp_10_5_3_th_0.3 = mlp_factory(c(10, 5, 3), threshold = 0.3)
   )
-  
-  pred_models <- c(mlr = fit_mlr)
+
   var_dir <- file.path(getwd(), base_res_var, 'same_season')
   mkdir(var_dir)
   
@@ -93,11 +93,11 @@ main <- function () {
         
         # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
         # save_data_split(base_res_var, training_set, test_set, plot_path)
+        
         # If the there are any errors the predicted values will be set to 0
         tryCatch({ fit_model(res_formula, training_set, test_set, '') },
                  warning = function (war) {
                      print(war)
-                     print("WARNING")
                      results <- data.frame(actual = test_set[, res_var],
                                            predicted = rep(0, length(test_set[, 1])),
                                            timestamp = test_set$future_timestamp)
@@ -105,7 +105,6 @@ main <- function () {
                    },
                    error = function (err) {
                      print(err)
-                     print("WARNING")
                      results <- data.frame(actual = test_set[, res_var],
                                            predicted = rep(0, length(test_set[, 1])),
                                            timestamp = test_set$future_timestamp)

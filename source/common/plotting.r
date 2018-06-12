@@ -105,6 +105,44 @@ save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab 
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
+save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '', legend_title = '') { 
+  copy <- data.frame(df[, c(x_var, y_var, id_var)])
+  
+  # After passing timestamps to forecasting models,
+  # they may be cast to numeric values
+  timestamp_present <- FALSE
+  if (grepl('timestamp', x_var)) {
+    copy$timestamp <- as.POSIXlt(copy$timestamp, origin = '1970-01-01', tz = 'UTC')
+    timestamp_present <- TRUE
+  }
+  
+  if (nchar(x_lab) == 0) {
+    x_lab <- pretty_var(x_var)
+  }
+  if (nchar(y_lab) == 0) {
+    y_lab <- pretty_var(y_var)
+  }
+  if (nchar(legend_title) == 0) {
+    legend_title <- paste(strsplit(id_var, '_')[[1]], collapse = ' ')
+  }
+  
+  facet_formula <- as.formula(paste('~', id_var))
+  plot <- ggplot(data = copy, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
+    geom_line() +
+    xlab(x_lab) +
+    ylab(y_lab) +
+    labs(color = legend_title) + 
+    facet_wrap(facet_formula, scales = 'free_y', ncol = 1) +
+  
+  if (timestamp_present) {
+    plot <- plot +
+      scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
+                       breaks = date_breaks('3 months'))
+  }
+  ggsave(plot_path, width = 30, height = 40, dpi = 200)
+  print(paste('Plot saved in', plot_path, sep = ' '))
+}
+
 save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   # The bin width is calculated using the Freedman-Diaconis formula
   # See: https://stats.stackexchange.com/questions/798/calculating-optimal-number-of-bins-in-a-histogram

@@ -238,7 +238,6 @@ impute_missing <- function (df, method = 'cart', imputation_count = 5, iters = 5
 # (there are records for every hourly measurment between the first and last
 # measurement)
 divide_into_windows <- function (df, past_lag, future_lag, vars = c(), future_vars = c(), excluded_vars = c()) {
-  present_vars <- colnames(df)
   if (length(vars) == 0) {
     vars <- colnames(df)
     vars <- vars[!(vars %in% excluded_vars)]

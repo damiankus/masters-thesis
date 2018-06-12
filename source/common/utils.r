@@ -121,6 +121,11 @@ pretty_var <- function (var) {
          })
 }
 
+pretty_station_id <- function (id) {
+  parts <- strsplit(id, '_')[[1]]
+  paste(toupper(parts[[1]]), cap(parts[[2]]))
+} 
+
 mkdir <- function (path) {
   if (!dir.exists(path)) {
     dir.create(path, showWarnings = TRUE, recursive = TRUE)

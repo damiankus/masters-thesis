@@ -26,42 +26,21 @@ save_scatter_plot <- function (df, res_var, expl_var, plot_path) {
 }
 
 main <- function () {
-  driver <- dbDriver('PostgreSQL')
-  passwd <- { 'pass' }
-  con <- dbConnect(driver, dbname = 'pollution',
-                   host = 'localhost',
-                   port = 5432,
-                   user = 'damian',
-                   password = passwd)
-  rm(passwd)
-  on.exit(dbDisconnect(con))
+  windows <- load_observations('observations') 
+  
+  response_vars <- c('future_pm2_5')
+  explanatory_vars <- c('pm2_5', 'temperature', 'wind_speed', 'pressure', 'humidity', 'wind_dir_ns', 'wind_dir_ew')
+  excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
+  explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
+  windows <- windows[, c(response_vars, explanatory_vars)]
+  windows <- na.omit(windows)
   
   target_root_dir <- file.path(getwd(), 'bivariate')
   mkdir(target_root_dir)
-  
-  # Fetch all observations
-  target_dir <- target_root_dir
-  table <- 'observations'
-  response_vars <- c('pm2_5_plus_24_log')
-  
-  query = paste('SELECT * FROM', table, 
-                "WHERE station_id = 'airly_171'",
-                sep = ' ')
-  obs <- dbGetQuery(con, query)
-  
-  obs[,'pm2_5_plus_24_log'] <- log(obs$pm2_5_plus_24)
-  obs[,'temperature_log'] <- log(obs$temperature)
-  obs[,'wind_speed_log'] <- log(obs$wind_speed)
-  explanatory_vars <- c('pm2_5', 'temperature', 'temperature_log', 'wind_speed', 'wind_speed_log', 'pressure', 'humidity', 'wind_dir_ns', 'wind_dir_ew')
-  excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
-  explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
-  obs <- obs[, c(response_vars, explanatory_vars)]
-  obs <- na.omit(obs)
-  
-  # plot_path <- file.path(target_dir, 'pairwise_relationships.png')
-  # png(filename = plot_path, height = 3112, width = 4096, pointsize = 25)
-  # pairs(obs[c(response_vars, explanatory_vars)], cex.labels = 3)
-  # dev.off()
+  plot_path <- file.path(target_dir, 'pairwise_relationships.png')
+  png(filename = plot_path, height = 3112, width = 4096, pointsize = 25)
+  pairs(windows[c(response_vars, explanatory_vars)], cex.labels = 3)
+  dev.off()
   
   for (res_var in response_vars) {
     target_dir <- file.path(target_root_dir, res_var)
@@ -69,7 +48,7 @@ main <- function () {
 
     for (expl_var in explanatory_vars) {
       plot_path <- file.path(target_dir, paste(res_var, '_', expl_var, '.png', sep = ''))
-      save_scatter_plot(obs, res_var, expl_var, plot_path)
+      save_scatter_plot(windows, res_var, expl_var, plot_path)
     }
   }
 }

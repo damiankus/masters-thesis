@@ -8,10 +8,7 @@ setwd(wd)
 
 source('models.r')
 
-packages <- c(
-  'RPostgreSQL', 'ggplot2', 'reshape',
-  'caTools', 'glmnet', 'car',
-  'leaps')
+packages <- c('parallel')
 import(packages)
 Sys.setenv(LANG = 'en')
 
@@ -29,19 +26,22 @@ find_training_percentiles <- function (windows, varname, last_training_idx, samp
 main <- function () {
   # Loaded data frame will be called windows
   load(file = file.path('..', 'time_windows.Rda'))
+  
+  windows <- windows[windows$station_id == 'gios_krasinskiego', ]
+  windows <- windows[, names(windows) != 'station_id']
+  
   test_year <- max(windows$year)
   training_years <- unique(windows$year)
   training_years <- training_years[training_years != test_year]
-  
   base_res_var <- 'pm2_5'
   
   # For calculating aggregated values
   past_lag <- 23
   future_lag <- 24
-  percentile_days <- 7
   training_days <- 0
   test_days <- 7
-  offset_days <- 7
+  percentile_days <- 4 * 7
+  offset_days <- test_days
   max_samples <- 5000
   
   percentile_count <- 24 * percentile_days
@@ -52,18 +52,18 @@ main <- function () {
 
   expl_vars <- list(c(), c(), c(), c())
   pred_models <- c(
-    mlp_3_th_0.5 = mlp_factory(c(3), threshold = 0.5),
-    mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
-    mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
-    mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
-    mlp_5_10_th_0.5 = mlp_factory(c(5, 10), threshold = 0.5),
-    mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
-    mlp_3_5_5_th_0.5 = mlp_factory(c(3, 5, 5), threshold = 0.5),
-    mlp_3_5_10_th_0.5 = mlp_factory(c(3, 5, 10), threshold = 0.5),
-    mlp_10_5_3_th_0.5 = mlp_factory(c(10, 5, 3), threshold = 0.5)
+    mlp_5_th_0.3 = mlp_factory(c(5), threshold = 0.3),
+    mlp_10_th_0.3 = mlp_factory(c(10), threshold = 0.3),
+    mlp_15_th_0.3 = mlp_factory(c(15), threshold = 0.3),
+    mlp_3_3_th_0.3 = mlp_factory(c(3, 3), threshold = 0.3),
+    mlp_3_5_5_th_1 = mlp_factory(c(3, 5, 5), threshold = 1),
+    mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
+    mlp_10_5_th_0.3 = mlp_factory(c(10, 5), threshold = 0.3),
+    mlp_3_5_10_th_0.3 = mlp_factory(c(3, 5, 10), threshold = 0.3),
+    mlp_10_5_3_th_0.3 = mlp_factory(c(10, 5, 3), threshold = 0.3)
   )
 
-  var_dir <- file.path(getwd(), base_res_var, 'continuous_percentiles')
+  var_dir <- file.path(getwd(), base_res_var, 'percentiles')
   mkdir(var_dir)
   cores_count <- floor(detectCores() / 4)
   clust <- makeForkCluster(cores_count, outfile = 'percentiles.log')
@@ -123,18 +123,23 @@ main <- function () {
                               seasonal_windows[1:(offset - 1), ])
         test_set <- seasonal_windows[offset:(offset + test_count - 1), ]
         
-        # plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
-        # save_data_split(base_res_var, training_set, test_set, plot_path)
+        plot_path <- file.path(season_dir, paste('data_split_', offset, '.png', sep = ''))
+        save_data_split(base_res_var, training_set, test_set, plot_path)
 
+        # If the there are any errors the predicted values will be set to 0
         tryCatch({ fit_model(res_formula, training_set, test_set, '') },
                  warning = function (war) {
                    print(war)
-                   results <- c(actual = c(), predicted = c(), residuals = c(), timestamp = c())
+                   results <- data.frame(actual = test_set[, res_var],
+                                         predicted = rep(0, length(test_set[, 1])),
+                                         timestamp = test_set$future_timestamp)
                    return(results)
                  },
                  error = function (err) {
                    print(err)
-                   results <- c(actual = c(), predicted = c(), residuals = c(), timestamp = c())
+                   results <- data.frame(actual = test_set[, res_var],
+                                         predicted = rep(0, length(test_set[, 1])),
+                                         timestamp = test_set$future_timestamp)
                    return(results)
                  })
       })

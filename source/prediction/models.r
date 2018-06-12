@@ -195,6 +195,13 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, 
     training_set <- standardize_with(training_set, means, sds)
     test_set <- standardize_with(test_set, means, sds)
     
+    # all_data <- rbind(training_set, test_set)
+    # mins <- apply(all_data, 2, min)
+    # maxs <- apply(all_data, 2, max)
+    # rm(all_data)
+    # training_set <- normalize_with(training_set, mins, maxs)
+    # test_set <- normalize_with(test_set, mins, maxs)
+    
     # Create an ensemble of neural networks
     # and get the final prediction by calculating
     # the average values
@@ -215,7 +222,7 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, 
     
     # Reverse the initial transformations
     pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
-    
+    # pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
     results$predicted <- pred_vals
     results
   }
@@ -227,7 +234,7 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, 
 # @thresholds - a vector of thresholds used as stop conditions in neuralnet package
 generate_mlps <- function (arch, deltas, thresholds) {
   layer_sizes <- lapply(seq(length(arch)), function (i) {
-    c(arch[i] - deltas[i], arch[i] + deltas[i])
+    c(arch[i] - deltas[i], arch[i], arch[i] + deltas[i])
   })
   archs <- expand.grid(layer_sizes)
   
