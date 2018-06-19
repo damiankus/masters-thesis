@@ -40,7 +40,7 @@ missing <- lapply(stations, function (sid) {
     sum(is.na(chunk[, var])) * 100 / theoretical_total
   })
   missing_for_station <- data.frame(c(pretty_station_id(sid), t(missing_for_station)))
-  names(missing_for_station) <- c('Station ID', 'Missing [%]')
+  names(missing_for_station) <- c('Station ID', paste('Missing', toupper(pretty_var(air_quality_vars[[1]])), '[%]'))
   missing_for_station
 })
 

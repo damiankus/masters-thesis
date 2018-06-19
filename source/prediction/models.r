@@ -71,7 +71,7 @@ fit_lasso_mlr <- function (res_formula, training_set, test_set, target_dir) {
   to_results(res_formula, test_set, pred_vals)
 }
 
-svr_factory <- function (kernel, gamma, cost) {
+svr_factory <- function (kernel, gamma, epsilon, cost) {
   fit_custom_svr <- function (res_formula, training_set, test_set, target_dir) {
     
     # Standardization requires dividing by the standard deviation
@@ -87,14 +87,7 @@ svr_factory <- function (kernel, gamma, cost) {
     training_set <- training_set[, c(res_var, expl_vars)] 
     test_set <- test_set[, c(res_var, expl_vars)]
     
-    # Normalization and standardization of the data
-    all_data <- rbind(training_set, test_set)
-    means <- apply(all_data, 2, mean)
-    sds <- apply(all_data, 2, sd)
-    rm(all_data)
-    training_set <- standardize_with(training_set, means, sds)
-    test_set <- standardize_with(test_set, means, sds)
-    
+    # Normalization of the data
     all_data <- rbind(training_set, test_set)
     mins <- apply(all_data, 2, min)
     maxs <- apply(all_data, 2, max)
@@ -108,33 +101,9 @@ svr_factory <- function (kernel, gamma, cost) {
     
     # Reverse the initial transformations
     pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
-    pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
     results$predicted <- pred_vals
     results
   }
-}
-
-fit_svr <- function (res_formula, training_set, test_set, target_dir) {
-  # Values found running best svm for winter data
-  fit_svr <- svr_factory(kernel = 'radial', 
-                         gamma = if (is.vector(training_set)) 1 
-                         else 1 / ncol(training_set), 
-                         cost = 1)
-  fit_svr(res_formula, training_set, test_set, target_dir)
-}
-
-fit_best_svr <- function (res_formula, training_set, test_set, target_dir) {
-  # Constant columns can't be scaled to unit variance by a SVM
-  res_formula <- skip_constant_variables(res_formula, training_set)
-  best_svm <- tune(svm, res_formula, data = training_set,
-                   ranges = list(gamma = seq(0.001, 0.01, 0.0025), 
-                                 cost = 2^(3:5),
-                                 epsilon <- seq(0, 1, 0.25),
-                                 kernel = c('radial')))
-  plot(best_svm)
-  model <- best_svm$best.model
-  pred_vals <- predict(model, test_set)
-  to_results(res_formula, test_set, pred_vals)
 }
 
 arima_factory <- function (order, seas_order, seas_period, method) {
@@ -233,13 +202,18 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, 
 # of neurons in @hidden (lengths must be the same!)
 # @thresholds - a vector of thresholds used as stop conditions in neuralnet package
 generate_mlps <- function (arch, deltas, thresholds) {
-  layer_sizes <- lapply(seq(length(arch)), function (i) {
-    c(arch[i] - deltas[i], arch[i], arch[i] + deltas[i])
-  })
-  archs <- expand.grid(layer_sizes)
+  archs <- data.frame(t(arch))
+  colnames(archs) <- sapply(seq(1, length(arch)), function (i) { paste('layer', i, sep = '_')  })
   
-  # Add the original architecture
-  archs <- rbind(archs, arch)
+  if (sum(deltas) != 0) {
+    layer_sizes <- lapply(seq(length(arch)), function (i) {
+      c(arch[i] - deltas[i], arch[i], arch[i] + deltas[i])
+    })
+    # Add the original architecture
+    archs <- expand.grid(layer_sizes)
+    colnames(archs) <- sapply(seq(1, length(arch)), function (i) { paste('layer', i, sep = '_')  })
+  }
+  
   unlist(apply(archs, 1, function (arch) {
     same_arch <- lapply(thresholds, function (th) {
       mlp_factory(hidden = arch, threshold = th)
@@ -251,7 +225,52 @@ generate_mlps <- function (arch, deltas, thresholds) {
   }))
 }
 
-generate_svrs <- function (gammas, epsilons, costs) {
+# Min and max values for SVR hyperparameters were taken from:
+# A Practical Guide to Support Vector Classification
+# Chih-Wei Hsu, Chih-Chung Chang, and Chih-Jen Lin
+# https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+generate_random_svr_params <- function (n_models = 5, 
+                                  gamma_pow_bound = c(-5, 3),
+                                  epsilon_pow_bound = c(-3, 2),
+                                  cost_pow_bound = c(-5, 10), 
+                                  gamma_step = 2, epsilon_step = 2, cost_step = 2) {
+  gammas <- seq(gamma_pow_bound[[1]], gamma_pow_bound[[2]], gamma_step)
+  gammas <- sapply(gammas, function (exponent) { 2 ^ exponent })
   
+  epsilons <- seq(epsilon_pow_bound[[1]], epsilon_pow_bound[[2]], epsilon_step)
+  epsilons <- sapply(epsilons, function (exponent) { 2 ^ exponent })
+  
+  costs <- seq(cost_pow_bound[[1]], cost_pow_bound[[2]], cost_step)
+  costs <- sapply(costs, function (exponent) { 2 ^ exponent })
+  
+  
+  params <- lapply(seq(1, n_models), function (i) {
+    c(gamma = sample(gammas, 1), epsilon = sample(epsilons, 1), cost = sample(costs, 1))
+  })
+  as.data.frame(do.call(rbind, params))
+}
+
+generate_random_svrs <- function (n_models = 5, 
+                                  gamma_pow_bound = c(-5, 3),
+                                  epsilon_pow_bound = c(-3, 2),
+                                  cost_pow_bound = c(-5, 10), 
+                                  gamma_step = 2, epsilon_step = 2, cost_step = 2) {
+  params <- generate_random_svr_params(n_models, 
+                                       gamma_pow_bound,
+                                       epsilon_pow_bound,
+                                       cost_pow_bound, 
+                                       gamma_step, epsilon_step, cost_step)
+  svrs <- apply(params, 1, function (p) {
+    svr_factory(kernel = 'radial', 
+                gamma = p[['gamma']],
+                epsilon = p[['epsilon']],
+                cost = p[['cost']])
+  })
+  names(svrs) <- apply(params, 1, function (p) {
+    paste('svr_g', signif(p[['gamma']], 3),
+          'e', signif(p[['epsilon']], 3),
+          'c', signif(p[['cost']], 3), sep = '_')
+  })
+  svrs
 }
 

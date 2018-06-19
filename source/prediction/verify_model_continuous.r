@@ -38,15 +38,14 @@ main <- function () {
   
   expl_vars <- list(c(), c(), c(), c())
   pred_models <- c(
-    mlp_5_th_0.3 = mlp_factory(c(5), threshold = 0.3),
-    mlp_10_th_0.3 = mlp_factory(c(10), threshold = 0.3),
-    mlp_15_th_0.3 = mlp_factory(c(15), threshold = 0.3),
-    mlp_3_3_th_0.3 = mlp_factory(c(3, 3), threshold = 0.3),
-    mlp_3_5_5_th_1 = mlp_factory(c(3, 5, 5), threshold = 1),
-    mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
-    mlp_10_5_th_0.3 = mlp_factory(c(10, 5), threshold = 0.3),
-    mlp_3_5_10_th_0.3 = mlp_factory(c(3, 5, 10), threshold = 0.3),
-    mlp_10_5_3_th_0.3 = mlp_factory(c(10, 5, 3), threshold = 0.3)
+    mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
+    mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
+    mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
+    mlp_3_3_th_0.5 = mlp_factory(c(3, 3), threshold = 0.5),
+    mlp_5_3_th_0.5 = mlp_factory(c(5, 3), threshold = 0.5),
+    mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
+    mlp_7_5_th_0.5 = mlp_factory(c(7, 5), threshold = 0.5),
+    mlp_10_7_th_0.5 = mlp_factory(c(10, 7), threshold = 0.5)
   )
   
   var_dir <- file.path(getwd(), base_res_var, 'continuous')

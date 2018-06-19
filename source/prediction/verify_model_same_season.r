@@ -36,23 +36,23 @@ main <- function () {
   seasons <- c('winter', 'spring', 'summer', 'autumn')
   
   expl_vars <- list(c(), c(), c(), c())
-  pred_models <- c(
-    mlp_5_th_0.3 = mlp_factory(c(5), threshold = 0.3),
-    mlp_10_th_0.3 = mlp_factory(c(10), threshold = 0.3),
-    mlp_15_th_0.3 = mlp_factory(c(15), threshold = 0.3),
-    mlp_3_3_th_0.3 = mlp_factory(c(3, 3), threshold = 0.3),
-    mlp_3_5_5_th_1 = mlp_factory(c(3, 5, 5), threshold = 1),
-    mlp_5_5_th_0.3 = mlp_factory(c(5, 5), threshold = 0.3),
-    mlp_10_5_th_0.3 = mlp_factory(c(10, 5), threshold = 0.3),
-    mlp_3_5_10_th_0.3 = mlp_factory(c(3, 5, 10), threshold = 0.3),
-    mlp_10_5_3_th_0.3 = mlp_factory(c(10, 5, 3), threshold = 0.3)
-  )
+  # pred_models <- c(
+  #   mlp_5_th_0.5 = mlp_factory(c(5), threshold = 0.5),
+  #   mlp_10_th_0.5 = mlp_factory(c(10), threshold = 0.5),
+  #   mlp_15_th_0.5 = mlp_factory(c(15), threshold = 0.5),
+  #   mlp_3_3_th_0.5 = mlp_factory(c(3, 3), threshold = 0.5),
+  #   mlp_5_3_th_0.5 = mlp_factory(c(5, 3), threshold = 0.5),
+  #   mlp_5_5_th_0.5 = mlp_factory(c(5, 5), threshold = 0.5),
+  #   mlp_7_5_th_0.5 = mlp_factory(c(7, 5), threshold = 0.5),
+  #   mlp_10_7_th_0.5 = mlp_factory(c(10, 7), threshold = 0.5)
+  # )
+  pred_models <- generate_random_svrs(n_models = 5)
 
   var_dir <- file.path(getwd(), base_res_var, 'same_season')
   mkdir(var_dir)
   
-  cores_count <- floor(detectCores() / 4)
-  clust <- makeForkCluster(cores_count, outfile = 'same_season.log')
+  # cores_count <- floor(detectCores() / 4)
+  # clust <- makeForkCluster(cores_count, outfile = 'same_season.log')
   
   all_seasons_results <- lapply(seq(1, 4), function (season) {
     season_dir <- file.path(var_dir, seasons[season])
@@ -84,7 +84,8 @@ main <- function () {
     total_obs <- 24 * floor(length(seasonal_windows[, 1]) / 24)
     offset_seq <- seq(training_count + 1, total_obs - test_count + 1, offset_step)
     
-    season_results <- parLapply(clust, names(pred_models), function (model_name) {
+    # season_results <- parLapply(clust, names(pred_models), function (model_name) {
+    season_results <- lapply(names(pred_models), function (model_name) {
       fit_model <- pred_models[[model_name]]
       print(paste('Fitting a', model_name, 'model'))
       model_results <- lapply(offset_seq, function (offset) {
@@ -138,6 +139,6 @@ main <- function () {
     })
     season_results
   })
-  stopCluster(clust)
+  # stopCluster(clust)
 }
 main()
