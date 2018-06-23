@@ -5,7 +5,7 @@ source('plotting.r')
 source('preprocess.r')
 setwd(wd)
 
-packages <- c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'neuralnet')
+packages <- c('e1071', 'neuralnet') #c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'neuralnet')
 import(packages)
 Sys.setenv(LANG = 'en')
 
@@ -71,41 +71,6 @@ fit_lasso_mlr <- function (res_formula, training_set, test_set, target_dir) {
   to_results(res_formula, test_set, pred_vals)
 }
 
-svr_factory <- function (kernel, gamma, epsilon, cost) {
-  fit_custom_svr <- function (res_formula, training_set, test_set, target_dir) {
-    
-    # Standardization requires dividing by the standard deviation
-    # of a column. If the column contains constant values it becomes
-    # division by 0!
-    
-    res_formula <- skip_constant_variables(res_formula, training_set)
-    all_vars <- all.vars(res_formula)
-    res_var <- all.vars(res_formula)[[1]]
-    expl_vars <- all_vars[2:length(all_vars)]
-    results <- data.frame(actual = test_set[, res_var], timestamp = test_set$future_timestamp)
-    
-    training_set <- training_set[, c(res_var, expl_vars)] 
-    test_set <- test_set[, c(res_var, expl_vars)]
-    
-    # Normalization of the data
-    all_data <- rbind(training_set, test_set)
-    mins <- apply(all_data, 2, min)
-    maxs <- apply(all_data, 2, max)
-    rm(all_data)
-    training_set <- normalize_with(training_set, mins, maxs)
-    test_set <- normalize_with(test_set, mins, maxs)
-    
-    model <- svm(res_formula, training_set,
-                 kernel = kernel, gamma = gamma, cost = cost)
-    pred_vals <- predict(model, test_set)
-    
-    # Reverse the initial transformations
-    pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
-    results$predicted <- pred_vals
-    results
-  }
-}
-
 arima_factory <- function (order, seas_order, seas_period, method) {
   fit_custom_arima <- function (res_formula, training_set, test_set, target_dir) {
     # res_var - future_pm2_5
@@ -156,20 +121,12 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, 
     training_set <- training_set[, c(res_var, expl_vars)] 
     test_set <- test_set[, c(res_var, expl_vars)]
     
-    # Data standardization (mean = 0, sd = 1)
     all_data <- rbind(training_set, test_set)
-    means <- apply(all_data, 2, mean)
-    sds <- apply(all_data, 2, sd)
+    mins <- apply(all_data, 2, min)
+    maxs <- apply(all_data, 2, max)
     rm(all_data)
-    training_set <- standardize_with(training_set, means, sds)
-    test_set <- standardize_with(test_set, means, sds)
-    
-    # all_data <- rbind(training_set, test_set)
-    # mins <- apply(all_data, 2, min)
-    # maxs <- apply(all_data, 2, max)
-    # rm(all_data)
-    # training_set <- normalize_with(training_set, mins, maxs)
-    # test_set <- normalize_with(test_set, mins, maxs)
+    training_set <- normalize_with(training_set, mins, maxs)
+    test_set <- normalize_with(test_set, mins, maxs)
     
     # Create an ensemble of neural networks
     # and get the final prediction by calculating
@@ -190,8 +147,7 @@ mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, 
     pred_vals <- apply(do.call(cbind, pred_vals_list), 1, mean)
     
     # Reverse the initial transformations
-    pred_vals <- reverse_standardize_vec_with(pred_vals, means[res_var], sds[res_var])
-    # pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
+    pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
     results$predicted <- pred_vals
     results
   }
@@ -225,41 +181,101 @@ generate_mlps <- function (arch, deltas, thresholds) {
   }))
 }
 
+svr_factory <- function (kernel, gamma, epsilon, cost) {
+  fit_custom_svr <- function (res_formula, training_set, test_set, target_dir) {
+    
+    # Standardization requires dividing by the standard deviation
+    # of a column. If the column contains constant values it becomes
+    # division by 0!
+    
+    res_formula <- skip_constant_variables(res_formula, training_set)
+    all_vars <- all.vars(res_formula)
+    res_var <- all.vars(res_formula)[[1]]
+    expl_vars <- all_vars[2:length(all_vars)]
+    results <- data.frame(actual = test_set[, res_var], timestamp = test_set$future_timestamp)
+    
+    training_set <- training_set[, c(res_var, expl_vars)] 
+    test_set <- test_set[, c(res_var, expl_vars)]
+    
+    # Normalization of the data
+    all_data <- rbind(training_set, test_set)
+    mins <- apply(all_data, 2, min)
+    maxs <- apply(all_data, 2, max)
+    rm(all_data)
+    training_set <- normalize_with(training_set, mins, maxs)
+    test_set <- normalize_with(test_set, mins, maxs)
+    
+    model <- svm(res_formula, training_set,
+                 kernel = kernel, gamma = gamma, cost = cost)
+    pred_vals <- predict(model, test_set)
+    
+    # Reverse the initial transformations
+    pred_vals <- reverse_normalize_vec_with(pred_vals, mins[res_var], maxs[res_var])
+    results$predicted <- pred_vals
+    results
+  }
+}
+
+fit_svr <- function (res_formula, training_set, test_set, target_dir) {
+  # Values found running best svm for winter data
+  print(1 / ncol(training_set))
+  default_svr <- svr_factory(kernel = 'radial', 
+                             gamma = 1 / ncol(training_set), 
+                             epsilon = 0.1,
+                             cost = 1)
+  default_svr(res_formula, training_set, test_set, target_dir)
+}
+
+
 # Min and max values for SVR hyperparameters were taken from:
 # A Practical Guide to Support Vector Classification
 # Chih-Wei Hsu, Chih-Chung Chang, and Chih-Jen Lin
 # https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
-generate_random_svr_params <- function (n_models = 5, 
-                                  gamma_pow_bound = c(-5, 3),
-                                  epsilon_pow_bound = c(-3, 2),
-                                  cost_pow_bound = c(-5, 10), 
-                                  gamma_step = 2, epsilon_step = 2, cost_step = 2) {
-  gammas <- seq(gamma_pow_bound[[1]], gamma_pow_bound[[2]], gamma_step)
-  gammas <- sapply(gammas, function (exponent) { 2 ^ exponent })
+generate_random_svr_power_grid <- function (n_models = 5, 
+                                            base = 2,
+                                            gamma_pow_bound = c(-10, 3),
+                                            epsilon_pow_bound = c(-4, 0),
+                                            cost_pow_bound = c(-2, 10)) {
+  gammas <- seq(gamma_pow_bound[[1]], gamma_pow_bound[[2]], base)
+  gammas <- sapply(gammas, function (exponent) { base ^ exponent })
   
-  epsilons <- seq(epsilon_pow_bound[[1]], epsilon_pow_bound[[2]], epsilon_step)
-  epsilons <- sapply(epsilons, function (exponent) { 2 ^ exponent })
+  epsilons <- seq(epsilon_pow_bound[[1]], epsilon_pow_bound[[2]], base)
+  epsilons <- sapply(epsilons, function (exponent) { base ^ exponent })
   
-  costs <- seq(cost_pow_bound[[1]], cost_pow_bound[[2]], cost_step)
-  costs <- sapply(costs, function (exponent) { 2 ^ exponent })
+  costs <- seq(cost_pow_bound[[1]], cost_pow_bound[[2]], base)
+  costs <- sapply(costs, function (exponent) { base ^ exponent })
   
-  
-  params <- lapply(seq(1, n_models), function (i) {
-    c(gamma = sample(gammas, 1), epsilon = sample(epsilons, 1), cost = sample(costs, 1))
-  })
-  as.data.frame(do.call(rbind, params))
+  params <- expand.grid(gammas, epsilons, costs)
+  colnames(params) <- c('gamma', 'epsilon', 'cost')
+  params[sample(nrow(params), n_models), ]
 }
 
-generate_random_svrs <- function (n_models = 5, 
-                                  gamma_pow_bound = c(-5, 3),
-                                  epsilon_pow_bound = c(-3, 2),
-                                  cost_pow_bound = c(-5, 10), 
-                                  gamma_step = 2, epsilon_step = 2, cost_step = 2) {
-  params <- generate_random_svr_params(n_models, 
-                                       gamma_pow_bound,
-                                       epsilon_pow_bound,
-                                       cost_pow_bound, 
-                                       gamma_step, epsilon_step, cost_step)
+
+# Default values:
+# gamma = 1 / ncol(training_set) ~ 0.027 for 44 inpur variables
+# epsilon = 0.1
+# cost = 1
+generate_random_svr_pow_params <- function (n_models = 5, 
+                                        gamma_bounds = c(0.001, 1),
+                                        epsilon_bounds = c(0.05, 0.15),
+                                        cost_bounds = c(0.5, 1.5)) {
+  data.frame(
+    gamma = runif(n_models, gamma_bounds[[1]], gamma_bounds[[2]]),
+    epsilon = runif(n_models, epsilon_bounds[[1]], epsilon_bounds[[2]]),
+    cost = runif(n_models, cost_bounds[[1]], cost_bounds[[2]])
+  )
+}
+
+generate_random_pow_svrs <- function (n_models = 5,
+                                    base = 2,
+                                    gamma_pow_bound = c(-10, 3),
+                                    epsilon_pow_bound = c(-4, 0),
+                                    cost_pow_bound = c(-2, 10)) {
+  params <- generate_random_svr_power_grid(n_models,
+                                           base,
+                                           gamma_pow_bound,
+                                           epsilon_pow_bound,
+                                           cost_pow_bound)
   svrs <- apply(params, 1, function (p) {
     svr_factory(kernel = 'radial', 
                 gamma = p[['gamma']],
@@ -267,9 +283,9 @@ generate_random_svrs <- function (n_models = 5,
                 cost = p[['cost']])
   })
   names(svrs) <- apply(params, 1, function (p) {
-    paste('svr_g', signif(p[['gamma']], 3),
-          'e', signif(p[['epsilon']], 3),
-          'c', signif(p[['cost']], 3), sep = '_')
+    paste('svr_gam', signif(p[['gamma']], 3),
+          '_eps', signif(p[['epsilon']], 3),
+          '_c', signif(p[['cost']], 3), sep = '')
   })
   svrs
 }

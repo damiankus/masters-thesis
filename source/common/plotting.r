@@ -25,7 +25,7 @@ save_comparison_plot <- function (df, res_var, plot_path) {
   line_plot <- ggplot(data = melted, aes(x = timestamp, y = value, colour = variable)) +
     geom_line() +
     facet_grid(~ group, scales = 'free_x', space = 'free_x') +
-    xlab('sDate') +
+    xlab('Date') +
     ylab(paste(pretty_var(res_var), units(res_var))) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   
