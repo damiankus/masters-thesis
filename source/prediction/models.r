@@ -7,7 +7,6 @@ setwd(wd)
 
 packages <- c('e1071', 'neuralnet') #c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'neuralnet')
 import(packages)
-Sys.setenv(LANG = 'en')
 
 to_results <- function (res_formula, test_set, predicted) {
   res_var <- all.vars(res_formula)[[1]]
@@ -206,7 +205,8 @@ svr_factory <- function (kernel, gamma, epsilon, cost) {
     test_set <- normalize_with(test_set, mins, maxs)
     
     model <- svm(res_formula, training_set,
-                 kernel = kernel, gamma = gamma, cost = cost)
+                 kernel = kernel, gamma = gamma, cost = cost, 
+                 cachesize = 2048)
     pred_vals <- predict(model, test_set)
     
     # Reverse the initial transformations
@@ -218,7 +218,6 @@ svr_factory <- function (kernel, gamma, epsilon, cost) {
 
 fit_svr <- function (res_formula, training_set, test_set, target_dir) {
   # Values found running best svm for winter data
-  print(1 / ncol(training_set))
   default_svr <- svr_factory(kernel = 'radial', 
                              gamma = 1 / ncol(training_set), 
                              epsilon = 0.1,
@@ -233,8 +232,8 @@ fit_svr <- function (res_formula, training_set, test_set, target_dir) {
 # https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 generate_random_svr_power_grid <- function (n_models = 5, 
                                             base = 2,
-                                            gamma_pow_bound = c(-10, 3),
-                                            epsilon_pow_bound = c(-4, 0),
+                                            gamma_pow_bound = c(-12, -2),
+                                            epsilon_pow_bound = c(-5, -1),
                                             cost_pow_bound = c(-2, 10)) {
   gammas <- seq(gamma_pow_bound[[1]], gamma_pow_bound[[2]], base)
   gammas <- sapply(gammas, function (exponent) { base ^ exponent })
@@ -266,10 +265,12 @@ generate_random_svr_pow_params <- function (n_models = 5,
   )
 }
 
+# Observations:
+# * gamma greater or equal to 0.25 makes SVM not learn 
 generate_random_pow_svrs <- function (n_models = 5,
                                     base = 2,
-                                    gamma_pow_bound = c(-10, 3),
-                                    epsilon_pow_bound = c(-4, 0),
+                                    gamma_pow_bound = c(-12, -4),
+                                    epsilon_pow_bound = c(-5, 1),
                                     cost_pow_bound = c(-2, 10)) {
   params <- generate_random_svr_power_grid(n_models,
                                            base,
