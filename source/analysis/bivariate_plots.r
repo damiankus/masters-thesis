@@ -26,31 +26,27 @@ save_scatter_plot <- function (df, res_var, expl_var, plot_path) {
 }
 
 main <- function () {
-  windows <- load_observations('observations') 
+  load(file = '../time_windows.Rda')
+  stations <- unique(windows$station_id)
   
-  response_vars <- c('future_pm2_5')
-  explanatory_vars <- c('pm2_5', 'temperature', 'wind_speed', 'pressure', 'humidity', 'wind_dir_ns', 'wind_dir_ew')
-  excluded <- c(response_vars, c('id', 'timestamp', 'station_id'))
-  explanatory_vars <- explanatory_vars[!(explanatory_vars %in% excluded)]
-  windows <- windows[, c(response_vars, explanatory_vars)]
-  windows <- na.omit(windows)
+  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_speed')
+  main_var <- 'future_pm2_5'
+  vars <- c(main_var, vars)
+  windows <- windows[, c(vars, 'station_id', 'season')]
   
-  target_root_dir <- file.path(getwd(), 'bivariate')
-  mkdir(target_root_dir)
-  plot_path <- file.path(target_dir, 'pairwise_relationships.png')
-  png(filename = plot_path, height = 3112, width = 4096, pointsize = 25)
-  pairs(windows[c(response_vars, explanatory_vars)], cex.labels = 3)
-  dev.off()
+  target_dir <- file.path(getwd(), 'bivariate')
+  mkdir(target_dir)
   
-  for (res_var in response_vars) {
-    target_dir <- file.path(target_root_dir, res_var)
-    mkdir(target_dir)
-
-    for (expl_var in explanatory_vars) {
-      plot_path <- file.path(target_dir, paste(res_var, '_', expl_var, '.png', sep = ''))
-      save_scatter_plot(windows, res_var, expl_var, plot_path)
-    }
-  }
+  lapply(seq(1, 4), function (season) {
+  data <- windows[windows$season == season, c(vars, 'station_id')]
+    lapply(stations, function (sid) {
+      data <- data[data$station_id == sid, vars]
+      plot_path <- file.path(target_dir, paste('relationships_', sid, '_', season, '.png', sep = ''))
+      png(filename = plot_path, height = 3112, width = 4096, pointsize = 25)
+      pairs(data[, vars], cex.labels = 3, lower.panel = NULL)
+      dev.off()
+    })
+  })
 }
 main()
 

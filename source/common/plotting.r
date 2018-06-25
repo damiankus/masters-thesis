@@ -176,5 +176,8 @@ save_data_split <- function (res_var, training_set, test_set, plot_path) {
   test_vals <- test_set[, c('timestamp', res_var)]
   test_vals$type <- 'test'
   merged <- rbind(training_vals, test_vals)
-  save_multiple_vars_plot(merged, 'timestamp', res_var, id_var = 'type', plot_path = plot_path)
+  ylab <- paste(pretty_var(res_var), ' [', units(res_var), ']', sep = '')
+  xlab <- 'Date'
+  save_multiple_vars_plot(merged, 'timestamp', res_var, id_var = 'type', plot_path = plot_path,
+                          x_lab = xlab, y_lab = ylab)
 }
