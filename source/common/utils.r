@@ -84,7 +84,7 @@ units <- function (var) {
          precip_total = 'mm',
          precip_rate = 'mm/h',
          {
-           if (grepl('^pm', var)) {
+           if (grepl('pm', tolower(var))) {
              'μg/m³'
            } else {
              ''

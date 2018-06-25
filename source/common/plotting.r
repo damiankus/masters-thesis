@@ -15,18 +15,20 @@ save_line_plot <- function(df, var_x, var_y, plot_path, title) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_comparison_plot <- function (df, res_var, plot_path) {
+save_comparison_plot <- function (df, res_var, plot_path, hour_units = 1) {
   # If the observations are separated by a period
   # longer than a week, we plot them with two charts 
   # to skip the missing values and thus save the space
   
-  df$group <- c(0, cumsum(diff(df$timestamp) > 24 * 7))
+  df$group <- c(0, cumsum(diff(df$timestamp) > hour_units * 24 * 7))
   melted <- melt(df, id = c('timestamp', 'group'))
   line_plot <- ggplot(data = melted, aes(x = timestamp, y = value, colour = variable)) +
     geom_line() +
     facet_grid(~ group, scales = 'free_x', space = 'free_x') +
     xlab('Date') +
-    ylab(paste(pretty_var(res_var), units(res_var))) +
+    ylab(paste(pretty_var(res_var), ' [', units(res_var), ']', sep = '')) +
+    scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
+                     breaks = date_breaks('1 week')) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
