@@ -108,12 +108,19 @@ pretty_var <- function (var) {
            } else if (grepl('past', var)) {
              delim <- '_past_'
              join_str <- '-'
-           }     
+           } else {
+             delim <- '_'
+             var_idx <- -1
+           }
            split_var <- strsplit(var, delim)[[1]]
            pvar <- ''
            if (length(split_var) > 1) {
-             pvar <- pretty_var(split_var[var_idx])
-             pvar <- paste(pvar, join_str, paste(split_var[-var_idx], collapse = ' '), sep = ' ')
+             if (var_idx > 0) {
+               pvar <- pretty_var(split_var[var_idx])
+               pvar <- paste(pvar, join_str, paste(split_var[-var_idx], collapse = ' '), sep = ' ')
+             } else {
+               pvar <- paste(split_var, collapse = join_str)
+             }
            } else {
              pvar <- var
            }
