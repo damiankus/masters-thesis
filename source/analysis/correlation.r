@@ -5,7 +5,9 @@ setwd(wd)
 
 packages <- c('corrplot', 'magrittr', 'knitr', 'plyr')
 import(packages)
-Sys.setenv(LANG = "en")
+Sys.setenv(LANGUAGE = 'en')
+Sys.setlocale('LC_TIME', 'en_GB.UTF-8')
+Sys.setlocale('LC_MESSAGES', 'en_GB.UTF-8')
 
 plotCorrMat <- function (data, main_var_idx, file_path, corr_threshold = 0.2) {
   data <- data[, sapply(data, function (col) { is.numeric(col) && sd(col) != 0 })]
@@ -14,7 +16,11 @@ plotCorrMat <- function (data, main_var_idx, file_path, corr_threshold = 0.2) {
                                 'blue', '#00007F', '#000050'))
   M <- cor(data, use = 'complete.obs')
   which_order <- order(abs(M[, main_var_idx]), decreasing = T)
+  orig_colnames <- colnames(M)
+  colnames(M) <- sapply(orig_colnames, pretty_var)
+  rownames(M) <- colnames(M)
   corrplot(M, type = 'upper', method = 'number', col = palette(100))
+  colnames(M) <- orig_colnames
   dev.off()
   
   # Find variables with absolute correlation above certain threshold
@@ -28,8 +34,8 @@ main <- function () {
   stations <- unique(windows$station_id)
   season_names <- c('winter', 'spring', 'summer', 'autumn')
   
-  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_speed',
-            'day_of_year', 'day_of_week', 'is_heating_season', 'is_holiday', 'month', 'period_of_day')
+  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_dir_ns', 'wind_dir_ew', 'wind_speed',
+            'day_of_week', 'day_of_year', 'is_heating_season', 'is_holiday', 'month', 'period_of_day')
   main_var <- 'future_pm2_5'
   vars <- c(main_var, vars)
   windows <- windows[, c(vars, 'station_id', 'season')]

@@ -5,7 +5,7 @@ source('plotting.r')
 source('preprocess.r')
 setwd(wd)
 
-packages <- c('e1071', 'neuralnet') #c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'neuralnet')
+packages <- c('e1071', 'neuralnet', 'glmnet') #c('caTools', 'glmnet', 'car', 'e1071', 'forecast', 'neuralnet')
 import(packages)
 
 to_results <- function (res_formula, test_set, predicted) {

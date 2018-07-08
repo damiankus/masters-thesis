@@ -107,14 +107,14 @@ save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab 
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '', legend_title = '') { 
+save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '', legend_title = '', date_breaks = '3 months') { 
   copy <- data.frame(df[, c(x_var, y_var, id_var)])
   
   # After passing timestamps to forecasting models,
   # they may be cast to numeric values
   timestamp_present <- FALSE
   if (grepl('timestamp', x_var)) {
-    copy$timestamp <- as.POSIXlt(copy$timestamp, origin = '1970-01-01', tz = 'UTC')
+    copy$timestamp <- utcts(copy$timestamp)
     timestamp_present <- TRUE
   }
   
@@ -139,9 +139,9 @@ save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = 
   if (timestamp_present) {
     plot <- plot +
       scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
-                       breaks = date_breaks('3 months'))
+                       breaks = date_breaks(date_breaks))
   }
-  ggsave(plot_path, width = 30, height = 40, dpi = 200)
+  ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 

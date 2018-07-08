@@ -6,7 +6,9 @@ setwd(wd)
 
 packages <- c('dplyr')
 import(packages)
-Sys.setenv(LANG = "en")
+Sys.setenv(LANGUAGE = 'en')
+Sys.setlocale('LC_TIME', 'en_GB.UTF-8')
+Sys.setlocale('LC_MESSAGES', 'en_GB.UTF-8')
 
 main <- function () {
   load('../time_windows.Rda')
@@ -14,21 +16,29 @@ main <- function () {
   
   excluded <- c('id')
   windows <- windows[, !(colnames(windows) %in% excluded)]
-  windows$date <- factor(as.Date(windows$timestamp))
+  windows$date <- as.Date(utcts(windows$timestamp))
   windows$station_id <- unlist(lapply(windows$station_id, function (id) { 
     parts <- strsplit(id, '_')[[1]]
     paste(toupper(parts[[1]]), cap(parts[[2]]))
   }))
+  
   vars <- colnames(windows)
   vars <- vars[!(vars %in% c('id', 'station_id', 'timestamp', 'date', 'month'))]
   month_names <- c('January', 'February', 'March', 'April', 'May', 'June',
                    'July', 'August', 'September', 'October', 'November', 'December')
   target_dir <- file.path(getwd(), 'trend')
   mkdir(target_dir)
+
+  # For plotting daily total precipitation
+  # vars <- c('precip_total')
+  # windows <- windows[, c(vars, 'date', 'station_id')]
+  # stats <- as.data.frame(
+  #   aggregate(windows[, var], by = list(windows$date, windows$station_id),
+  #             FUN = function (x) { max(x) }))
   
   lapply(vars, function (var) {
     stats <- as.data.frame(
-      aggregate(windows[, var], by = list(windows$date, windows$station_id), 
+      aggregate(windows[, var], by = list(windows$date, windows$station_id),
                 FUN = mean, na.rm = TRUE))
     names(stats) <- c('dates', 'station_id', var)
     stats[, 'date'] <- as.Date(stats$date)

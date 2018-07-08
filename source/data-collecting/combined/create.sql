@@ -895,6 +895,48 @@ ALTER TABLE observations ADD COLUMN wind_dir_rad FLOAT;
 UPDATE observations 
 SET wind_dir_rad = wind_dir_deg * PI() / 180;
 
+/* WARNING:
+ EW component should be calculated as SIN(rads) 
+ NS component should be calculated as COS(rads)
+ 
+ It hasn't been changed yet to preserve the original 
+ transformations used to obtain thesis results.
+ 
+ This error stems from not taking into account the fact that
+ the North direction corresponds to the beginning of the coordinate system.
+ 
+              E (90 deg)
+              ^  /
+              | /
+              |/alpha
+       S------|------>N (0 deg)  
+              |
+              |
+              W
+              
+ which corresponds to directions on a compass dial
+ 
+	      N (0)
+              ^
+              |
+              |            
+ (270) W------|------>E (90)
+              |
+              |
+              S (180)
+        
+  Originally it was assumed that wind direction scale starts from Eeast and goes counter-clockwise
+  ENWS, like this:
+  
+              N (90)
+              ^  /
+              | /
+              |/alpha
+       W------|------>E (0)
+              |
+              |
+              S
+*/
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ew;
 ALTER TABLE observations ADD COLUMN wind_dir_ew FLOAT;
 UPDATE observations 

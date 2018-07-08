@@ -29,24 +29,26 @@ main <- function () {
   load(file = '../time_windows.Rda')
   stations <- unique(windows$station_id)
   
-  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_speed')
+  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_dir_ns', 'wind_dir_ew', 'wind_speed')
   main_var <- 'future_pm2_5'
   vars <- c(main_var, vars)
   windows <- windows[, c(vars, 'station_id', 'season')]
   
   target_dir <- file.path(getwd(), 'bivariate')
   mkdir(target_dir)
+  labels <- sapply(vars, pretty_var)
   
-  lapply(seq(1, 4), function (season) {
-  data <- windows[windows$season == season, c(vars, 'station_id')]
+  # lapply(seq(1, 4), function (season) {
+    # data <- windows[windows$season == season, c(vars, 'station_id')]
+    data <- windows[, c(vars, 'station_id')]
     lapply(stations, function (sid) {
       data <- data[data$station_id == sid, vars]
-      plot_path <- file.path(target_dir, paste('relationships_', sid, '_', season, '.png', sep = ''))
+      plot_path <- file.path(target_dir, paste('relationships_', sid, '.png', sep = ''))
       png(filename = plot_path, height = 3112, width = 4096, pointsize = 25)
-      pairs(data[, vars], cex.labels = 3, lower.panel = NULL)
+      pairs(data[, vars], labels = labels, cex.labels = 3, lower.panel = NULL)
       dev.off()
     })
-  })
+  # })
 }
 main()
 

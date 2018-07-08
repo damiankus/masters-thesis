@@ -81,6 +81,8 @@ units <- function (var) {
          pressure = 'hPa',
          wind_speed = 'm/s',
          wind_dir_deg = '°',
+         wind_dir_ew = '1',
+         wind_dir_ns = '1',
          precip_total = 'mm',
          precip_rate = 'mm/h',
          {
@@ -92,11 +94,38 @@ units <- function (var) {
          })
 }
 
+#   WARNING!
+#   labels for NS and EW components of wind direction
+#   are swapped intentionally because of the error made
+#   while performing the transformation. Originally it 
+#   was assumed that East corresponds to the beginning of 
+#   the coordinate systems and goes towards North (ENWS).
+#   Actually, the coordinate system starts from North and goes
+#   towards East (as shown below).
+#   
+#     N            E
+#   W-|-E  ----> W-|-N  
+#     S            S
 pretty_var <- function (var) {
   switch(var,
-         pm1 = 'PM1', pm2_5 = 'PM2.5', pm10 = 'PM10', solradiation = 'solar irradiance', wind_speed = 'wind speed',
-         wind_dir = 'wind direction', wind_dir_deg = 'wind direction', precip_rate = 'precipitation rate',
+         pm1 = 'PM1',
+         pm2_5 = 'PM2.5',
+         pm10 = 'PM10',
+         future_pm2_5 = 'PM2.5 in 24h',
+         solradiation = 'solar irradiance',
+         wind_speed = 'wind speed',
+         wind_dir = 'wind direction',
+         wind_dir_deg = 'wind direction',
+         
+         # !!! See comment above ^
+         wind_dir_ns = 'wind direction\nE - W',
+         wind_dir_ew = 'wind direction\nN - S',
+         # !!!
+         
+         precip_rate = 'precipitation rate',
          precip_total = 'total precipitation',
+         is_heating_season = 'heating season',
+         is_holiday = 'holiday',
          {
            delim <- ' '
            join_str <- ' '
