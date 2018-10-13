@@ -75,7 +75,7 @@ save_goodness_plot <- function (df, x_var, y_var, id_var, x_order, plot_path, x_
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '') { 
+save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '', breaks = '4 months', font_size = 24) { 
   copy <- data.frame(df[, c(x_var, y_var, id_var)])
   
   # After passing timestamps to forecasting models,
@@ -96,18 +96,19 @@ save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab 
   plot <- ggplot(data = copy, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
     geom_line() +
     xlab(x_lab) +
-    ylab(y_lab)
+    ylab(y_lab) +
+    theme(text = element_text(size = font_size))
   
   if (timestamp_present) {
     plot <- plot +
       scale_x_datetime(labels = date_format('%Y-%m-%d', tz = 'UTC'),
-                       breaks = date_breaks('3 months'))
+                       breaks = date_breaks(breaks))
   }
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '', legend_title = '', date_breaks = '3 months') { 
+save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = '', y_lab = '', legend_title = '', date_breaks = '3 months', font_size = 24) { 
   copy <- data.frame(df[, c(x_var, y_var, id_var)])
   
   # After passing timestamps to forecasting models,
@@ -135,6 +136,7 @@ save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab = 
     ylab(y_lab) +
     labs(color = legend_title) + 
     facet_wrap(facet_formula, scales = 'free_y', ncol = 1) +
+    theme(text = element_text(size = font_size))
   
   if (timestamp_present) {
     plot <- plot +
@@ -170,7 +172,7 @@ save_histogram <- function (df, factor, plot_path, show_outlier_thr = FALSE) {
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
-save_data_split <- function (res_var, training_set, test_set, plot_path) {
+save_data_split <- function (res_var, training_set, test_set, plot_path, breaks = '4 months', font_size = 24) {
   training_vals <- training_set[, c('timestamp', res_var)]
   training_vals$type <- 'training'
   test_vals <- test_set[, c('timestamp', res_var)]
@@ -179,5 +181,5 @@ save_data_split <- function (res_var, training_set, test_set, plot_path) {
   ylab <- paste(pretty_var(res_var), ' [', units(res_var), ']', sep = '')
   xlab <- 'Date'
   save_multiple_vars_plot(merged, 'timestamp', res_var, id_var = 'type', plot_path = plot_path,
-                          x_lab = xlab, y_lab = ylab)
+                          x_lab = xlab, y_lab = ylab, breaks = breaks, font_size = font_size)
 }

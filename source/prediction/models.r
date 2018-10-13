@@ -106,7 +106,7 @@ fit_arima <- function (res_formula, training_set, test_set, target_dir) {
   arima_fun(res_formula, training_set, test_set, target_dir)
 }
 
-mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, lifesign = 'minimal') {
+mlp_factory <- function (hidden, threshold, stepmax = 1e+06, ensemble_size = 3, lifesign = 'full') {
   fit_mlp <- function (res_formula, training_set, test_set, target_dir) {
     # Standardization requires dividing by the standard deviation
     # of a column. If the column contains constant values it becomes
@@ -254,7 +254,7 @@ generate_random_svr_power_grid <- function (n_models = 5,
 # gamma = 1 / ncol(training_set) ~ 0.027 for 44 inpur variables
 # epsilon = 0.1
 # cost = 1
-generate_random_svr_pow_params <- function (n_models = 5, 
+generate_random_svr_params <- function (n_models = 5, 
                                         gamma_bounds = c(0.001, 1),
                                         epsilon_bounds = c(0.05, 0.15),
                                         cost_bounds = c(0.5, 1.5)) {

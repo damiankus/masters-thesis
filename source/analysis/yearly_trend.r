@@ -11,7 +11,8 @@ Sys.setlocale('LC_TIME', 'en_GB.UTF-8')
 Sys.setlocale('LC_MESSAGES', 'en_GB.UTF-8')
 
 main <- function () {
-  load('../time_windows.Rda')
+  # load('../time_windows.Rda')
+  load('wind_dir_windows.Rda')
   stations <- unique(windows$station_id)
   
   excluded <- c('id')
@@ -30,16 +31,19 @@ main <- function () {
   mkdir(target_dir)
 
   # For plotting daily total precipitation
-  # vars <- c('precip_total')
-  # windows <- windows[, c(vars, 'date', 'station_id')]
-  # stats <- as.data.frame(
-  #   aggregate(windows[, var], by = list(windows$date, windows$station_id),
-  #             FUN = function (x) { max(x) }))
   
   lapply(vars, function (var) {
-    stats <- as.data.frame(
-      aggregate(windows[, var], by = list(windows$date, windows$station_id),
-                FUN = mean, na.rm = TRUE))
+    # Total precipitation so far is a cumulative value
+    stats <- NULL
+    if (var == 'precip_total') {
+      stats <- aggregate(windows[, var], by = list(windows$date, windows$station_id),
+                         FUN = mean, na.rm = TRUE)
+    } else {
+      # Plots are prepared separately for each station so the total precipitation for the
+      # given day is the 24h maximum value
+      stats <- aggregate(windows[, var], by = list(windows$date, windows$station_id),
+                         FUN = function (x) { max(x) })
+    }
     names(stats) <- c('dates', 'station_id', var)
     stats[, 'date'] <- as.Date(stats$date)
     plot_path <- file.path(target_dir, paste(var, '_yearly_trend.png', sep = ''))

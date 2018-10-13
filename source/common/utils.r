@@ -118,8 +118,8 @@ pretty_var <- function (var) {
          wind_dir_deg = 'wind direction',
          
          # !!! See comment above ^
-         wind_dir_ns = 'wind direction\nE - W',
-         wind_dir_ew = 'wind direction\nN - S',
+         wind_dir_ns = 'wind direction E - W',
+         wind_dir_ew = 'wind direction N - S',
          # !!!
          
          precip_rate = 'precipitation rate',

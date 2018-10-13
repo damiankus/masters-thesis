@@ -11,7 +11,8 @@ Sys.setenv(LANG = 'en')
 stations <- c('gios_krasinskiego', 'gios_bulwarowa', 'gios_bujaka')
 obs <- load_observations('observations',
                          stations = stations)
-excluded <- c('pm10', 'solradiation', 'wind_dir_deg', 'id')
+# excluded <- c('pm10', 'solradiation', 'wind_dir_deg', 'id')
+excluded <- c('pm10', 'solradiation', 'id')
 obs <- obs[, !(names(obs) %in% excluded)]
 obs$station_id <- sapply(obs$station_id, trimws)
 create_table_from_schema('observations', 'complete_observations')
@@ -53,7 +54,7 @@ windows <- lapply(stations, function (station_id) {
                                  past_lag = 23,
                                  future_lag = 24,
                                  future_vars = c('pm2_5', 'timestamp'))
-  windows <- add_aggregated(windows, past_lag = 23, vars = c('pm2_5', 'wind_speed', 'temperature', 'humidity', 'pressure', 'precip_rate', 'wind_dir_ns', 'wind_dir_ew'))
+  windows <- add_aggregated(windows, past_lag = 23, vars = c('pm2_5', 'wind_speed', 'temperature', 'humidity', 'pressure', 'precip_rate', 'wind_dir_ns', 'wind_dir_ew', 'wind_dir_deg'))
   windows <- skip_past(windows)
   windows$station_id <- station_id
   windows

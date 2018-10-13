@@ -2,7 +2,7 @@ library('ggplot2')
 library('reshape')
 library('latex2exp')
 
-save_comparison_plot <- function (df, x_var, y_var, id_var, facet_var, plot_path, x_lab = '', y_lab = '', title = '') {
+save_comparison_plot <- function (df, x_var, y_var, id_var, facet_var, plot_path, x_lab = '', y_lab = '', title = '', font_size = 24) {
   x_order <- unique(df[, x_var])
   df[, facet_var] <- as.factor(df[, facet_var])
   levels(df[, facet_var]) <- c(
@@ -18,7 +18,9 @@ save_comparison_plot <- function (df, x_var, y_var, id_var, facet_var, plot_path
     facet_wrap(facet_formula, scales = 'free', labeller = label_parsed) +
     xlab(x_lab) +
     ylab(NULL) +
-    scale_x_discrete(limits = x_order)
+    scale_x_discrete(limits = x_order) +
+    theme(text = element_text(size = font_size))
+  
   ggsave(plot_path, width = 16, height = 10, dpi = 150)
 }
 
@@ -47,6 +49,6 @@ lapply(files, function (f) {
   plot_path <- file.path(paste(plot_path, '_plot.png', sep = ''))
   save_comparison_plot(data, x_var = 'season', y_var = 'value',
                        id_var = 'model', facet_var = 'measure',
-                       x_lab = 'season', plot_path)
+                       x_lab = 'season', plot_path, font_size = 20)
 })
 

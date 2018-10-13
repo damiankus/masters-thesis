@@ -32,7 +32,6 @@ main <- function () {
   load('../time_windows.Rda')
   
   # Fetch all windowservations
-  # table_name <- 'windowservations'
   excluded <- c('id', 'station_id')
   windows <- windows[, !(colnames(windows) %in% excluded)]
   windows[, 'date'] <- var(as.Date(windows$timestamp))
@@ -45,9 +44,9 @@ main <- function () {
   
   target_root_dir <- file.path(getwd(), 'distribution')
   mkdir(target_root_dir)
-  target_root_dir <- file.path(target_root_dir, strsplit(table_name, '_')[[1]][1])
+  target_root_dir <- file.path(target_root_dir, 'observations')
   mkdir(target_root_dir)
-  vars <- c('wind_speed')
+  vars <- c('wind_dir_ns')
 
   for (year in seq(min(windows$year), max(windows$year))) {
     year_dir <- file.path(target_root_dir, year)

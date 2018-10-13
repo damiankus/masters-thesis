@@ -3,22 +3,27 @@ setwd(file.path('..', 'common'))
 source('utils.r')
 setwd(wd)
 
-packages <- c('knitr')
+packages <- c('knitr', 'xtable')
 import(packages)
 Sys.setenv(LANG = "en")
 options(digits = 4)
 
-save_pretty <- function (df, file_path) {
-  pretty <- knitr::kable(df)
+save_markdown <- function (df, file_path) {
+  pretty <- knitr::kable(df, row.names = FALSE)
   write(pretty, file = file_path)
 }
 
+save_latex <- function (df, file_path) {
+  print(xtable(df, type = 'latex'), file = file_path, booktabs = TRUE, include.rownames=FALSE)
+} 
+
 # Original data
-data <- load_observations('observations')
+# data <- load_observations('observations')
 
 # Imputed data
 # load('../time_windows.Rda')
-# data <- windows
+load(file = 'wind_dir_windows.Rda')
+data <- windows
 
 month_names <- c('January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December')
@@ -29,7 +34,7 @@ data$station_id <- sapply(data$station_id, trimws)
 stations <- unique(data$station_id)
 air_quality_vars <- c('pm2_5')
 meteo_vars <- c('humidity', 'precip_total', 'pressure',
-                'temperature', 'wind_speed')
+                'temperature', 'wind_dir_deg', 'wind_speed')
 vars <- c(air_quality_vars, meteo_vars)
 target_dir <- file.path(getwd(), 'stats')
 mkdir(target_dir)
@@ -46,7 +51,7 @@ missing <- lapply(stations, function (sid) {
 
 missing <- do.call(rbind, missing)
 file_path <- file.path(target_dir, 'missing-pm25.txt')
-save_pretty(missing, file_path)
+save_latex(missing, file_path)
 file_path <- file.path(target_dir, 'missing-pm25.csv')
 write.csv(missing, file = file_path, row.names = FALSE)
 
@@ -73,7 +78,12 @@ stats_for_station <- lapply(stations, function (sid) {
 stats_for_station <- do.call(rbind, stats_for_station)
 rownames(stats_for_station) <- NULL
 
-file_path <- file.path(target_dir, 'stats_for_station.txt')
-save_pretty(stats_for_station, file_path)
-file_path <- file.path(target_dir, 'stats_for_station.csv')
-write.csv(stats_for_station, file = file_path, row.names = FALSE)
+lapply(stations, function (sid) {
+  station_data <- stats_for_station[stats_for_station[, 'Station ID'] == pretty_station_id(sid), ]
+  station_data <- station_data[, !(colnames(station_data) %in% c('Station ID'))]
+  file_path <- file.path(target_dir, paste('stats_for_', sid, '.latex', sep = ''))
+  save_latex(station_data, file = file_path)
+  # file_path <- file.path(target_dir, paste('stats_for_', sid, '.md', sep = ''))
+  # save_markdown(station_data, file = file_path)
+})
+

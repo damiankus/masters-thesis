@@ -26,10 +26,11 @@ save_scatter_plot <- function (df, res_var, expl_var, plot_path) {
 }
 
 main <- function () {
-  load(file = '../time_windows.Rda')
+  # load(file = '../time_windows.Rda')
+  load(file = 'wind_dir_windows.Rda')
   stations <- unique(windows$station_id)
   
-  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_dir_ns', 'wind_dir_ew', 'wind_speed')
+  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_dir_deg', 'wind_speed')
   main_var <- 'future_pm2_5'
   vars <- c(main_var, vars)
   windows <- windows[, c(vars, 'station_id', 'season')]
@@ -44,8 +45,8 @@ main <- function () {
     lapply(stations, function (sid) {
       data <- data[data$station_id == sid, vars]
       plot_path <- file.path(target_dir, paste('relationships_', sid, '.png', sep = ''))
-      png(filename = plot_path, height = 3112, width = 4096, pointsize = 25)
-      pairs(data[, vars], labels = labels, cex.labels = 3, lower.panel = NULL)
+      png(filename = plot_path, width = 3112, height = 3112, pointsize = 25)
+      pairs(data[, vars], labels = labels, cex.labels = 2, lower.panel = NULL)
       dev.off()
     })
   # })

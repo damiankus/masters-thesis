@@ -30,11 +30,12 @@ plotCorrMat <- function (data, main_var_idx, file_path, corr_threshold = 0.2) {
 }
 
 main <- function () {
-  load(file = '../time_windows.Rda')
+  # load(file = '../time_windows.Rda')
+  load(file = 'wind_dir_windows.Rda')
   stations <- unique(windows$station_id)
   season_names <- c('winter', 'spring', 'summer', 'autumn')
   
-  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_dir_ns', 'wind_dir_ew', 'wind_speed',
+  vars <- c('pm2_5', 'humidity', 'precip_total', 'pressure', 'temperature', 'wind_dir_deg', 'wind_speed',
             'day_of_week', 'day_of_year', 'is_heating_season', 'is_holiday', 'month', 'period_of_day')
   main_var <- 'future_pm2_5'
   vars <- c(main_var, vars)
