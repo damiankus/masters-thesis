@@ -48,7 +48,7 @@ main <- function () {
   excluded <- c('id', 'station_id')
   query = paste('SELECT * FROM',
                  table_name,
-                "WHERE station_id = 'airly_171'",
+                "WHERE station_id = 'gios_krasinskiego'",
                  sep = ' ')
   obs <- dbGetQuery(con, query)
   obs <- obs[, !(colnames(obs) %in% excluded)]
@@ -86,7 +86,7 @@ main <- function () {
       which <- missing_obs[missing_obs$month == month,]
       plot_name <- paste(factor, '_', month, '.png', sep = '')
       plot_path <- file.path(target_dir, plot_name)
-      title <- paste('Time points with values of', pretty_var(factor), 'present during', month_names[month], sep = ' ')
+      title <- paste('Time points with missing values of', pretty_var(factor), ' during', month_names[month], sep = ' ')
       save_line_plot(which, factor, plot_path, title)
     }
   }

@@ -183,3 +183,15 @@ save_data_split <- function (res_var, training_set, test_set, plot_path, breaks 
   save_multiple_vars_plot(merged, 'timestamp', res_var, id_var = 'type', plot_path = plot_path,
                           x_lab = xlab, y_lab = ylab, breaks = breaks, font_size = font_size)
 }
+
+save_boxplot <- function (df, x_var, y_var, plot_path, x_order) {
+  plot <- ggplot(df, aes_string(x=x_var, y=y_var, fill=x_var)) +
+    geom_boxplot(aes_string(group=x_var), outlier.alpha = 0.1) + 
+    xlab(pretty_var(x_var)) +
+    ylab(pretty_var(y_var)) +
+    scale_x_discrete(limits = x_order) +
+    theme(legend.position='none', text = element_text(size=30))
+  
+  ggsave(plot_path, width = 16, height = 10, dpi = 200)
+  print(paste('Plot saved in', plot_path, sep = ' '))
+}

@@ -19,20 +19,52 @@ maxs <- apply(observations, 2, max)
 epsilon <- 1e-4
 varname <- 'pm2_5'
 
-test_that('Generating winter time series (Jan - Mar)', {
+test_that('Generated winter time series (Jan - Mar) starts at 00:00 on Jan 1st', {
   winter_series <- generate_ts_by_season(1, 2017)
   first_ts <- as.POSIXct('2017-01-01 00:00', tz = 'UTC')
-  last_ts <- as.POSIXct('2017-03-20 23:00', tz = 'UTC')
   expect_equal(winter_series[1], first_ts)
+})
+
+test_that('Generated winter time series (Jan - Mar) ends at 23:00 on Mar 20th', {
+  winter_series <- generate_ts_by_season(1, 2017)
+  last_ts <- as.POSIXct('2017-03-20 23:00', tz = 'UTC')
   expect_equal(winter_series[length(winter_series)], last_ts)
 })
 
-test_that('Generating summer time series', {
+test_that('Generated spring time series starts at 00:00 on Mar 21st', {
+  spring_series <- generate_ts_by_season(2, 2017)
+  first_ts <- as.POSIXct('2017-03-21 00:00', tz = 'UTC')
+  expect_equal(spring_series[1], first_ts)
+})
+
+test_that('Generated spring time series ends at 11:00 p.m. on Jun 21st', {
+  spring_series <- generate_ts_by_season(2, 2017)
+  last_ts <- as.POSIXct('2017-06-21 23:00', tz = 'UTC')
+  expect_equal(spring_series[length(spring_series)], last_ts)
+})
+
+test_that('Generated summer time series starts at 00:00 on Jun 22nd', {
   summer_series <- generate_ts_by_season(3, 2017)
   first_ts <- as.POSIXct('2017-06-22 00:00', tz = 'UTC')
-  last_ts <- as.POSIXct('2017-09-22 23:00', tz = 'UTC')
   expect_equal(summer_series[1], first_ts)
+})
+
+test_that('Generated summer time series ends at 23:00 on Sep 22nd', {
+  summer_series <- generate_ts_by_season(3, 2017)
+  last_ts <- as.POSIXct('2017-09-22 23:00', tz = 'UTC')
   expect_equal(summer_series[length(summer_series)], last_ts)
+})
+
+test_that('Generated autumn time series starts at 00:00 on Sep 23rd', {
+  autumn_series <- generate_ts_by_season(4, 2017)
+  first_ts <- as.POSIXct('2017-09-23 00:00', tz = 'UTC')
+  expect_equal(autumn_series[1], first_ts)
+})
+
+test_that('Generated autumn time series ends at 23:00 on Dec 20th', {
+  autumn_series <- generate_ts_by_season(4, 2017)
+  last_ts <- as.POSIXct('2017-12-21 23:00', tz = 'UTC')
+  expect_equal(autumn_series[length(autumn_series)], last_ts)
 })
 
 test_that('Normalizing scales values to range > 0', {
@@ -60,7 +92,7 @@ test_that('Reversing normalization for vector changes values to original ones', 
 
 test_that('Standardizing changes mean to 0', {
   standardized <- standardize_with(observations, means, sds)
-  expect_true(all(apply(standardized, 2, function (col) { abs(mean(col)) < epsilon})))
+  expect_true(all(apply(standardized, 2, function (col) { abs(mean(col) - 0) < epsilon})))
 })
 
 test_that('Standardizing changes sd to 1', {

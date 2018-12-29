@@ -11,11 +11,9 @@ Sys.setenv(LANG = 'en')
 stations <- c('gios_krasinskiego', 'gios_bulwarowa', 'gios_bujaka')
 obs <- load_observations('observations',
                          stations = stations)
-# excluded <- c('pm10', 'solradiation', 'wind_dir_deg', 'id')
-excluded <- c('pm10', 'solradiation', 'id')
+excluded <- c('id')
 obs <- obs[, !(names(obs) %in% excluded)]
 obs$station_id <- sapply(obs$station_id, trimws)
-create_table_from_schema('observations', 'complete_observations')
 
 all_imputed <- lapply(stations, function (station_id) {
   print(paste('Imputing data for station', station_id))
@@ -23,11 +21,6 @@ all_imputed <- lapply(stations, function (station_id) {
   
   imputed <- lapply(unique(data$year), function (year) {
     yearly_data <- data[data$year == year, ]
-    
-    # Last week of a year is treated as a period separate 
-    # from that year's winter - it's more related to the next
-    # year's period from January to March
-    # year = [winter, spring, summer, autumn, beginning of the next year's winter]
     imputed_seasonal <- lapply(seq(1, 5), function (season) {
       seasonal_data <- yearly_data[yearly_data$season == season, ]
       ts_seq <- generate_ts_by_season(season, year)
@@ -63,5 +56,5 @@ windows <- lapply(stations, function (station_id) {
 windows <- do.call(rbind, windows)
 windows$timestamp <- utcts(windows$timestamp)
 windows$future_timestamp <- utcts(windows$future_timestamp)
-save(windows, file = 'time_windows.Rda')
+save(windows, file = 'imputed_time_windows.Rda')
 
