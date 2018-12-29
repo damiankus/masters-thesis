@@ -789,41 +789,45 @@ SELECT fill_missing(ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', '
 ALTER TABLE observations DROP COLUMN IF EXISTS is_holiday;
 ALTER TABLE observations ADD COLUMN is_holiday INT DEFAULT 0;
 UPDATE observations 
-SET is_holiday = 1
-WHERE EXTRACT(DOW FROM timestamp) = 0 
-	OR EXTRACT(DOW FROM timestamp) = 6	
-	OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
-	OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
-	OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
-	OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
-	OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
-	OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
-	OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
-	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
-	OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26)
-	-- Easter Mondays
-	OR date_trunc('day', timestamp) = '2017-04-17'
-	OR date_trunc('day', timestamp) = '2017-03-28'
-	OR date_trunc('day', timestamp) = '2017-04-02';
+SET is_holiday = 1 WHERE
+-- Sunday
+EXTRACT(DOW FROM timestamp) = 0 
+-- Saturday
+OR EXTRACT(DOW FROM timestamp) = 6	
+-- New Year
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 1)
+-- Epiphany (Catholic holiday)
+OR (EXTRACT(MONTH FROM timestamp) = 1 AND EXTRACT(DAY FROM timestamp) = 6)
+-- Labour Day
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 1)
+-- Constitution Day
+OR (EXTRACT(MONTH FROM timestamp) = 5 AND EXTRACT(DAY FROM timestamp) = 3)
+-- Assumption of Mary (Catholic holiday)
+OR (EXTRACT(MONTH FROM timestamp) = 8 AND EXTRACT(DAY FROM timestamp) = 15)
+-- All Saints' Day (Catholic holiday)
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 1)
+-- Independence Day
+OR (EXTRACT(MONTH FROM timestamp) = 11 AND EXTRACT(DAY FROM timestamp) = 11)
+-- Christmas
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 25)
+-- Christmas - 2nd day
+OR (EXTRACT(MONTH FROM timestamp) = 12 AND EXTRACT(DAY FROM timestamp) = 26);
 
 -- ===================================
 
-ALTER TABLE observations DROP COLUMN IF EXISTS period_of_day;
-ALTER TABLE observations ADD COLUMN period_of_day INT;
+ALTER TABLE observations DROP COLUMN IF EXISTS is_heating_season;
+ALTER TABLE observations ADD COLUMN is_heating_season smallint DEFAULT 0;
+UPDATE observations 
+SET is_heating_season = 1
+WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
+OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
 
--- Winter is split into two periods: January - Match and December
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS year;
+ALTER TABLE observations ADD COLUMN year INT;
 UPDATE observations 
-SET period_of_day = 1
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 0 AND 5;
-UPDATE observations 
-SET period_of_day = 2
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 6 AND 11;
-UPDATE observations 
-SET period_of_day = 3
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 12 AND 17;
-UPDATE observations
-SET period_of_day = 4
-WHERE EXTRACT(HOUR FROM timestamp) BETWEEN 18 AND 23;
+SET year = EXTRACT(YEAR FROM timestamp);
 
 -- ===================================
 
@@ -846,47 +850,69 @@ WHERE to_char(timestamp::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
 
 -- ===================================
 
-ALTER TABLE observations DROP COLUMN IF EXISTS is_heating_season;
-ALTER TABLE observations ADD COLUMN is_heating_season smallint DEFAULT 0;
-UPDATE observations 
-SET is_heating_season = 1
-WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 1 AND 3
-OR EXTRACT(MONTH FROM timestamp) BETWEEN 9 AND 12;
-
--- ===================================
-
 ALTER TABLE observations DROP COLUMN IF EXISTS month;
 ALTER TABLE observations ADD COLUMN month INT;
 UPDATE observations 
 SET month = EXTRACT(MONTH FROM timestamp);
 
-ALTER TABLE observations DROP COLUMN IF EXISTS year;
-ALTER TABLE observations ADD COLUMN year INT;
-UPDATE observations 
-SET year = EXTRACT(YEAR FROM timestamp);
-
 -- ===================================
 
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week;
-ALTER TABLE observations ADD COLUMN day_of_week FLOAT;
+ALTER TABLE observations ADD COLUMN day_of_week INTEGER;
 UPDATE observations
-SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6.0) + 0.5;
+SET day_of_week = EXTRACT(DOW FROM timestamp);
+
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week_norm;
+ALTER TABLE observations ADD COLUMN day_of_week_norm FLOAT;
+UPDATE observations
+SET day_of_week_norm = -0.5 * COS(2 * PI() * day_of_week / 6.0) + 0.5;
 
 -- ===================================
 
 -- Transform the date to a continuous value
 
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year;
-ALTER TABLE observations ADD COLUMN day_of_year FLOAT;
+ALTER TABLE observations ADD COLUMN day_of_year INTEGER;
 UPDATE observations 
-SET day_of_year = -0.5 * COS(2 * PI() * EXTRACT(DOY FROM timestamp) / 365.0) + 0.5;
+SET day_of_year = EXTRACT(DOY FROM timestamp);
+
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year_norm;
+ALTER TABLE observations ADD COLUMN day_of_year_norm FLOAT;
+UPDATE observations 
+SET day_of_year_norm = -0.5 * COS(2 * PI() * day_of_year / 365.0) + 0.5;
 
 -- Transform the hour of day to a continuous value
 
 ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day;
-ALTER TABLE observations ADD COLUMN hour_of_day FLOAT;
+ALTER TABLE observations ADD COLUMN hour_of_day INTEGER;
 UPDATE observations 
-SET hour_of_day = -0.5 * COS(2 * PI() * EXTRACT(HOUR FROM timestamp) / 24.0) + 0.5;
+SET hour_of_day = EXTRACT(HOUR FROM timestamp);
+
+ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day_norm;
+ALTER TABLE observations ADD COLUMN hour_of_day_norm FLOAT;
+UPDATE observations 
+SET hour_of_day_norm = -0.5 * COS(2 * PI() * hour_of_day / 24.0) + 0.5;
+
+-- ===================================
+
+ALTER TABLE observations DROP COLUMN IF EXISTS period_of_day;
+ALTER TABLE observations ADD COLUMN period_of_day INT;
+
+UPDATE observations 
+SET period_of_day = 1
+WHERE hour_of_day BETWEEN 0 AND 5;
+
+UPDATE observations 
+SET period_of_day = 2
+WHERE hour_of_day BETWEEN 6 AND 11;
+
+UPDATE observations 
+SET period_of_day = 3
+WHERE hour_of_day BETWEEN 12 AND 17;
+
+UPDATE observations
+SET period_of_day = 4
+WHERE hour_of_day BETWEEN 18 AND 23;
 
 -- ===================================
 
@@ -895,15 +921,11 @@ ALTER TABLE observations ADD COLUMN wind_dir_rad FLOAT;
 UPDATE observations 
 SET wind_dir_rad = wind_dir_deg * PI() / 180;
 
-/* WARNING:
+/*
  EW component should be calculated as SIN(rads) 
  NS component should be calculated as COS(rads)
- 
- It hasn't been changed yet to preserve the original 
- transformations used to obtain thesis results.
- 
- This error stems from not taking into account the fact that
- the North direction corresponds to the beginning of the coordinate system.
+
+ The North direction corresponds to the beginning of the coordinate system.
  
               E (90 deg)
               ^  /
@@ -924,28 +946,16 @@ SET wind_dir_rad = wind_dir_deg * PI() / 180;
               |
               |
               S (180)
-        
-  Originally it was assumed that wind direction scale starts from Eeast and goes counter-clockwise
-  ENWS, like this:
-  
-              N (90)
-              ^  /
-              | /
-              |/alpha
-       W------|------>E (0)
-              |
-              |
-              S
 */
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ew;
 ALTER TABLE observations ADD COLUMN wind_dir_ew FLOAT;
 UPDATE observations 
-SET wind_dir_ew = COS(wind_dir_rad);
+SET wind_dir_ew = SIN(wind_dir_rad);
 
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ns;
 ALTER TABLE observations ADD COLUMN wind_dir_ns FLOAT;
 UPDATE observations 
-SET wind_dir_ns = SIN(wind_dir_rad);
+SET wind_dir_ns = COS(wind_dir_rad);
 
 /*
 Values in this column are linearly dependent on the values
