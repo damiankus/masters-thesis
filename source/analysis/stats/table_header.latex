@@ -1,10 +1,11 @@
+\begin{landscape}
 \begin{table}[htp]
 \centering
-\caption{Variable statistics - GIOŚ Bujaka}
-\label{tab:dataset-stats-bujaka}
-\begin{tabular}{@{}llllllllllllr@{}}
-\toprule
-Month     & \multicolumn{2}{c}{PM2.5}       & \multicolumn{2}{c}{Humidity} & \multicolumn{2}{c}{Total precipitation} & \multicolumn{2}{c}{Pressure} & \multicolumn{2}{c}{Temperature} & \multicolumn{2}{c}{Wind speed}  \\ \midrule
-Units     & \multicolumn{2}{c}{$\mu g/m^3$} & \multicolumn{2}{c}{\%}       & \multicolumn{2}{c}{$mm$}                  & \multicolumn{2}{c}{$hPa$}      & \multicolumn{2}{c}{$\degree C$} & \multicolumn{2}{c}{$m/s$}         \\
-Type      & mean           & std            & mean          & std          & mean               & std                & mean         & std           & mean            & std           & mean  & \multicolumn{1}{l}{std} \\
-\midrule
+\caption{Variable statistics - GIOŚ }
+\label{tab:dataset-stats-}
+\footnotesize
+\begin{tabular}{llrrrrrrrrrrrrr}
+\hline
+Month & \multicolumn{2}{c}{PM2.5} & \multicolumn{2}{c}{Humidity} & \multicolumn{2}{c}{Total precipitation} & \multicolumn{2}{c}{Pressure} & \multicolumn{2}{c}{Temperature} & \multicolumn{2}{c}{Wind direction} & \multicolumn{2}{c}{Wind speed} \\
+Units & \multicolumn{2}{c}{$\mu g / m^3$} & \multicolumn{2}{c}{$\%$} & \multicolumn{2}{c}{$mm$} & \multicolumn{2}{c}{$hPa$} & \multicolumn{2}{c}{$\degree C$} & \multicolumn{2}{c}{$\degree$} & \multicolumn{2}{c}{$m/s$} \\
+Type & mean & std & mean & std & mean & std & mean & std & mean & std & mean & std & mean & std \\ \hline

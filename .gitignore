@@ -26,3 +26,4 @@ data/**
 **/lib
 **/lib64
 **/share
+.Rproj.user

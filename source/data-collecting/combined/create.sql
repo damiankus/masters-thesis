@@ -407,7 +407,7 @@ Deleting outliers
 */
 
 /*
-Iniial outlier elimination for specific factors
+Initial outlier elimination for specific factors
 */
 
 UPDATE meteo_observations 
@@ -868,9 +868,9 @@ SET year = EXTRACT(YEAR FROM timestamp);
 -- ===================================
 
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week;
-ALTER TABLE observations ADD COLUMN day_of_week INT;
-UPDATE observations 
-SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6) + 0.5;
+ALTER TABLE observations ADD COLUMN day_of_week FLOAT;
+UPDATE observations
+SET day_of_week = -0.5 * COS(2 * PI() * EXTRACT(DOW FROM timestamp) / 6.0) + 0.5;
 
 -- ===================================
 
