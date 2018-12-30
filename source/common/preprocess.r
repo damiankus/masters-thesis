@@ -361,3 +361,9 @@ skip_past <- function (windows, excluded = c()) {
   past_vars <- setdiff(past_vars, excluded)
   windows[, setdiff(vars, past_vars)]
 }
+
+df_to_list_of_columns <- function (df) {
+  lapply(colnames(df), function (colname) {
+    df[, colname]
+  })
+}

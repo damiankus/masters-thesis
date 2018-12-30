@@ -76,6 +76,8 @@ cap <- function (s) {
 
 units <- function (var) {
   switch(var,
+         pm2_5 = 'μg/m³',
+         pm10 = 'μg/m³',
          temperature = '°C',
          humidity = '%',
          pressure = 'hPa',
@@ -86,26 +88,22 @@ units <- function (var) {
          precip_total = 'mm',
          precip_rate = 'mm/h',
          {
-           if (grepl('pm', tolower(var))) {
-             'μg/m³'
+           if (grepl('future_', var)) {
+             delim <- 'future_'
+             split_var <- strsplit(var, delim)[[1]]
+             base_var <- split_var[[2]]
+             units(base_var)
+           } else if (grepl('_past_', var)) {
+             delim <- '_past_'
+             split_var <- strsplit(var, delim)[[1]]
+             base_var <- split_var[[1]]
+             units(base_var)
            } else {
              ''
            }
-         })
+       })
 }
 
-#   WARNING!
-#   labels for NS and EW components of wind direction
-#   are swapped intentionally because of the error made
-#   while performing the transformation. Originally it 
-#   was assumed that East corresponds to the beginning of 
-#   the coordinate systems and goes towards North (ENWS).
-#   Actually, the coordinate system starts from North and goes
-#   towards East (as shown below).
-#   
-#     N            E
-#   W-|-E  ----> W-|-N  
-#     S            S
 pretty_var <- function (var) {
   switch(var,
          pm1 = 'PM1',
@@ -116,44 +114,27 @@ pretty_var <- function (var) {
          wind_speed = 'wind speed',
          wind_dir = 'wind direction',
          wind_dir_deg = 'wind direction',
-         
-         # !!! See comment above ^
-         wind_dir_ns = 'wind direction E - W',
-         wind_dir_ew = 'wind direction N - S',
-         # !!!
-         
+         wind_dir_ns = 'wind direction N - S',
+         wind_dir_ew = 'wind direction E - W',
          precip_rate = 'precipitation rate',
          precip_total = 'total precipitation',
          is_heating_season = 'heating season',
          is_holiday = 'holiday',
          {
-           delim <- ' '
-           join_str <- ' '
-           var_idx <- 1
-           if (grepl('future', var)) {
+           if (grepl('future_', var)) {
              delim <- 'future_'
-             join_str <- ''
-             var_idx <- 2
-           } else if (grepl('past', var)) {
+             split_var <- strsplit(var, delim)[[1]]
+             pvar <- pretty_var(split_var[[2]])
+             paste(pvar, 'in 24h')
+          } else if (grepl('_past_', var)) {
              delim <- '_past_'
-             join_str <- '-'
-           } else {
-             delim <- '_'
-             var_idx <- -1
+             split_var <- strsplit(var, delim)[[1]]
+             pvar <- pretty_var(split_var[[1]])
+             lag <- split_var[[2]]
+             paste(pvar, ' ', lag, 'h ago', sep='')
+          } else {
+             var
            }
-           split_var <- strsplit(var, delim)[[1]]
-           pvar <- ''
-           if (length(split_var) > 1) {
-             if (var_idx > 0) {
-               pvar <- pretty_var(split_var[var_idx])
-               pvar <- paste(pvar, join_str, paste(split_var[-var_idx], collapse = ' '), sep = ' ')
-             } else {
-               pvar <- paste(split_var, collapse = join_str)
-             }
-           } else {
-             pvar <- var
-           }
-           trimws(pvar)
          })
 }
 
