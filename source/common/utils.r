@@ -120,6 +120,8 @@ pretty_var <- function (var) {
          precip_total = 'total precipitation',
          is_heating_season = 'heating season',
          is_holiday = 'holiday',
+         day_of_week = 'day of the week',
+         hour_of_day = 'hour of the day',
          {
            if (grepl('future_', var)) {
              delim <- 'future_'
@@ -133,8 +135,9 @@ pretty_var <- function (var) {
              lag <- split_var[[2]]
              paste(pvar, ' ', lag, 'h ago', sep='')
           } else {
-             var
-           }
+            delim <- '_'
+            paste(strsplit(var, delim)[[1]], collapse=' ')
+          }
          })
 }
 

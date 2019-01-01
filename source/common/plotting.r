@@ -194,12 +194,20 @@ save_data_split <- function (res_var, training_set, test_set, plot_path, breaks=
                           x_lab = xlab, breaks = breaks)
 }
 
-save_boxplot <- function (df, x_var, y_var, plot_path, x_order) {
-  plot <- ggplot(df, aes_string(x=x_var, y=y_var, fill=x_var)) +
-    geom_boxplot(aes_string(group=x_var), outlier.alpha = 0.1) + 
-    xlab(get_or_generate_label(var_x, x_lab)) +
-    ylab(get_or_generate_label(var_y, y_lab)) + 
+save_boxplot <- function (df, var_x, var_y, plot_path, x_order, show_outliers=TRUE) {
+  outlier_alpha = if (show_outliers) 0.1 else 0
+  plot <- ggplot(df, aes_string(x=var_x, y=var_y, fill=var_x)) +
+    geom_boxplot(aes_string(group=var_x), outlier.alpha=outlier_alpha) + 
+    xlab(get_or_generate_label(var_x)) +
+    ylab(get_or_generate_label(var_y)) + 
     scale_x_discrete(limits = x_order) +
     theme(legend.position='none')
+
+  if (!show_outliers) {
+    min_idx <- 1
+    max_idx <- 5
+    y_lim <- boxplot.stats(series$pm2_5)$stats[c(min_idx, max_idx)]
+    plot <- plot + coord_cartesian(ylim=(y_lim * 1.1))
+  }
   save_plot_file(plot, plot_path)
 }
