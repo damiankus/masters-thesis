@@ -1,9 +1,12 @@
 source('utils.r')
 source('preprocess.r')
-import(c('ggplot2', 'reshape', 'car', 'scales'))
+packages <- c('ggplot2', 'reshape', 'car', 'scales', 'ggthemes', 'moments', 'colorspace') 
+import(packages)
+
+COLORS <- hue_pal()(4)
 
 save_plot_file <- function (plot, plot_path) {
-  ggsave(plot_path, width=7, height=4)
+  ggsave(plot_path, width=7, height=5)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
@@ -163,18 +166,20 @@ save_histogram <- function (df, var, plot_path, show_stats_lines=TRUE) {
   # See: https://stats.stackexchange.com/questions/798/calculating-optimal-number-of-bins-in-a-histogram
   # Also: https://nxskok.github.io/blog/2017/06/08/histograms-and-bins/
   
-  df <- data.frame(df)
-  var_col <- df[, var]
-  bw <- 2 * IQR(var_col, na.rm = TRUE) / length(var_col) ^ 0.33
+  var_col <- na.omit(df[, var])
   
-  plot <- ggplot(data = df, aes_string(var)) +
-    geom_histogram(colour = 'white', fill = 'blue', binwidth = bw) +
+  # originally the exponent is equal to 0.33 but it
+  # resulted in too narrow bins
+  bw <- 2 * IQR(var_col) / length(var_col) ^ 0.2
+  hist_color <- COLORS[3]
+  # It's a darker version of the standard blue colour used by ggplot
+  density_color <- '#003050'
+  
+  plot <- ggplot(data = df, aes_string(x=var, y='..density..', fill=var)) +
+    geom_histogram(color=hist_color, fill=hist_color, alpha=0.3, binwidth=bw) +
+    geom_density(color=density_color, size=0.5) + 
     xlab(get_or_generate_label(var)) +
     ylab('Frequency')
-  
-  if (show_stats_lines) {
-    
-  }
   save_plot_file(plot, plot_path)
 }
 
