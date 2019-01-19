@@ -21,7 +21,7 @@ all_imputed <- lapply(stations, function (station_id) {
   
   imputed <- lapply(unique(data$year), function (year) {
     yearly_data <- data[data$year == year, ]
-    imputed_seasonal <- lapply(seq(1, 5), function (season) {
+    imputed_seasonal <- lapply(seq(1, 4), function (season) {
       seasonal_data <- yearly_data[yearly_data$season == season, ]
       ts_seq <- generate_ts_by_season(season, year)
       ts_seq <- ts_seq[ts_seq >= min(seasonal_data$timestamp) 

@@ -42,8 +42,8 @@ save_relationship_plots <- function (df, plot_path) {
   
   svg(plot_path, height=12, width=12, pointsize=16)
   plot <- ggpairs(df,
-          upper=list(continuous=draw_corr_tile),
           lower=list(continuous=draw_scatter_bin_tile),
+          upper=list(continuous=draw_corr_tile),
           columnLabels=sapply(colnames(df), get_or_generate_label))
   print(plot)
   dev.off()
@@ -51,9 +51,11 @@ save_relationship_plots <- function (df, plot_path) {
 }
 
 # MAIN
-load('original_series.Rda')
+# load('original_series.Rda')
+load('../time_windows.Rda')
+series <- windows[, c('future_pm2_5', "pm2_5", "temperature", "precip_total", "humidity", "pressure", "wind_speed")]
 target_dir <- 'relationships'
 mkdir(target_dir)
-plot_path <- file.path(target_dir, 'relationships.svg')
-series <- series[, BASE_VARS]
+plot_path <- file.path(target_dir, 'windows_relationships.svg')
+# series <- series[, BASE_VARS]
 save_relationship_plots(series, plot_path)
