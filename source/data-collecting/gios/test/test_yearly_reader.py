@@ -24,7 +24,6 @@ Czas uśredniania,1g,1g,1g,1g,1g,1g,1g,1g,1g"""
 
     def test_yearly_getVarIndexes_firstStation_firstVar(self):
         col_indexes = self.reader.get_var_indexes(self.header)
-        print(self.header)
         self.assertEqual(
             col_indexes[self.station_ids[0]][self.var_names[0]],
             1)

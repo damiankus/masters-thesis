@@ -36,16 +36,12 @@ class Observation(SqlBase):
                 primary_key=True)
     station_id = Column(CHAR(20), ForeignKey('gios_stations.id'))
     station = relationship(Station)
-    timestamp = Column(TIMESTAMP)
+    measurement_time = Column(TIMESTAMP(timezone=True))
     pm2_5 = Column(NUMERIC(precision=9, scale=5))
     pm10 = Column(NUMERIC(precision=9, scale=5))
 
     def __init__(self, **kwargs):
         super(Observation, self).__init__(**kwargs)
-        if 'pm2_5' not in kwargs:
-            self.pm2_5 = None
-        if 'pm10' not in kwargs:
-            self.pm10 = None
 
     def __repr__(self):
         return 'Observation({station_id}, {timestamp}, {pm2_5}, {pm10})' \

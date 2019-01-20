@@ -41,15 +41,17 @@ class AbstractDataReader(ABC):
             col_indexes = self.get_var_indexes(header)
 
             for row in reader:
-                for s in self.station_ids:
+                for station_id in self.station_ids:
+                    # GIOS time data is specified for the CET timezone
+                    # it can be found in the first column
                     record = {
-                        'timestamp':  row[0],
-                        'station_id': s
+                        'measurement_time':  row[0] + ' CET',
+                        'station_id': station_id
                     }
-                    for v in self.var_names:
-                        idx = col_indexes[s][v]
+                    for var_name in self.var_names:
+                        idx = col_indexes[station_id][var_name]
                         if idx is not None and row[idx]:
-                            record[v] = row[idx].translate(TRANS_NUM)
+                            record[var_name] = row[idx].translate(TRANS_NUM)
                     append(record)
         return lines
 
