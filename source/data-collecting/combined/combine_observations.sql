@@ -180,6 +180,111 @@ FROM airly_observations
 WHERE temperature IS NOT NULL OR PRESSURE IS NOT NULL OR humidity IS NOT NULL
 ORDER BY station_id, utc_time;
 
+a
+/*
+IQR is the difference between the 3rd and 1st quartile
+outliers are assumed to be those observations which are
+< Q1 - 1.5 * IQR
+OR
+> Q3 + 1.5 * IQR
+Quantiles are calculated for each month (although observations may
+have been taken during different years and at different stations)
+e.g. Jan 2014, Jan 2015, Jan 2016, Jan 2017
+*/
+
+DROP FUNCTION IF EXISTS delete_outliers_based_on_iqr(TEXT, TEXT[]);
+CREATE OR REPLACE FUNCTION delete_outliers_based_on_iqr(table_name TEXT, column_names TEXT[])
+RETURNS VOID AS $$
+DECLARE
+	column_name TEXT;
+	query_template TEXT;
+	query TEXT;
+BEGIN
+	
+		
+
+	query_template := '
+		DELETE FROM observations WHERE id IN (
+			SELECT id
+			FROM %1$s AS observations_table
+			JOIN (
+				SELECT 	stats.measurement_month, 
+					stats.q1 - 1.5 * stats.iqr AS min,
+					stats.q3 + 1.5 * stats.iqr AS max
+				FROM (
+					SELECT quartiles.measurement_month, quartiles.q1, quartiles.q3, quartiles.q3 - quartiles.q1 AS iqr 
+					FROM (
+						SELECT EXTRACT(MONTH FROM measurement_time) AS measurement_month,
+							percentile_cont(0.25) WITHIN GROUP (ORDER BY %2$s ASC) AS q1,
+							percentile_cont(0.75) WITHIN GROUP (ORDER BY %2$s ASC) AS q3
+						FROM %1$s
+						GROUP BY 1
+						ORDER BY 1
+					) AS quartiles
+				) AS stats
+			) AS thresholds ON thresholds.measurement_month = EXTRACT(MONTH FROM observations_table.measurement_time)
+			WHERE %2$s < thresholds.min OR thresholds.max < %2$s
+		)
+	';
+	FOREACH column_name IN ARRAY column_names
+	LOOP
+		RAISE NOTICE 'DROPPING OUTLIERS FOR %', column_name;
+		query := format(query_template, table_name, column_name);
+		RAISE NOTICE 'QUERY: %', query;
+		EXECUTE query;
+			
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT delete_outliers_based_on_iqr('observations', ARRAY['pm2_5', 'pm10']);
+SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
+
+/*
+A function creating empty records for timestamps not
+present in the data set. Columns will then be imputed
+(wherever possible) with the fill_missing function.
+The remaining empty values will be imputed in an R script,
+using the MICE package.
+*/
+
+DROP FUNCTION IF EXISTS create_empty_records();
+CREATE OR REPLACE FUNCTION create_empty_records()
+RETURNS VOID AS $$
+DECLARE
+	cur_station_id CHAR(20);
+	min_ts timestamp;
+	max_ts timestamp;
+	min_ts_for_station timestamp;
+	max_ts_for_station timestamp;
+BEGIN
+	min_ts := (SELECT MIN(measurement_time) FROM observations);
+	max_ts := (SELECT MAX(measurement_time) FROM observations);
+	RAISE NOTICE '% %', min_ts, max_ts;
+	DROP TABLE IF EXISTS ts_seq;
+	CREATE TEMP TABLE ts_seq AS (
+		SELECT generate_series AS measurement_time FROM generate_series(min_ts, max_ts, '1 hour'::interval)
+	);
+	CREATE INDEX ON ts_seq(measurement_time);
+	
+	FOR cur_station_id IN SELECT id FROM stations
+	LOOP
+		RAISE NOTICE '%', cur_station_id;
+		min_ts_for_station := (SELECT MIN(measurement_time) FROM observations WHERE station_id = cur_station_id);
+		max_ts_for_station := (SELECT MAX(measurement_time) FROM observations WHERE station_id = cur_station_id);
+		
+		INSERT INTO observations (station_id, measurement_time) (
+			SELECT cur_station_id AS station_id, measurement_time FROM ts_seq
+				WHERE measurement_time BETWEEN min_ts_for_station AND max_ts_for_station
+			EXCEPT
+			SELECT station_id, measurement_time FROM observations WHERE station_id = cur_station_id);
+			
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT create_empty_records();
+
 
 CREATE INDEX ON meteo_observations(measurement_time);
 CREATE INDEX ON meteo_observations(station_id);
@@ -275,51 +380,6 @@ CREATE INDEX ON air_quality_distance(station_id2);
 CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
 
 /*
-A function creating empty records for timestamps not
-present in the data set. Columns will then be imputed
-(wherever possible) with the fill_missing function.
-The remaining empty values will be imputed in an R script,
-using the MICE package.
-*/
-
-DROP FUNCTION IF EXISTS create_empty_records();
-CREATE OR REPLACE FUNCTION create_empty_records()
-RETURNS VOID AS $$
-DECLARE
-	cur_station_id CHAR(20);
-	min_ts timestamp;
-	max_ts timestamp;
-	min_ts_for_station timestamp;
-	max_ts_for_station timestamp;
-BEGIN
-	min_ts := (SELECT MIN(measurement_time) FROM observations);
-	max_ts := (SELECT MAX(measurement_time) FROM observations);
-	RAISE NOTICE '% %', min_ts, max_ts;
-	DROP TABLE IF EXISTS ts_seq;
-	CREATE TEMP TABLE ts_seq AS (
-		SELECT generate_series AS measurement_time FROM generate_series(min_ts, max_ts, '1 hour'::interval)
-	);
-	CREATE INDEX ON ts_seq(measurement_time);
-	
-	FOR cur_station_id IN SELECT id FROM stations
-	LOOP
-		RAISE NOTICE '%', cur_station_id;
-		min_ts_for_station := (SELECT MIN(measurement_time) FROM observations WHERE station_id = cur_station_id);
-		max_ts_for_station := (SELECT MAX(measurement_time) FROM observations WHERE station_id = cur_station_id);
-		
-		INSERT INTO observations (station_id, measurement_time) (
-			SELECT cur_station_id AS station_id, measurement_time FROM ts_seq
-				WHERE measurement_time BETWEEN min_ts_for_station AND max_ts_for_station
-			EXCEPT
-			SELECT station_id, measurement_time FROM observations WHERE station_id = cur_station_id);
-			
-	END LOOP;
-END;
-$$  LANGUAGE plpgsql;
-
-SELECT create_empty_records();
-
-/*
 A function filling missing values by 
 copying them from the nearest meteo station
 containing the desired value
@@ -373,7 +433,7 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT fill_missing(ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_total', 'precip_rate', 'solradiation']);
+SELECT fill_missing(ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
 
 -- ===================================
 -- Creating auxilliary variables
@@ -458,7 +518,7 @@ SET day_of_week = EXTRACT(DOW FROM measurement_time);
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week_norm;
 ALTER TABLE observations ADD COLUMN day_of_week_norm FLOAT;
 UPDATE observations
-SET day_of_week_norm = -0.5 * COS(2 * PI() * day_of_week / 6.0) + 0.5;
+SET day_of_week_norm = COS(2 * PI() * day_of_week / 6.0);
 
 -- ===================================
 
@@ -472,7 +532,7 @@ SET day_of_year = EXTRACT(DOY FROM measurement_time);
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year_norm;
 ALTER TABLE observations ADD COLUMN day_of_year_norm FLOAT;
 UPDATE observations 
-SET day_of_year_norm = -0.5 * COS(2 * PI() * day_of_year / 365.0) + 0.5;
+SET day_of_year_norm = COS(2 * PI() * day_of_year / 365.0);
 
 -- Transform the hour of day to a continuous value
 
@@ -484,7 +544,7 @@ SET hour_of_day = EXTRACT(HOUR FROM measurement_time);
 ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day_norm;
 ALTER TABLE observations ADD COLUMN hour_of_day_norm FLOAT;
 UPDATE observations 
-SET hour_of_day_norm = -0.5 * COS(2 * PI() * hour_of_day / 24.0) + 0.5;
+SET hour_of_day_norm = -COS(2 * PI() * hour_of_day / 24.0);
 
 -- ===================================
 
