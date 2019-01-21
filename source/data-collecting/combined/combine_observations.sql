@@ -180,7 +180,6 @@ FROM airly_observations
 WHERE temperature IS NOT NULL OR PRESSURE IS NOT NULL OR humidity IS NOT NULL
 ORDER BY station_id, utc_time;
 
-a
 /*
 IQR is the difference between the 3rd and 1st quartile
 outliers are assumed to be those observations which are
@@ -200,9 +199,6 @@ DECLARE
 	query_template TEXT;
 	query TEXT;
 BEGIN
-	
-		
-
 	query_template := '
 		DELETE FROM observations WHERE id IN (
 			SELECT id
@@ -232,7 +228,6 @@ BEGIN
 		query := format(query_template, table_name, column_name);
 		RAISE NOTICE 'QUERY: %', query;
 		EXECUTE query;
-			
 	END LOOP;
 END;
 $$  LANGUAGE plpgsql;
@@ -325,59 +320,58 @@ The formula assumes that the lat and lon values are expressed in RADIANS!
 For reference see: https://www.movable-type.co.uk/scripts/latlong.html
 */
 
-DROP TABLE IF EXISTS meteo_distance;
-CREATE TABLE meteo_distance AS (
-SELECT row_number() OVER() AS id, dist.*
-FROM (
-	SELECT s1.id AS station_id1, s2.id AS station_id2, 
-		(ACOS(
-			SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
-			+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-			* COS(radians(s2.longitude) - radians(s1.longitude))
-		) * 6371000) AS dist,
-		s1.latitude AS latitude1, s1.longitude AS longitude1,
-		s2.latitude AS latitude2, s2.longitude AS longitude2
-	FROM stations AS s1
-	CROSS JOIN meteo_stations AS s2
-	WHERE s1.id <> s2.id
-	ORDER BY 1, 3, 2
-) AS dist
+DROP TABLE IF EXISTS air_quality_meteo_distance;
+CREATE TABLE air_quality_meteo_distance AS (
+	SELECT row_number() OVER() AS id, dist.*
+	FROM (
+		SELECT s1.id AS station_id1, s2.id AS station_id2, 
+			(ACOS(
+				SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+				+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+				* COS(radians(s2.longitude) - radians(s1.longitude))
+			) * 6371000) AS dist,
+			s1.latitude AS latitude1, s1.longitude AS longitude1,
+			s2.latitude AS latitude2, s2.longitude AS longitude2
+		FROM stations AS s1
+		CROSS JOIN meteo_stations AS s2
+		WHERE s1.id <> s2.id
+		ORDER BY 1, 3, 2
+	) AS dist
 );
 
-ALTER TABLE meteo_distance ADD PRIMARY KEY (id);
-CREATE INDEX ON meteo_distance(station_id1);
-CREATE INDEX ON meteo_distance(station_id2);
-CLUSTER meteo_distance USING "meteo_distance_station_id1_idx";
-select * from meteo_distance;
+ALTER TABLE air_quality_meteo_distance ADD PRIMARY KEY (id);
+CREATE INDEX ON air_quality_meteo_distance(station_id1);
+CREATE INDEX ON air_quality_meteo_distance(station_id2);
+CLUSTER air_quality_meteo_distance USING "air_quality_meteo_distance_station_id1_idx";
 
 /*
 Similarly, calculate the distance between
 the stations measuring air quality.
 */
 
-DROP TABLE IF EXISTS air_quality_distance;
-CREATE TABLE air_quality_distance AS (
-SELECT row_number() OVER() AS id, dist.*
-FROM (
-	SELECT s1.id AS station_id1, s2.id AS station_id2, 
-		(ACOS(
-			SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
-			+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
-			* COS(radians(s2.longitude) - radians(s1.longitude))
-		) * 6371000) AS dist,
-		s1.latitude AS latitude1, s1.longitude AS longitude1,
-		s2.latitude AS latitude2, s2.longitude AS longitude2
-	FROM stations AS s1
-	CROSS JOIN stations AS s2
-	WHERE s1.id <> s2.id
-	ORDER BY 1, 3, 2
-) AS dist
+DROP TABLE IF EXISTS air_quality_cross_distance;
+CREATE TABLE air_quality_cross_distance AS (
+	SELECT row_number() OVER() AS id, dist.*
+	FROM (
+		SELECT s1.id AS station_id1, s2.id AS station_id2, 
+			(ACOS(
+				SIN(radians(s1.latitude)) * SIN(radians(s2.latitude)) 
+				+ COS(radians(s1.latitude)) * COS(radians(s2.latitude)) 
+				* COS(radians(s2.longitude) - radians(s1.longitude))
+			) * 6371000) AS dist,
+			s1.latitude AS latitude1, s1.longitude AS longitude1,
+			s2.latitude AS latitude2, s2.longitude AS longitude2
+		FROM stations AS s1
+		CROSS JOIN stations AS s2
+		WHERE s1.id <> s2.id
+		ORDER BY 1, 3, 2
+	) AS dist
 );
 
-ALTER TABLE air_quality_distance ADD PRIMARY KEY (id);
-CREATE INDEX ON air_quality_distance(station_id1);
-CREATE INDEX ON air_quality_distance(station_id2);
-CLUSTER air_quality_distance USING "air_quality_distance_station_id1_idx";
+ALTER TABLE air_quality_cross_distance ADD PRIMARY KEY (id);
+CREATE INDEX ON air_quality_cross_distance(station_id1);
+CREATE INDEX ON air_quality_cross_distance(station_id2);
+CLUSTER air_quality_cross_distance USING "air_quality_cross_distance_station_id1_idx";
 
 /*
 A function filling missing values by 
@@ -385,8 +379,8 @@ copying them from the nearest meteo station
 containing the desired value
 */
 
-DROP FUNCTION IF EXISTS fill_missing(TEXT[]);
-CREATE OR REPLACE FUNCTION fill_missing(meteo_cols TEXT[])
+DROP FUNCTION IF EXISTS fill_missing(TEXT, TEXT, TEXT, TEXT[]);
+CREATE OR REPLACE FUNCTION fill_missing(table_name TEXT, other_table_name TEXT, distance_table_name TEXT, column_names TEXT[])
 RETURNS VOID AS $$
 DECLARE
 	air_quality_cols text[];
@@ -399,32 +393,35 @@ BEGIN
 	the rows in the distance tables are sorted ascendingly
 	by the distance between stations
 	parameters: 
-	target table, source table, distance table, column name
+	%1$s - target table,
+	%2$s - source table,
+	%3$s - distance table,
+	%4$s - column name
 	*/
 	query_template := '
-		UPDATE observations AS obs
-		SET %1$s = nearest.%1$s
+		UPDATE %1$s AS obs
+		SET %4$s = nearest.%4$s
 		FROM (
-		    SELECT dist_rows.station_id, dist_rows.measurement_time, nearest_meteo.%1$s 
+		    SELECT dist_rows.station_id, dist_rows.measurement_time, nearest_other.%4$s 
 		    FROM (
-			SELECT obs.measurement_time, obs.station_id, MIN(dist.id) AS row_id
-			FROM observations as obs
-			JOIN meteo_distance as dist ON dist.station_id1 = obs.station_id
-			JOIN meteo_observations as other ON other.station_id = dist.station_id2 AND other.measurement_time = obs.measurement_time
-			WHERE obs.%1$s IS NULL
-			AND other.%1$s IS NOT NULL
-			GROUP BY obs.station_id, obs.measurement_time
+		    SELECT obs.measurement_time, obs.station_id, MIN(dist.id) AS row_id
+		    FROM %1$s as obs
+		    JOIN %3$s as dist ON dist.station_id1 = obs.station_id
+		    JOIN %2$s as other ON other.station_id = dist.station_id2 AND other.measurement_time = obs.measurement_time
+		    WHERE obs.%4$s IS NULL
+		    AND other.%4$s IS NOT NULL
+		    GROUP BY obs.station_id, obs.measurement_time
 		    ) AS dist_rows
-		    JOIN meteo_distance AS dist ON dist.id = dist_rows.row_id
-		    JOIN meteo_observations AS nearest_meteo ON nearest_meteo.station_id = dist.station_id2 AND nearest_meteo.measurement_time = dist_rows.measurement_time
+		    JOIN %3$s AS dist ON dist.id = dist_rows.row_id
+		    JOIN %2$s AS nearest_other ON nearest_other.station_id = dist.station_id2 AND nearest_other.measurement_time = dist_rows.measurement_time
 		) AS nearest
 		WHERE nearest.station_id = obs.station_id
 		AND nearest.measurement_time = obs.measurement_time
 	';
 	
-	FOREACH column_name IN ARRAY meteo_cols
+	FOREACH column_name IN ARRAY column_names
 	LOOP
-		query := format(query_template, column_name);
+		query := format(query_template, table_name, other_table_name, distance_table_name, column_name);
 		 
 		RAISE NOTICE 'Filling missing % values', column_name;
 		RAISE NOTICE '%', query;
@@ -433,7 +430,17 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT fill_missing(ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
+SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance', ARRAY['pm2_5', 'pm10']);
+SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
+
+DROP INDEX "observations_temperature_idx";
+DROP INDEX "observations_pressure_idx";
+DROP INDEX "observations_humidity_idx";
+DROP INDEX "observations_wind_speed_idx";
+DROP INDEX "observations_wind_dir_deg_idx";
+DROP INDEX "observations_precip_total_idx";
+DROP INDEX "observations_precip_rate_idx";
+DROP INDEX "observations_solradiation_idx";
 
 -- ===================================
 -- Creating auxilliary variables
@@ -507,6 +514,11 @@ ALTER TABLE observations DROP COLUMN IF EXISTS month;
 ALTER TABLE observations ADD COLUMN month INT;
 UPDATE observations
 SET month = EXTRACT(MONTH FROM measurement_time);
+
+ALTER TABLE observations DROP COLUMN IF EXISTS month_norm;
+ALTER TABLE observations ADD COLUMN month_norm FLOAT;
+UPDATE observations
+SET month = COS(2 * PI() * month / 12);
 
 -- ===================================
 
@@ -616,13 +628,3 @@ in the wind_dir_deg column which is problematic while finding
 the best subsets for regression.
 */
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_rad;
-
--- SELECT * FROM pg_indexes WHERE tablename = 'observations';
-DROP INDEX "observations_temperature_idx";
-DROP INDEX "observations_pressure_idx";
-DROP INDEX "observations_humidity_idx";
-DROP INDEX "observations_wind_speed_idx";
-DROP INDEX "observations_wind_dir_deg_idx";
-DROP INDEX "observations_precip_total_idx";
-DROP INDEX "observations_precip_rate_idx";
-DROP INDEX "observations_solradiation_idx";
