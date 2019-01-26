@@ -62,13 +62,11 @@ CREATE TABLE observations (
 INSERT INTO observations(station_id, measurement_time, pm2_5, pm10)
 SELECT station_id, date_trunc('hour', measurement_time), pm2_5, pm10
 FROM gios_observations
-ORDER BY station_id, measurement_time;
-
--- ===================================
--- Removing invalid and missing measurements
+ORDER BY measurement_time, station_id;
 
 -- ===================================
 -- Indexes on observations
+-- ===================================
 
 DROP INDEX IF EXISTS observations_measurement_time_idx;
 DROP INDEX IF EXISTS observations_station_id_idx;
@@ -155,10 +153,9 @@ ORDER BY time;
 
 /*
 It is assumed that the hourly mean values
-are calculated for a period before the time stored in
-the record e.g. mean values for 12:00 are calculated based on
-measurements for 11:05, 11:30, 11:55
-Thus we need to add one hour (UPDATE query)
+are calculated for a period from the beginning to the end 
+of the given hour e.g. mean values for 12:00 are calculated based on
+measurements from 12:00 to 12:59
 */
 
 INSERT INTO meteo_observations(station_id, measurement_time, temperature,
@@ -171,6 +168,7 @@ FROM wunderground_observations
 GROUP BY 1, 2
 ORDER BY 1, 2;
 
+-- Pressure for Airly stations is expressed in pascals (not hectopascals)
 INSERT INTO meteo_observations (
 	station_id, measurement_time,
 	temperature, pressure, humidity
@@ -179,6 +177,77 @@ SELECT 'airly_' || station_id, utc_time, temperature, (pressure / 100.0), humidi
 FROM airly_observations
 WHERE temperature IS NOT NULL OR PRESSURE IS NOT NULL OR humidity IS NOT NULL
 ORDER BY station_id, utc_time;
+
+/*
+A function creating empty records for timestamps not
+present in the data set. Columns will then be imputed
+(wherever possible) with the fill_missing function.
+The remaining empty values will be imputed in an R script,
+using the MICE package.
+*/
+
+DROP FUNCTION IF EXISTS create_empty_records();
+CREATE OR REPLACE FUNCTION create_empty_records()
+RETURNS VOID AS $$
+DECLARE
+	cur_station_id CHAR(20);
+	min_ts timestamp;
+	max_ts timestamp;
+	min_ts_for_station timestamp;
+	max_ts_for_station timestamp;
+BEGIN
+	min_ts := (SELECT MIN(measurement_time) FROM observations);
+	max_ts := (SELECT MAX(measurement_time) FROM observations);
+	RAISE NOTICE '% %', min_ts, max_ts;
+	DROP TABLE IF EXISTS ts_seq;
+	CREATE TEMP TABLE ts_seq AS (
+		SELECT generate_series AS measurement_time FROM generate_series(min_ts, max_ts, '1 hour'::interval)
+	);
+	CREATE INDEX ON ts_seq(measurement_time);
+	
+	FOR cur_station_id IN SELECT id FROM stations
+	LOOP
+		RAISE NOTICE '%', cur_station_id;
+		INSERT INTO observations (station_id, measurement_time) (
+			SELECT cur_station_id AS station_id, measurement_time FROM ts_seq
+			EXCEPT SELECT station_id, measurement_time FROM observations WHERE station_id = cur_station_id
+		);
+	END LOOP;
+
+	FOR cur_station_id IN SELECT id FROM meteo_stations
+	LOOP
+		RAISE NOTICE '%', cur_station_id;
+		INSERT INTO meteo_observations (station_id, measurement_time) (
+			SELECT cur_station_id AS station_id, measurement_time FROM ts_seq
+			EXCEPT SELECT station_id, measurement_time FROM meteo_observations WHERE station_id = cur_station_id
+		);
+	END LOOP;
+END;
+$$  LANGUAGE plpgsql;
+
+SELECT create_empty_records();
+
+--------------------------------
+COPY (SELECT * FROM observations TO '/tmp/observations_raw.csv' WITH CSV DELIMITER ';';
+COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_raw.csv' WITH CSV DELIMITER ';';
+--------------------------------
+
+/*
+Some variables have well defined min and max values
+We can remove any observation being outside the allowed 
+range
+*/
+
+UPDATE observations SET pm2_5 = NULL WHERE pm2_5 < 0;
+UPDATE observations SET pm10 = NULL WHERE pm10 < 0;
+
+UPDATE observations SET pm2_5 = NULL WHERE pm2_5 < 0;
+UPDATE observations SET pm10 = NULL WHERE pm10 < 0;
+
+UPDATE meteo_observations SET wind_dir_deg = NULL WHERE wind_dir_deg < 0 OR wind_dir_deg > 360;
+UPDATE meteo_observations SET humidity = NULL WHERE humidity < 0 OR humidity > 100;
+
+
 
 /*
 IQR is the difference between the 3rd and 1st quartile
@@ -235,51 +304,10 @@ $$  LANGUAGE plpgsql;
 SELECT delete_outliers_based_on_iqr('observations', ARRAY['pm2_5', 'pm10']);
 SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
 
-/*
-A function creating empty records for timestamps not
-present in the data set. Columns will then be imputed
-(wherever possible) with the fill_missing function.
-The remaining empty values will be imputed in an R script,
-using the MICE package.
-*/
-
-DROP FUNCTION IF EXISTS create_empty_records();
-CREATE OR REPLACE FUNCTION create_empty_records()
-RETURNS VOID AS $$
-DECLARE
-	cur_station_id CHAR(20);
-	min_ts timestamp;
-	max_ts timestamp;
-	min_ts_for_station timestamp;
-	max_ts_for_station timestamp;
-BEGIN
-	min_ts := (SELECT MIN(measurement_time) FROM observations);
-	max_ts := (SELECT MAX(measurement_time) FROM observations);
-	RAISE NOTICE '% %', min_ts, max_ts;
-	DROP TABLE IF EXISTS ts_seq;
-	CREATE TEMP TABLE ts_seq AS (
-		SELECT generate_series AS measurement_time FROM generate_series(min_ts, max_ts, '1 hour'::interval)
-	);
-	CREATE INDEX ON ts_seq(measurement_time);
-	
-	FOR cur_station_id IN SELECT id FROM stations
-	LOOP
-		RAISE NOTICE '%', cur_station_id;
-		min_ts_for_station := (SELECT MIN(measurement_time) FROM observations WHERE station_id = cur_station_id);
-		max_ts_for_station := (SELECT MAX(measurement_time) FROM observations WHERE station_id = cur_station_id);
-		
-		INSERT INTO observations (station_id, measurement_time) (
-			SELECT cur_station_id AS station_id, measurement_time FROM ts_seq
-				WHERE measurement_time BETWEEN min_ts_for_station AND max_ts_for_station
-			EXCEPT
-			SELECT station_id, measurement_time FROM observations WHERE station_id = cur_station_id);
-			
-	END LOOP;
-END;
-$$  LANGUAGE plpgsql;
-
-SELECT create_empty_records();
-
+--------------------------------
+COPY (SELECT * FROM observations TO '/tmp/observations_no_outliers.csv' WITH CSV DELIMITER ';';
+COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_no_outliers.csv' WITH CSV DELIMITER ';';
+--------------------------------
 
 CREATE INDEX ON meteo_observations(measurement_time);
 CREATE INDEX ON meteo_observations(station_id);
@@ -432,6 +460,11 @@ $$  LANGUAGE plpgsql;
 
 SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance', ARRAY['pm2_5', 'pm10']);
 SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
+
+--------------------------------
+COPY (SELECT * FROM observations TO '/tmp/observations_imputed.csv' WITH CSV DELIMITER ';';
+COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_imputed.csv' WITH CSV DELIMITER ';';
+--------------------------------
 
 DROP INDEX "observations_temperature_idx";
 DROP INDEX "observations_pressure_idx";
@@ -628,3 +661,8 @@ in the wind_dir_deg column which is problematic while finding
 the best subsets for regression.
 */
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_rad;
+
+--------------------------------
+COPY (SELECT * FROM observations TO '/tmp/observations_extra_vars.csv' WITH CSV DELIMITER ';';
+COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_extra_vars.csv' WITH CSV DELIMITER ';';
+--------------------------------

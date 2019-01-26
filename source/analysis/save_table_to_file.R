@@ -1,10 +1,10 @@
 wd <- getwd()
 setwd(file.path('..', 'common'))
-source('utils.r')
-source('preprocess.r')
+  source('utils.r')
+  source('preprocess.r')
 setwd(wd)
 
-packages <- c('RPostgreSQL', 'tidyverse')
+packages <- c('RPostgreSQL', 'tidyverse', )
 import(packages)
 
 series <- load_observations('observations')

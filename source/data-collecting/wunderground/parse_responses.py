@@ -66,7 +66,10 @@ if __name__ == '__main__':
                 session.commit()
 
         padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
-        timestamp_format = '{year}-{mon}-{mday} {hour}:{min}'
+
+        # Postgres interprets datetime string without timezone info
+        # to be defined in the user's local timezone
+        timestamp_format = '{year}-{mon}-{mday} {hour}:{min} UTC'
         for dirpath in glob.glob(os.path.join(args['dir'], '*')):
             station_id = dirpath.split(os.path.sep)[-1]
             print('Saving data for station: ' + station_id)
