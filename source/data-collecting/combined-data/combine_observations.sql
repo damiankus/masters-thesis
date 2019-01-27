@@ -57,6 +57,7 @@ CREATE TABLE observations (
 	pressure NUMERIC(7, 3)
 );
 
+
 -- =====================================
 
 INSERT INTO observations(station_id, measurement_time, pm2_5, pm10)
@@ -295,7 +296,7 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT delete_outliers_based_on_iqr('observations', ARRAY['pm2_5', 'pm10']);
-SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
+SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_total', 'precip_rate', 'solradiation']);
 
 --------------------------------
 COPY observations TO '/tmp/observations_no_outliers.csv' WITH CSV HEADER DELIMITER ';';
@@ -452,7 +453,7 @@ END;
 $$  LANGUAGE plpgsql;
 
 SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance', ARRAY['pm2_5', 'pm10']);
-SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
+SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_total', 'precip_rate', 'solradiation']);
 
 --------------------------------
 COPY observations TO '/tmp/observations_imputed.csv' WITH CSV HEADER DELIMITER ';';
