@@ -65,11 +65,11 @@ if __name__ == '__main__':
                 session.add_all(stations)
                 session.commit()
 
-        padding_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
+        placeholder_vals = ['', '-573.3', '-1608.8', '-2539.7', '-3386.0', '-9999']
 
         # Postgres interprets datetime string without timezone info
         # to be defined in the user's local timezone
-        timestamp_format = '{year}-{mon}-{mday} {hour}:{min} UTC'
+        timestamp_format = '{year}-{mon}-{mday} {hour}:{min} {tzname}'
         for dirpath in glob.glob(os.path.join(args['dir'], '*')):
             station_id = dirpath.split(os.path.sep)[-1]
             print('Saving data for station: ' + station_id)
@@ -79,11 +79,9 @@ if __name__ == '__main__':
                     observations = []
                     append = observations.append
                     for o in json.load(in_file)['history']['observations']:
-                        time = o['utcdate']
-                        time = time['hour'] + ':' + time['min']
                         record = map_keys(o, api_to_db_field)
                         for key, val in record.items():
-                            if val in padding_vals:
+                            if val in placeholder_vals:
                                 record[key] = None
                         record['station_id'] = station_id
                         record['timestamp'] = timestamp_format.format(

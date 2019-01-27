@@ -109,7 +109,7 @@ ORDER BY id;
 
 INSERT INTO meteo_stations(
 	id, city, latitude, longitude, source)
-SELECT	'airly_' || id::text, 'Kraków', lattitude, longitude, 'airly'
+SELECT	'airly_' || id::text, 'Kraków', latitude, longitude, 'airly'
 FROM airly_stations
 ORDER BY id;
 
@@ -175,7 +175,11 @@ INSERT INTO meteo_observations (
 )
 SELECT 'airly_' || station_id, utc_time, temperature, (pressure / 100.0), humidity
 FROM airly_observations
-WHERE temperature IS NOT NULL OR PRESSURE IS NOT NULL OR humidity IS NOT NULL
+WHERE (temperature IS NOT NULL OR
+pressure IS NOT NULL OR
+humidity IS NOT NULL) AND
+-- Airly data contain some weird humidity measurements e.g. < -10 000
+(humidity IS NULL OR (humidity BETWEEN 0 AND 100))
 ORDER BY station_id, utc_time;
 
 /*
@@ -213,23 +217,14 @@ BEGIN
 			EXCEPT SELECT station_id, measurement_time FROM observations WHERE station_id = cur_station_id
 		);
 	END LOOP;
-
-	FOR cur_station_id IN SELECT id FROM meteo_stations
-	LOOP
-		RAISE NOTICE '%', cur_station_id;
-		INSERT INTO meteo_observations (station_id, measurement_time) (
-			SELECT cur_station_id AS station_id, measurement_time FROM ts_seq
-			EXCEPT SELECT station_id, measurement_time FROM meteo_observations WHERE station_id = cur_station_id
-		);
-	END LOOP;
 END;
 $$  LANGUAGE plpgsql;
 
 SELECT create_empty_records();
 
 --------------------------------
-COPY (SELECT * FROM observations TO '/tmp/observations_raw.csv' WITH CSV DELIMITER ';';
-COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_raw.csv' WITH CSV DELIMITER ';';
+COPY observations TO '/tmp/observations_raw.csv' WITH CSV HEADER DELIMITER ';';
+COPY meteo_observations TO '/tmp/meteo_observations_raw.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------
 
 /*
@@ -246,8 +241,6 @@ UPDATE observations SET pm10 = NULL WHERE pm10 < 0;
 
 UPDATE meteo_observations SET wind_dir_deg = NULL WHERE wind_dir_deg < 0 OR wind_dir_deg > 360;
 UPDATE meteo_observations SET humidity = NULL WHERE humidity < 0 OR humidity > 100;
-
-
 
 /*
 IQR is the difference between the 3rd and 1st quartile
@@ -269,7 +262,7 @@ DECLARE
 	query TEXT;
 BEGIN
 	query_template := '
-		DELETE FROM observations WHERE id IN (
+		DELETE FROM %1$s WHERE id IN (
 			SELECT id
 			FROM %1$s AS observations_table
 			JOIN (
@@ -305,8 +298,8 @@ SELECT delete_outliers_based_on_iqr('observations', ARRAY['pm2_5', 'pm10']);
 SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
 
 --------------------------------
-COPY (SELECT * FROM observations TO '/tmp/observations_no_outliers.csv' WITH CSV DELIMITER ';';
-COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_no_outliers.csv' WITH CSV DELIMITER ';';
+COPY observations TO '/tmp/observations_no_outliers.csv' WITH CSV HEADER DELIMITER ';';
+COPY meteo_observations TO '/tmp/meteo_observations_no_outliers.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------
 
 CREATE INDEX ON meteo_observations(measurement_time);
@@ -462,8 +455,8 @@ SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance'
 SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'precip_total', 'precip_rate', 'solradiation']);
 
 --------------------------------
-COPY (SELECT * FROM observations TO '/tmp/observations_imputed.csv' WITH CSV DELIMITER ';';
-COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_imputed.csv' WITH CSV DELIMITER ';';
+COPY observations TO '/tmp/observations_imputed.csv' WITH CSV HEADER DELIMITER ';';
+COPY meteo_observations TO '/tmp/meteo_observations_imputed.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------
 
 DROP INDEX "observations_temperature_idx";
@@ -663,6 +656,6 @@ the best subsets for regression.
 ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_rad;
 
 --------------------------------
-COPY (SELECT * FROM observations TO '/tmp/observations_extra_vars.csv' WITH CSV DELIMITER ';';
-COPY (SELECT * FROM meteo_observations TO '/tmp/meteo_observations_extra_vars.csv' WITH CSV DELIMITER ';';
+COPY observations TO '/tmp/observations_extra_vars.csv' WITH CSV HEADER DELIMITER ';';
+COPY meteo_observations TO '/tmp/meteo_observations_extra_vars.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------

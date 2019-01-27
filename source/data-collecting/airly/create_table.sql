@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS airly_stations;
 
 CREATE TABLE airly_stations (
     id INT PRIMARY KEY,
-    lattitude NUMERIC(9, 6),
+    latitude NUMERIC(9, 6),
     longitude NUMERIC(9, 6)
 );
 

@@ -78,61 +78,8 @@ reverse_standardize_vec_with <- function (vals, orig_mean, orig_sd) {
 }
 
 # =====================================
-# Splitting data
+# Missing data imputation
 # =====================================
-
-split_by_heating_season <- function (df) {
-  sapply(df$timestamp, function (ts) {
-    month <- as.POSIXlt(ts)$mon + 1
-    (month < 4) || (month > 9) })
-}
-
-# The split is based on the astronomical seasons in Poland
-# 1 - winter, 2 - spring, 3 - summer, 4 - autumn
-split_by_season <- function (df) {
-  sapply(df$timestamp, function (ts) {
-    date <- format(as.Date(ts), format = '%m-%d')
-    spring_day <- '03-21'
-    summer_day <- '06-22'
-    autumn_day <- '09-23'
-    winter_day <- '12-22'
-    season <- 1
-    if (date >= spring_day && date < summer_day) {
-      season <- 2
-    } else if (date >= summer_day && date < autumn_day) {
-      season <- 3
-    } else if (date >= autumn_day && date < winter_day) {
-      season <- 4
-    }
-    season
-  })
-}
-
-# Returns a vector with TRUE values at positions that
-# should be included in the training set, the rest being
-# the values from the test set
-split_with_ratio <- function (d, ratio = 0.75) {
-  len <- 0
-  if (is.data.frame(d)) {
-    len <- length(d[, 1])
-  } else {
-    len <- length(d)
-  }
-  training_size <- round(ratio * len)
-  c(rep(TRUE, training_size), rep(FALSE, len - training_size))
-}
-
-split_with_day_ratio <- function (d, ratio = 0.75) {
-  len <- 0
-  if (is.data.frame(d)) {
-    len <- length(d[, 1])
-  } else {
-    len <- length(d)
-  }
-  training_days <- floor(len / 24)
-  training_size <- 24 * round(ratio * training_days)
-  c(rep(TRUE, training_size), rep(FALSE, len - training_size))
-}
 
 # The split is based on the astronomical seasons in Poland
 # 1 - winter, 2 - spring, 3 - summer, 4 - autumn
@@ -303,7 +250,7 @@ skip_constant_variables <- function (res_formula, df) {
 }
 
 # vars and excluded store names of base variables (without the past_ and future_ prefixes)
-add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
+add_aggregated <- function (windows, past_lag, vars=c(), excluded = c(), na.rm = TRUE) {
   if (past_lag <= 0) {
     windows
   }
@@ -337,11 +284,11 @@ add_aggregated <- function (windows, past_lag, vars=c(), excluded = c()) {
     })
     
     # If the past lag was 0 $sliced would become a 1D vector
-    # thus causing error in apply
+    # thus causing an error in apply
     sliced <- data.frame(windows[, which_vars])
     stats <- apply(sliced, 1, function (row, aggr_names, aggr_funs) {
       row_stats <- unlist(lapply(aggr_funs, function (f) {
-        f(row)
+        f(row, na.rm = na.rm)
       }))
       row_stats
     }, aggr_names = aggr_names, aggr_funs = aggr_funs)

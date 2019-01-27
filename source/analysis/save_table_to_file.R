@@ -4,7 +4,7 @@ setwd(file.path('..', 'common'))
   source('preprocess.r')
 setwd(wd)
 
-packages <- c('RPostgreSQL', 'tidyverse', )
+packages <- c('RPostgreSQL', 'tidyverse')
 import(packages)
 
 series <- load_observations('observations')
