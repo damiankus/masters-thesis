@@ -608,47 +608,6 @@ WHERE hour_of_day BETWEEN 18 AND 23;
 
 -- ===================================
 
-ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_rad;
-ALTER TABLE observations ADD COLUMN wind_dir_rad FLOAT;
-UPDATE observations 
-SET wind_dir_rad = wind_dir_deg * PI() / 180;
-
-/*
- EW component should be calculated as SIN(rads) 
- NS component should be calculated as COS(rads)
-
- The North direction corresponds to the beginning of the coordinate system.
- 
-              E (90 deg)
-              ^  /
-              | /
-              |/alpha
-       S------|------>N (0 deg)  
-              |
-              |
-              W
-              
- which corresponds to directions on a compass dial
- 
-	      N (0)
-              ^
-              |
-              |            
- (270) W------|------>E (90)
-              |
-              |
-              S (180)
-*/
-ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ew;
-ALTER TABLE observations ADD COLUMN wind_dir_ew FLOAT;
-UPDATE observations 
-SET wind_dir_ew = SIN(wind_dir_rad);
-
-ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_ns;
-ALTER TABLE observations ADD COLUMN wind_dir_ns FLOAT;
-UPDATE observations 
-SET wind_dir_ns = COS(wind_dir_rad);
-
 /*
 Values in this column are linearly dependent on the values
 in the wind_dir_deg column which is problematic while finding
