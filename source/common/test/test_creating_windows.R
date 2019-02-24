@@ -13,9 +13,9 @@ varname <- 'pm2_5'
 
 past_lag <- 23
 future_lag <- 24
-windows <- divide_into_windows(observations, past_lag = past_lag, future_lag = future_lag, future_vars = c('pm2_5', 'timestamp'))
+windows <- divide_into_windows(observations, past_lag = past_lag, future_lag = future_lag, future_vars = c('pm2_5', 'measurement_time'))
 vars <- colnames(windows)
-ts_vars <- vars[grepl('timestamp', vars)]
+ts_vars <- vars[grepl('measurement_time', vars)]
 windows[, ts_vars] <- lapply(ts_vars, function (varname) {
   utcts(windows[, varname])
 })
@@ -29,13 +29,13 @@ test_that('Number of windows is correct', {
 })
 
 test_that('Earliest past observation comes from moment t - past_lag', {
-  earliest_var <- paste('timestamp_past', past_lag, sep = '_')
-  t_delta <- difftime(first_window$timestamp, first_window[[earliest_var]], tz = 'UTC', units = 'hours')
+  earliest_var <- paste('measurement_time_past', past_lag, sep = '_')
+  t_delta <- difftime(first_window$measurement_time, first_window[[earliest_var]], tz = 'UTC', units = 'hours')
   expect_true(t_delta == past_lag)
 })
 
 test_that('Future observation comes from moment t + future_lag', {
-  t_delta <- difftime(first_window$future_timestamp, first_window$timestamp, tz = 'UTC', units = 'hours')
+  t_delta <- difftime(first_window$future_measurement_time, first_window$measurement_time, tz = 'UTC', units = 'hours')
   expect_true(t_delta == future_lag)
 })
 
