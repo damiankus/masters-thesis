@@ -334,7 +334,7 @@ SET hour_of_day = EXTRACT(HOUR FROM measurement_time);
 ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day_scaled;
 ALTER TABLE observations ADD COLUMN hour_of_day_scaled FLOAT;
 UPDATE observations 
-SET hour_of_day_scaled = -COS(2 * PI() * hour_of_day / 24.0);
+SET hour_of_day_scaled = COS(2 * PI() * hour_of_day / 24.0);
 
 -- ===================================
 

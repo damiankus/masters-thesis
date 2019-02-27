@@ -1,21 +1,22 @@
 wd <- getwd()
-setwd('../common')
-source('utils.r')
-source('constants.r')
-source('plotting.r')
+setwd(file.path("..", "common"))
+source("utils.R")
+source("constants.R")
+source("plotting.R")
 setwd(wd)
 
-main <- function () {
-  load('./original_series.Rda')
-  
-  vars <- BASE_VARS
-  target_dir <- file.path(getwd(), 'distribution')
-  mkdir(target_dir)
-  
-  lapply(vars, function (var) {
-    plot_name <-paste(var, 'histogram.png', sep = '_')
-    plot_path <- file.path(target_dir, plot_name)
-    save_histogram(series, var, plot_path)
-  })
-}
-main()
+packages <- c("optparse")
+import(packages)
+
+option_list <- list(
+  make_option(c("-f", "--file"), type = "character", default = "imputed/mice_time_windows.Rda"),
+  make_option(c("-o", "--output-file"), type = "character"),
+  make_option(c("-v", "--variable"), type = "character"),
+  make_option(c("-w", "--width"), type = "numeric", default = 1280),
+  make_option(c("-s", "--font-size"), type = "numeric", default = NA)
+)
+opt_parser <- OptionParser(option_list = option_list)
+opts <- parse_args(opt_parser)
+
+load(file = opts$file)
+save_histogram(series, opts$variable, opts[["output-file"]])

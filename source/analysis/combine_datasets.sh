@@ -41,10 +41,10 @@ Rscript save_imputed_time_windows.R --file $SERIES_FILE --target-file $MICE_TIME
 Rscript save_imputed_time_windows.R --file $SERIES_FILE --target-file $IMPUTE_TS_WINDOWS_FILE --method kalman --algorithm StructTS;
 
 # Draw scatter plots to visualise relationships between variables
-Rscript scatter.R $MICE_COMMON_PARAMS $METEO_PARAMS --use-aggregated;
-Rscript scatter.R $MICE_COMMON_PARAMS $TIME_PARAMS --output-file mice_time_vars_relationships.png;
-Rscript scatter.R $MICE_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file mice_time_scaled_vars_relationships.png;
+Rscript draw_scatterplot.R $MICE_COMMON_PARAMS $METEO_PARAMS --use-aggregated;
+Rscript draw_scatterplot.R $MICE_COMMON_PARAMS $TIME_PARAMS --output-file mice_time_vars_relationships.png;
+Rscript draw_scatterplot.R $MICE_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file mice_time_scaled_vars_relationships.png;
 
-Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $METEO_PARAMS --use-aggregated;
-Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $TIME_PARAMS --output-file impute_ts_time_vars_relationships.png;
-Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file impute_ts_time_scaled_vars_relationships.png;
+Rscript draw_scatterplot.R $IMPUTE_TS_COMMON_PARAMS $METEO_PARAMS --use-aggregated;
+Rscript draw_scatterplot.R $IMPUTE_TS_COMMON_PARAMS $TIME_PARAMS --output-file impute_ts_time_vars_relationships.png;
+Rscript draw_scatterplot.R $IMPUTE_TS_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file impute_ts_time_scaled_vars_relationships.png;

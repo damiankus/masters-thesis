@@ -20,9 +20,10 @@ option_list <- list(
   make_option(c("-t", "--target-file"), type = "character", default = "imputed/mice_time_windows.Rda"),
   make_option(c("-m", "--method"), type = "character", default = "mice"),
   make_option(c("-a", "--algorithm"), type = "character", default = "StructTS"),
-  make_option(c("-v", "--variables"), type = "character", default = paste(default_vars, collapse = ";")),
+  make_option(c("-v", "--variables"), type = "character", default = paste(default_vars, collapse = ",")),
   make_option(c("-p", "--past-lag"), type = "numeric", default = 23),
-  make_option(c("-l", "--future-lag"), type = "numeric", default = 24)
+  make_option(c("-l", "--future-lag"), type = "numeric", default = 24),
+  make_option(c('-y', "--test-year"), type = "numeric", default = NA)
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -34,7 +35,16 @@ stations <- unique(series$station_id)
 time_place_vars <- c("measurement_time", "station_id")
 imputed_vars <- parse_list_argument(opts, "variables")
 remaining_vars <- setdiff(colnames(series), c(time_place_vars, response_vars, imputed_vars))
-series <- series[order(series$measurement_time), ]
+
+test_year <- if (is.na(opts[["test-year"]])) {
+  # years sorted ascendingly
+  tail(sort(unique(series$year)), 1)
+} else {
+  opts[["test-year"]]
+}
+which_to_impute <- (series$year < test_year)
+series_to_impute <- series[which_to_impute, ]
+unchanged_series <- series[!which_to_impute, ]
 
 target_dir <- dirname(opts[["target-file"]])
 mkdir(target_dir)
@@ -45,7 +55,7 @@ imputed_for_stations <- if (opts$method == "mice") {
   # See: https://datascienceplus.com/imputing-missing-data-with-r-mice-package/
   lapply(stations, function(station_id) {
     print(paste("[MICE] Imputing data for station", station_id))
-    series_for_station <- series[series$station_id == station_id, ]
+    series_for_station <- series_to_impute[series_to_impute$station_id == station_id, ]
 
     which_to_impute <- is.na(series_for_station[, imputed_vars])
     mids <- mice(data = series_for_station[, imputed_vars], m = 1, maxit = 30, where = which_to_impute)
@@ -76,7 +86,7 @@ imputed_for_stations <- if (opts$method == "mice") {
   # Based on https://cran.r-project.org/web/packages/imputeTS/vignettes/imputeTS-Time-Series-Missing-Value-Imputation-in-R.pdf
   lapply(stations, function(station_id) {
     print(paste("[ImputeTS, ", opts$method, "] Imputing data for station ", station_id, sep = ""))
-    series_for_station <- series[series$station_id == station_id, ]
+    series_for_station <- series_to_impute[series_to_impute$station_id == station_id, ]
     imputed_cols <- lapply(imputed_vars, function(var) {
       print(paste("Imputing for", pretty_var(var)))
       col <- series_for_station[, var]
@@ -105,52 +115,25 @@ imputed_for_stations <- if (opts$method == "mice") {
     series_for_station
   })
 }
+new_series <- rbind(do.call(rbind, imputed_for_stations), unchanged_series)
+# Series must be ordered chronologically to make sure
+# that partitioning observations into time windows works
+# properly
+new_series <- new_series[order(new_series$measurement_time), ]
 
-all_imputed <- do.call(rbind, imputed_for_stations)
-
-# EW component should be calculated as SIN(rads)
-# NS component should be calculated as COS(rads)
-#
-# The North direction corresponds to the beginning of the coordinate system.
-#
-#              E (90 deg)
-#              ^
-#              | /
-#              |/alpha
-#       S------|------>N (0 deg)
-#              |
-#              |
-#              W
-#
-# which corresponds to directions on a compass dial
-#
-#              N (0)
-#              ^
-#              |
-#              |
-# (270) W------|------>E (90)
-#              |
-#              |
-#              S (180)
-#
-
-rad_col <- "wind_dir_rad"
-all_imputed[, rad_col] <- all_imputed$wind_dir_deg * pi / 180
-all_imputed$wind_dir_ns <- cos(all_imputed[, rad_col])
-all_imputed$wind_dir_ew <- sin(all_imputed[, rad_col])
-all_imputed <- all_imputed[, colnames(all_imputed) != rad_col]
-cols <- colnames(all_imputed)
+new_series$wind_dir_scaled <- cos(2 * pi * new_series$wind_dir_deg / 360)
+cols <- colnames(new_series)
 cols <- cols[cols != "station_id"]
 
 windows_for_station <- lapply(stations, function(station_id) {
-  series_for_station <- all_imputed[all_imputed$station_id == station_id, cols]
+  series_for_station <- new_series[new_series$station_id == station_id, cols]
   windows <- divide_into_windows(
     series_for_station,
     past_lag = opts[["past-lag"]],
     future_lag = opts[["future-lag"]],
     future_vars = c("pm2_5", "measurement_time")
   )
-  windows <- add_aggregated(windows, past_lag = opts[["past-lag"]], vars = c(BASE_VARS, "wind_dir_ns", "wind_dir_ew"))
+  windows <- add_aggregated(windows, past_lag = opts[["past-lag"]], vars = c(BASE_VARS, "wind_dir_scaled"))
   windows <- skip_past(windows)
   windows$station_id <- station_id
   windows
