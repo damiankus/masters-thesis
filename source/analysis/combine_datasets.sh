@@ -31,11 +31,9 @@ Rscript preprocess_raw_db_dumps.R --source-dir $RAW_DATA_DIR --target-dir $PREPR
 Rscripts count_missing.R --file $SERIES_FILE
 
 # Draw yearly trends
-Rscript draw_trend.R --file $RAW_FILE --output-dir trend-raw
 Rscript draw_trend.R --file $SERIES_FILE --output-dir trend
 
 # Draw boxplots
-Rscript draw_boxplot.R --file $SERIES_FILE --output-dir boxplot-raw
 Rscript draw_boxplot.R --file $SERIES_FILE --output-dir boxplot
 
 # Impute missing values
@@ -48,5 +46,5 @@ Rscript scatter.R $MICE_COMMON_PARAMS $TIME_PARAMS --output-file mice_time_vars_
 Rscript scatter.R $MICE_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file mice_time_scaled_vars_relationships.png;
 
 Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $METEO_PARAMS --use-aggregated;
-Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $TIME_PARAMS --output-file mice_time_vars_relationships.png;
-Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file mice_time_scaled_vars_relationships.png;
+Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $TIME_PARAMS --output-file impute_ts_time_vars_relationships.png;
+Rscript scatter.R $IMPUTE_TS_COMMON_PARAMS $SCALED_TIME_PARAMS --output-file impute_ts_time_scaled_vars_relationships.png;

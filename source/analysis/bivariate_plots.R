@@ -40,8 +40,8 @@ main <- function () {
   labels <- sapply(vars, pretty_var)
   
   # lapply(seq(1, 4), function (season) {
-    # data <- windows[windows$season == season, c(vars, 'station_id')]
-    data <- windows[, c(vars, 'station_id')]
+  # data <- windows[windows$season == season, c(vars, 'station_id')]
+  data <- windows[, c(vars, 'station_id')]
     lapply(stations, function (sid) {
       data <- data[data$station_id == sid, vars]
       plot_path <- file.path(target_dir, paste('relationships_', sid, '.png', sep = ''))

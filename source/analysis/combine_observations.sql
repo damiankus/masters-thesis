@@ -1,4 +1,4 @@
-﻿SET TIME ZONE 'UTC';
+SET TIME ZONE 'UTC';
 
 DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS stations;
@@ -594,7 +594,7 @@ BEGIN
 END;
 $$  LANGUAGE plpgsql;
 
-SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance', ARRAY['pm2_5', 'pm10']);
+-- SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance', ARRAY['pm2_5', 'pm10']);
 SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_rate', 'solradiation']);
 
 
