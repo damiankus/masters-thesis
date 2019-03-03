@@ -21,6 +21,6 @@ BASE_VARS <- c(
 # including temporal auxiliary variables
 MAIN_VARS <- c(
   BASE_VARS,
-  "hour_of_day", "period_of_day", "day_of_week", "month", "season", "is_heating_season", "is_holiday"
+  "hour_of_day", "day_of_week", "day_of_year"
 )
 

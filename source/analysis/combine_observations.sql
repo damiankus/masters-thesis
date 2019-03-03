@@ -1,4 +1,4 @@
-SET TIME ZONE 'UTC';
+﻿SET TIME ZONE 'UTC';
 
 DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS stations;
@@ -312,7 +312,6 @@ SET day_of_week_scaled = COS(2 * PI() * day_of_week / 6.0);
 -- ===================================
 
 -- Transform the date to a continuous value
-
 ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year;
 ALTER TABLE observations ADD COLUMN day_of_year INTEGER;
 UPDATE observations 
@@ -324,8 +323,6 @@ UPDATE observations
 SET day_of_year_scaled = COS(2 * PI() * day_of_year / 365.0);
 
 -- Transform the hour of day to a continuous value
--- Transform the hour of day to a continuous value
-
 ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day;
 ALTER TABLE observations ADD COLUMN hour_of_day INTEGER;
 UPDATE observations 
@@ -652,3 +649,12 @@ DROP INDEX "observations_wind_speed_idx";
 DROP INDEX "observations_wind_dir_deg_idx";
 DROP INDEX "observations_precip_rate_idx";
 DROP INDEX "observations_solradiation_idx";
+
+-- Wind direction is expressed in degrees. Since 0 and 360 degrees
+-- are the same, let's express this variable using a periodic function 
+-- COS(0) = COS(360 = 2 * PI rad) = 1
+
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_scaled;
+ALTER TABLE observations ADD COLUMN wind_dir_scaled FLOAT;
+UPDATE observations 
+SET wind_dir_scaled = COS(2 * PI() * wind_dir_deg / 360.0);

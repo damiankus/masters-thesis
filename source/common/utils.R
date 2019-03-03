@@ -35,7 +35,10 @@ units <- function(vars) {
           split_var <- strsplit(var, delim)[[1]]
           base_var <- split_var[[1]]
           units(base_var)
-        } else if (grepl("min_", var) || grepl("max_", var) || grepl("mean_", var)) {
+        } else if (startsWith(var, "min_") ||
+                   startsWith(var, "max_") ||
+                   startsWith(var, "mean_") ||
+                   startsWith(var, "total_")) {
           parts <- strsplit(var, '_')[[1]]
           var_name <- paste(parts[3:length(parts)], collapse="_")
           units(var_name)
@@ -81,9 +84,19 @@ pretty_var <- function(vars) {
           pvar <- pretty_var(split_var[[1]])
           lag <- split_var[[2]]
           paste(pvar, " ", lag, "h ago", sep = "")
-        } else if (grepl("min_", var) || grepl("max_", var) || grepl("mean_", var)) {
+        } else if (startsWith(var, "min_") ||
+                   startsWith(var, "max_") ||
+                   startsWith(var, "mean_") ||
+                   startsWith(var, "total_")) {
           parts <- strsplit(var, '_')[[1]]
           aggr_type <- parts[[1]]
+          time_lag <- parts[[2]]         
+          var_name <- pretty_var(
+            paste(
+              parts[3:length(parts)], collapse="_"))
+          paste(aggr_type, time_lag, "h", var_name)
+        } else if (startsWith(var, "sum_")) {
+          parts <- strsplit(var, '_')[[1]]
           time_lag <- parts[[2]]         
           var_name <- pretty_var(
             paste(

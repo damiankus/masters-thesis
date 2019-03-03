@@ -5,8 +5,8 @@ packages <- c('ggplot2', 'reshape', 'car', 'scales', 'ggthemes', 'moments')
 import(packages)
 
 
-save_plot_file <- function (plot, plot_path) {
-  ggsave(plot_path, width=7, height=5)
+save_plot_file <- function (plot, plot_path, width = 7, height = 5) {
+  ggsave(plot_path, width = width, height = height)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
 
@@ -108,7 +108,7 @@ save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab 
 }
 
 save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path,
-                                   x_lab='', y_lab='', legend_title='') {
+                                   x_lab='', y_lab='', legend_title='', plot_component = geom_line(size=0.5)) {
   copy <- data.frame(df[, c(x_var, y_var, id_var)])
   
   # After passing timestamps to forecasting models,
@@ -131,19 +131,12 @@ save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path,
   
   facet_formula <- as.formula(paste('~', id_var))
   plot <- ggplot(data = copy, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
-    geom_line(size=0.5) +
+    plot_component +
     xlab(get_or_generate_label(x_var, x_lab)) +
     ylab(get_or_generate_label(y_var)) + 
     labs(color = legend_title) +
     theme(legend.position='none') +
     facet_wrap(facet_formula, scales = 'free_y', ncol = 1)
-  
-  if (timestamp_present) {
-    # plot <- plot +
-    #   scale_x_datetime(labels = date_format('%Y-%m-%d %h:%M', tz = 'UTC')
-    #                    # breaks = date_breaks(date_breaks)
-    #                    )
-  }
   save_plot_file(plot, plot_path)
 }
 

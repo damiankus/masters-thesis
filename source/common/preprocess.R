@@ -170,13 +170,14 @@ add_aggregated <- function (windows, past_lag, vars_to_aggregate=c(), excluded =
     aggr_vars <- all_vars[which_selected & (!which_future)]
   }))
   
-  aggr_types <- c('min', 'mean', 'max')
+  aggr_types <- c('min', 'mean', 'max', 'sum')
+  aggr_type_names <- c(aggr_types[1:3], 'total')
   aggr_funs <- sapply(aggr_types, get)
-  
+    
   all_stats <- lapply(vars, function (v) {
     which_vars <- aggr_vars[grepl(v, aggr_vars)]
     
-    aggr_names <- sapply(aggr_types, function (t) {
+    aggr_names <- sapply(aggr_type_names, function (t) {
       paste(t, (past_lag + 1), v, sep = '_')
     })
     

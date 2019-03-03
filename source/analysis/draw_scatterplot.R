@@ -86,19 +86,20 @@ save_relationship_plots <- function(df, plot_path, width = 1280, font_size, smal
 
 default_res_var <- "future_pm2_5"
 option_list <- list(
-  make_option(c("-f", "--file"), type = "character", default = "imputed/mice_time_windows.Rda"),
-  make_option(c("-o", "--output-file"), type = "character", default = "mice/relationships.png"),
+  make_option(c("-f", "--file"), type = "character", default = "data/time_windows.Rda"),
+  make_option(c("-o", "--output-file"), type = "character", default = "relationships.png"),
   make_option(c("-d", "--output-dir"), type = "character", default = "relationships"),
   make_option(c("-r", "--response-variable"), type = "character", default = default_res_var),
   make_option(c("-e", "--explanatory-variables"), type = "character", default = paste(
-    BASE_VARS[BASE_VARS != default_res_var],
+    MAIN_VARS[MAIN_VARS != default_res_var],
     collapse = ","
   )),
+  make_option(c("-i", "--filter-aggregated"), action = "store_true", default = TRUE),
   make_option(c("-a", "--use-aggregated"), action = "store_true", default = FALSE),
   make_option(c("-w", "--width"), type = "numeric", default = 1280),
   make_option(c("-s", "--font-size"), type = "numeric", default = NA),
-  make_option(c("-m", "--small-font-size"), type = "numeric", default = NA)
-  
+  make_option(c("-m", "--small-font-size"), type = "numeric", default = NA),
+  make_option(c('-y', "--test-year"), type = "numeric", default = NA)
 )
 opt_parser <- OptionParser(option_list = option_list)
 opts <- parse_args(opt_parser)
@@ -113,10 +114,16 @@ target_dir <- if (!is.null(opts[["output-dir"]])) {
 }
 mkdir(target_dir)
 
+test_year <- if (is.na(opts[["test-year"]])) {
+  # years sorted ascendingly
+  tail(sort(unique(series$year)), 1)
+} else {
+  opts[["test-year"]]
+}
+series <- series[series$year != test_year, ]
+
 all_vars <- colnames(series)
 res_var <- opts[["response-variable"]]
-
-print(opts$file)
 
 params_seq <- if (opts[["use-aggregated"]]) {
   lapply(expl_vars, function(expl_var) {
@@ -127,6 +134,22 @@ params_seq <- if (opts[["use-aggregated"]]) {
                message = paste("Plotting relationships between", res_var, "and aggregated", expl_var, "variables")
    )
   })
+} else if (opts[["filter-aggregated"]]) {
+  res_col <- series[, res_var]
+  all_expl_vars <- all_vars[all_vars != res_var]
+  filtered_vars <- do.call(rbind, lapply(expl_vars, function (expl_var) {
+    aggregated_vars <- all_expl_vars[grepl(expl_var, all_expl_vars)]
+    corrs <- unlist(lapply(aggregated_vars, function (aggr_var) {
+      cor(x = res_col, y = series[, aggr_var], use = 'complete.obs', method = "pearson")
+    }))
+    highest_corr_idx <- head(order(abs(corrs), decreasing = TRUE), 1)
+    data.frame(name = aggregated_vars[[highest_corr_idx]], corr = corrs[[highest_corr_idx]])
+  }))
+  expl_vars_with_highest_corr <- as.character(filtered_vars$name)[order(abs(filtered_vars$corr), decreasing = TRUE)]
+  list(list(variables = c(expl_vars_with_highest_corr, res_var),
+            plot_path = file.path(target_dir, opts[["output-file"]]),
+            message = paste("Plotting relationships between", res_var, "and the following variables:",
+                            paste(expl_vars, collapse=", "))))
 } else {
   list(list(variables = c(expl_vars, res_var),
                   plot_path = file.path(target_dir, opts[["output-file"]]),
@@ -136,21 +159,20 @@ params_seq <- if (opts[["use-aggregated"]]) {
 
 lapply(params_seq, function (params) {
   print(params$message)
-  present_vars <- intersect(all_vars, params$variables)
+  present_vars <- params$variables[params$variables %in% all_vars]
   
   if (length(present_vars) == 0) {
     print(paste("Skipping plot because there are no variables containing the word:", expl_var))
   } else {
-    # Since intersect changes variable order
-    # we need to do it manually to make sure the 
-    # response variable is last so that the last row
-    # is comprised of scatter plots with this variable
-    # on Y axis
-    which_res <- (present_vars == res_var)
-    present_res <- present_vars[which_res]
-    present_expl <- sort(present_vars[!which_res])
-    
-    subseries <- series[, c(present_expl, present_res)]
+    # lapply(unique(series$season), function (season) {
+    #   subseries <- series[(series$season == season), present_vars]
+    #   save_relationship_plots(subseries,
+    #                           paste(params$plot_path, SEASONS[[season]], '.png', sep = ""),
+    #                           width = opts$width,
+    #                           font_size = opts[["font-size"]],
+    #                           small_font_size = opts[["small-font-size"]])
+    # })
+    subseries <- series[, present_vars]
     save_relationship_plots(subseries,
                             params$plot_path,
                             width = opts$width,
