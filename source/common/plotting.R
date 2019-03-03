@@ -150,7 +150,7 @@ save_histogram <- function (df, var, plot_path, show_stats_lines=TRUE) {
   # originally the exponent is equal to 0.33 but it
   # resulted in too narrow bins
   bw <- 2 * IQR(var_col) / length(var_col) ^ 0.2
-  hist_color <- COLORS[3]
+  hist_color <- COLORS[1]
   # It's a darker version of the standard blue colour used by ggplot
   density_color <- '#003050'
   
@@ -158,7 +158,7 @@ save_histogram <- function (df, var, plot_path, show_stats_lines=TRUE) {
     geom_histogram(color=hist_color, fill=hist_color, alpha=0.3, binwidth=bw) +
     geom_density(color=density_color, size=0.5) + 
     xlab(get_or_generate_label(var)) +
-    ylab('Frequency')
+    ylab('Density')
   save_plot_file(plot, plot_path)
 }
 

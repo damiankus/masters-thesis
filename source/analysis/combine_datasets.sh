@@ -22,9 +22,17 @@ mkdir $PREPROCESSED_DIR
 psql -d air_quality -a -f combine_observations.sql
 sudo mv /tmp/*observations*.csv $RAW_DATA_DIR/
 
+# Preprocess SQL dumps to make them usable with R
 Rscript preprocess_raw_db_dumps.R --source-dir $RAW_DATA_DIR --target-dir $PREPROCESSED_DIR
 
+# Count missing observations for each variable and station
 Rscripts count_missing.R --file $SERIES_FILE
+
+# Calculate basic statistics
+Rscripts save_basic_statistics.R --file $SERIES_FILE --output-dir statistics --variable pm2_5 
+
+# Draw response variable's distribution
+Rscript draw_distribution.R --file $SERIES_FILE --output-file distribution/distribution.png --variable pm2_5
 
 # Draw yearly trends
 Rscript draw_trend.R --file $SERIES_FILE --output-dir trend
@@ -39,6 +47,8 @@ Rscript save_time_windows.R --file $SERIES_FILE --output-file $TIME_WINDOWS_FILE
 Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS $METEO_PARAMS --use-aggregated;
 Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS $TIME_PARAMS --output-file time_vars_relationships.png;
 Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS $SCALED_TIME_PARAMS --output-file time_scaled_vars_relationships.png;
+Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS $COMMON_SCATTER_PARAMS --output-file base_variables_relationships.png;
+Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS $COMMON_SCATTER_PARAMS --output-file filtered_base_variables_relationships.png --filter-aggregated;
 
 # Draw autocorrelation plots (ACF and PACF)
 Rscript draw_acf.R --file $TIME_WINDOWS_FILE --output-dir autocorrelation --variable pm2_5;

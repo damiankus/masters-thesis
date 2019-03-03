@@ -94,7 +94,7 @@ option_list <- list(
     MAIN_VARS[MAIN_VARS != default_res_var],
     collapse = ","
   )),
-  make_option(c("-i", "--filter-aggregated"), action = "store_true", default = TRUE),
+  make_option(c("-i", "--filter-aggregated"), action = "store_true", default = FALSE),
   make_option(c("-a", "--use-aggregated"), action = "store_true", default = FALSE),
   make_option(c("-w", "--width"), type = "numeric", default = 1280),
   make_option(c("-s", "--font-size"), type = "numeric", default = NA),
@@ -139,8 +139,9 @@ params_seq <- if (opts[["use-aggregated"]]) {
   all_expl_vars <- all_vars[all_vars != res_var]
   filtered_vars <- do.call(rbind, lapply(expl_vars, function (expl_var) {
     aggregated_vars <- all_expl_vars[grepl(expl_var, all_expl_vars)]
+    print(aggregated_vars)
     corrs <- unlist(lapply(aggregated_vars, function (aggr_var) {
-      cor(x = res_col, y = series[, aggr_var], use = 'complete.obs', method = "pearson")
+      cor(x = res_col, y = as.numeric(series[, aggr_var]), use = 'complete.obs', method = "pearson")
     }))
     highest_corr_idx <- head(order(abs(corrs), decreasing = TRUE), 1)
     data.frame(name = aggregated_vars[[highest_corr_idx]], corr = corrs[[highest_corr_idx]])
@@ -164,14 +165,6 @@ lapply(params_seq, function (params) {
   if (length(present_vars) == 0) {
     print(paste("Skipping plot because there are no variables containing the word:", expl_var))
   } else {
-    # lapply(unique(series$season), function (season) {
-    #   subseries <- series[(series$season == season), present_vars]
-    #   save_relationship_plots(subseries,
-    #                           paste(params$plot_path, SEASONS[[season]], '.png', sep = ""),
-    #                           width = opts$width,
-    #                           font_size = opts[["font-size"]],
-    #                           small_font_size = opts[["small-font-size"]])
-    # })
     subseries <- series[, present_vars]
     save_relationship_plots(subseries,
                             params$plot_path,
