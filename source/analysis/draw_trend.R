@@ -8,18 +8,12 @@ packages <- c("optparse", "lubridate")
 import(packages)
 
 aggr_vals <- function(df, var, by_vars) {
-  aggr_series <- if (var == "precip_total") {
-    # Total precipitation is a cumulative value
-    by_cols <- df_to_list_of_columns(df[, by_vars])
-    aggregate(df[, var], by = by_cols, FUN = max)
-  } else {
-    # Plots are prepared separately for each station so the total precipitation for the
-    # given day is the 24h maximum value
-    aggregate(series[, var],
+  # Plots are prepared separately for each station so the total precipitation for the
+  # given day is the 24h maximum value
+  aggr_series <- aggregate(series[, var],
       by = list(series$date, series$station_id),
       FUN = mean, na.rm = TRUE
     )
-  }
   names(aggr_series) <- c(by_vars, var)
   aggr_series
 }
@@ -87,6 +81,8 @@ draw_yearly <- function(df, vars) {
 option_list <- list(
   make_option(c("-f", "--file"), type = "character", default = "preprocessed/observations.Rda"),
   make_option(c("-o", "--output-dir"), type = "character", default = "trend"),
+  make_option(c("-v", "--variables"), type = "character", default = paste(BASE_VARS, collapse = ",")),
+  
 
   # A semicolon separated string with following possible values
   # yearly, monthly, daily, hourly
@@ -97,7 +93,7 @@ opt_parser <- OptionParser(option_list = option_list)
 opts <- parse_args(opt_parser)
 
 load(file = opts$file)
-vars <- BASE_VARS
+vars <- parse_list_argument(opts, 'variables')
 required_vars <- c(vars, "measurement_time", "station_id")
 series <- series[, required_vars]
 series$date <- as.Date(utcts(series$measurement_time))

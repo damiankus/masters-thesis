@@ -23,6 +23,7 @@ units <- function(vars) {
       wind_dir_deg = "°",
       wind_dir_ew = "1",
       wind_dir_ns = "1",
+      solradiation = 'W/m²',
       precip_total = "mm",
       precip_rate = "mm/h", {
         if (grepl("future_", var)) {

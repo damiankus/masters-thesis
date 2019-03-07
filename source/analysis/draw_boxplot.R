@@ -9,24 +9,6 @@ setwd(wd)
 packages <- c("optparse")
 import(packages)
 
-get_group <- function(df, varname, val) {
-  if (!varname %in% colnames(df)) {
-    data.frame()
-  } else {
-    df[which(df[, varname] == val), ]
-  }
-}
-
-get_samples_grouped_by <- function(df, groupingType, vars = "*") {
-  if (!groupingType %in% grouping_types) {
-    stop(paste(groupingType, "is not a member ot the grouping_types enum"))
-  }
-  vals <- as.factor(unique(data[, groupingType]))
-  lapply(vals, function(val) {
-    get_group(df, groupingType, val)
-  })
-}
-
 # MAIN
 
 option_list <- list(

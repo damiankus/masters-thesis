@@ -354,6 +354,48 @@ UPDATE observations
 SET period_of_day = 4
 WHERE hour_of_day BETWEEN 18 AND 23;
 
+
+-- ===============================================================
+-- Creating auxilliary variables for meteorological observations
+-- ===============================================================
+
+ALTER TABLE meteo_observations DROP COLUMN IF EXISTS year;
+ALTER TABLE meteo_observations ADD COLUMN year INT;
+UPDATE meteo_observations 
+SET year = EXTRACT(YEAR FROM measurement_time);
+
+-- ===================================
+
+ALTER TABLE meteo_observations DROP COLUMN IF EXISTS season;
+ALTER TABLE meteo_observations ADD COLUMN season INT;
+UPDATE meteo_observations 
+SET season = 1
+WHERE to_char(measurement_time::date, 'MM-dd') < '03-21'
+OR to_char(measurement_time::date, 'MM-dd') > '12-21';
+UPDATE meteo_observations 
+SET season = 2
+WHERE to_char(measurement_time::date, 'MM-dd') BETWEEN '03-21' AND '06-21';
+UPDATE meteo_observations 
+SET season = 3
+WHERE to_char(measurement_time::date, 'MM-dd') BETWEEN '06-22' AND '09-22';
+UPDATE meteo_observations
+SET season = 4
+WHERE to_char(measurement_time::date, 'MM-dd') BETWEEN '09-23' AND '12-21';
+
+-- ===================================
+
+ALTER TABLE meteo_observations DROP COLUMN IF EXISTS month;
+ALTER TABLE meteo_observations ADD COLUMN month INT;
+UPDATE meteo_observations
+SET month = EXTRACT(MONTH FROM measurement_time);
+
+-- ===================================
+
+ALTER TABLE meteo_observations DROP COLUMN IF EXISTS day_of_week;
+ALTER TABLE meteo_observations ADD COLUMN day_of_week INTEGER;
+UPDATE meteo_observations
+SET day_of_week = EXTRACT(DOW FROM measurement_time);
+
 -- ===================================
 
 --------------------------------
@@ -376,6 +418,11 @@ UPDATE meteo_observations SET precip_rate = NULL WHERE precip_rate < 0;
 UPDATE meteo_observations SET temperature = NULL WHERE temperature < -25 OR temperature > 40;
 UPDATE meteo_observations SET wind_dir_deg = NULL WHERE wind_dir_deg < 0 OR wind_dir_deg > 360;
 UPDATE meteo_observations SET wind_speed = NULL WHERE wind_speed < 0;
+
+--------------------------------
+COPY observations TO '/tmp/observations_filtered.csv' WITH CSV HEADER DELIMITER ';';
+COPY meteo_observations TO '/tmp/meteo_observations_filtered.csv' WITH CSV HEADER DELIMITER ';';
+--------------------------------
 
 /*
 IQR is the difference between the 3rd and 1st quartile
@@ -436,11 +483,11 @@ $$  LANGUAGE plpgsql;
 -- Additionally it has been assumed that using this method for variables with well defined 
 -- boundaries is redundant and can potentially lead to removing valid values
 -- (for example relative humisity which takes values between 0 and 100, or wind direction expressed in degrees)
-SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'pressure', 'solradiation']);
+SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'pressure']);
 
 --------------------------------
-COPY observations TO '/tmp/observations_no_outliers.csv' WITH CSV HEADER DELIMITER ';';
-COPY meteo_observations TO '/tmp/meteo_observations_no_outliers.csv' WITH CSV HEADER DELIMITER ';';
+COPY observations TO '/tmp/observations_iqr.csv' WITH CSV HEADER DELIMITER ';';
+COPY meteo_observations TO '/tmp/meteo_observations_iqr.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------
 
 CREATE INDEX ON meteo_observations(measurement_time);

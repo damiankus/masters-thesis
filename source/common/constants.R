@@ -14,7 +14,7 @@ WEEKDAYS_ABB <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 SEASONS <- c("Winter", "Spring", "Summer", "Autumn")
 
 BASE_VARS <- c(
-  "pm2_5", "pm10",
+  "pm2_5",
   "temperature", "precip_rate", "humidity", "pressure", "wind_speed", "wind_dir_deg", "solradiation"
 )
 
@@ -23,4 +23,15 @@ MAIN_VARS <- c(
   BASE_VARS,
   "hour_of_day", "day_of_week", "day_of_year"
 )
+
+# Generate formatters
+lapply(c('month', 'weekday', 'season'), function (name) {
+  formatted_vals <- get(toupper(paste(name, 's', sep = "")))
+  formatter <- function (x) {
+    unlist(lapply(x, function (val) {
+      formatted_vals[val]
+    }))
+  }
+  assign(paste('pretty', name, sep = "_"), formatter, envir = globalenv())
+})
 
