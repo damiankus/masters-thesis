@@ -47,7 +47,6 @@ class AirlyImporter:
             # is parsed for the UTC timezone
             utc_time = cols[0] + '+00:00'
 
-            # print('Importing data for {}'.format(utc_time))
             records = []
             append = records.append
             print('Saving for {}'.format(utc_time))

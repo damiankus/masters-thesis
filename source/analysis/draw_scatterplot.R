@@ -5,7 +5,7 @@ source("constants.R")
 source("plotting.R")
 setwd(wd)
 
-packages <- c("optparse", "GGally")
+packages <- c("optparse", "GGally", "viridis")
 import(packages)
 
 font_sizes <- read.csv(file = 'font_sizes.csv')
@@ -58,9 +58,9 @@ save_relationship_plots <- function(df, plot_path, width = 1280, font_size, smal
     accuracy <- 10 ** (floor(log10(max_x - min_x)) - 1)
 
     ggplot(data = data, mapping = mapping) +
-      geom_hex() +
-      geom_smooth(method = "lm", na.rm = TRUE, color = "red") +
-      
+      stat_binhex() +
+      geom_smooth(method = "lm", na.rm = TRUE, color = COLOR_CONTRAST) +
+      scale_fill_viridis() +
       # Automatic X axis labels overlap each other
       # so we need to limit their number
       scale_x_continuous(labels = scales::number_format(accuracy = accuracy, big.mark = ""),
@@ -94,12 +94,14 @@ option_list <- list(
     MAIN_VARS[MAIN_VARS != default_res_var],
     collapse = ","
   )),
+  make_option(c("-g", "--group-by"), type = "character", default = NA),
   make_option(c("-i", "--filter-aggregated"), action = "store_true", default = FALSE),
   make_option(c("-a", "--use-aggregated"), action = "store_true", default = FALSE),
-  make_option(c("-w", "--width"), type = "numeric", default = 1280),
+  make_option(c("-w", "--width"), type = "numeric", default = 1920),
   make_option(c("-s", "--font-size"), type = "numeric", default = NA),
   make_option(c("-m", "--small-font-size"), type = "numeric", default = NA),
   make_option(c('-y', "--test-year"), type = "numeric", default = NA)
+  
 )
 opt_parser <- OptionParser(option_list = option_list)
 opts <- parse_args(opt_parser)
@@ -107,12 +109,12 @@ opts <- parse_args(opt_parser)
 load(file = opts$file)
 expl_vars <- parse_list_argument(opts, "explanatory-variables")
 
-target_dir <- if (!is.null(opts[["output-dir"]])) {
+output_dir <- if (!is.null(opts[["output-dir"]])) {
   opts[["output-dir"]]
 } else {
   "."
 }
-mkdir(target_dir)
+mkdir(output_dir)
 
 test_year <- if (is.na(opts[["test-year"]])) {
   # years sorted ascendingly
@@ -130,8 +132,8 @@ params_seq <- if (opts[["use-aggregated"]]) {
     same_type_vars <- all_vars[grepl(expl_var, all_vars)]
     same_type_vars <- same_type_vars[same_type_vars != res_var]
     list(variables = c(same_type_vars, res_var),
-               plot_path = file.path(target_dir, paste("relationships_aggregated_", expl_var, ".png", sep = "")),
-               message = paste("Plotting relationships between", res_var, "and aggregated", expl_var, "variables")
+         file_name = paste("relationships_aggregated_", expl_var, ".png", sep = ""),
+         message = paste("Plotting relationships between", res_var, "and aggregated", expl_var, "variables")
    )
   })
 } else if (opts[["filter-aggregated"]]) {
@@ -139,7 +141,6 @@ params_seq <- if (opts[["use-aggregated"]]) {
   all_expl_vars <- all_vars[all_vars != res_var]
   filtered_vars <- do.call(rbind, lapply(expl_vars, function (expl_var) {
     aggregated_vars <- all_expl_vars[grepl(expl_var, all_expl_vars)]
-    print(aggregated_vars)
     corrs <- unlist(lapply(aggregated_vars, function (aggr_var) {
       cor(x = res_col, y = as.numeric(series[, aggr_var]), use = 'complete.obs', method = "pearson")
     }))
@@ -148,28 +149,46 @@ params_seq <- if (opts[["use-aggregated"]]) {
   }))
   expl_vars_with_highest_corr <- as.character(filtered_vars$name)[order(abs(filtered_vars$corr), decreasing = TRUE)]
   list(list(variables = c(expl_vars_with_highest_corr, res_var),
-            plot_path = file.path(target_dir, opts[["output-file"]]),
+            file_name = opts[["output-file"]],
             message = paste("Plotting relationships between", res_var, "and the following variables:",
                             paste(expl_vars, collapse=", "))))
 } else {
   list(list(variables = c(expl_vars, res_var),
-                  plot_path = file.path(target_dir, opts[["output-file"]]),
+                  file_name = opts[["output-file"]],
                   message = paste("Plotting relationships between", res_var, "and the following variables:",
                                   paste(expl_vars, collapse=", "))))
 }
 
-lapply(params_seq, function (params) {
-  print(params$message)
-  present_vars <- params$variables[params$variables %in% all_vars]
-  
-  if (length(present_vars) == 0) {
-    print(paste("Skipping plot because there are no variables containing the word:", expl_var))
-  } else {
-    subseries <- series[, present_vars]
-    save_relationship_plots(subseries,
-                            params$plot_path,
-                            width = opts$width,
-                            font_size = opts[["font-size"]],
-                            small_font_size = opts[["small-font-size"]])
-  }
-})
+draw_plots <- function (data, subseries_dir, subseries_name = "") {
+  lapply(params_seq, function (params) {
+    print(params$message)
+    present_vars <- params$variables[params$variables %in% all_vars]
+    
+    if (length(present_vars) == 0) {
+      print(paste("Skipping plot because there are no variables containing the word:", expl_var))
+    } else {
+      subseries <- data[, present_vars]
+      print(params)
+      save_relationship_plots(df = subseries,
+                              plot_path = file.path(subseries_dir, paste(subseries_name, params$file_name, sep = "_")),
+                              width = opts$width,
+                              font_size = opts[["font-size"]],
+                              small_font_size = opts[["small-font-size"]])
+    }
+  })
+}
+
+grouping_varname <- opts[["group-by"]]
+if (is.na(grouping_varname)) {
+  draw_plots(series, output_dir)
+} else {
+  group_vals <- sort(unique(series[, grouping_varname]))
+  lapply(group_vals, function (val) {
+    which_rows <- series[, grouping_varname] == val
+    subseries <- series[which_rows, ]
+    subseries_name <- paste(grouping_varname, val, sep = "-")
+    output_dir <- file.path(output_dir, subseries_name)
+    mkdir(output_dir)
+    draw_plots(subseries, output_dir, subseries_name = subseries_name)
+  })
+}

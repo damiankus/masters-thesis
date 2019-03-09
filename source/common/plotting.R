@@ -4,8 +4,10 @@ source('preprocess.R')
 packages <- c('ggplot2', 'reshape', 'car', 'scales', 'ggthemes', 'moments') 
 import(packages)
 
+Sys.setlocale("LC_ALL", 'en_GB.UTF-8')
+Sys.setenv(LANG = "en_US.UTF-8")
 
-save_plot_file <- function (plot, plot_path, width = 7, height = 5) {
+save_plot_file <- function (plot, plot_path, width = 6, height = 4) {
   ggsave(plot_path, width = width, height = height)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
@@ -63,10 +65,10 @@ save_scedascicity_plot <- function (df, res_var, plot_path) {
 
 save_goodness_plot <- function (df, x_var, y_var, id_var, x_order, plot_path, x_lab = '', y_lab = '', title = '') {
   if (nchar(x_lab) == 0) {
-    x_lab <- pretty_var(x_var)
+    x_lab <- get_pretty_var(x_var)
   }
   if (nchar(y_lab) == 0) {
-    y_lab <- pretty_var(y_var)
+    y_lab <- get_pretty_var(y_var)
   }
   plot <- ggplot(data = df, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
     geom_bar(position = 'dodge', stat = 'identity') +
@@ -87,10 +89,10 @@ save_multiple_vars_plot <- function (df, x_var, y_var, id_var, plot_path, x_lab 
   }
   
   if (nchar(x_lab) == 0) {
-    x_lab <- pretty_var(x_var)
+    x_lab <- get_pretty_var(x_var)
   }
   if (nchar(y_lab) == 0) {
-    y_lab <- pretty_var(y_var)
+    y_lab <- get_pretty_var(y_var)
   }
   
   plot <- ggplot(data = copy, aes_string(x = x_var, y = y_var, colour = id_var, fill = id_var)) +
@@ -120,10 +122,10 @@ save_multi_facet_plot <- function (df, x_var, y_var, id_var, plot_path,
   }
   
   if (nchar(x_lab) == 0) {
-    x_lab <- pretty_var(x_var)
+    x_lab <- get_pretty_var(x_var)
   }
   if (nchar(y_lab) == 0) {
-    y_lab <- pretty_var(y_var)
+    y_lab <- get_pretty_var(y_var)
   }
   if (nchar(legend_title) == 0) {
     legend_title <- paste(strsplit(id_var, '_')[[1]], collapse = ' ')
@@ -152,7 +154,7 @@ save_histogram <- function (df, var, plot_path, show_stats_lines=TRUE) {
   bw <- 2 * IQR(var_col) / length(var_col) ^ 0.2
   hist_color <- COLORS[1]
   # It's a darker version of the standard blue colour used by ggplot
-  density_color <- '#003050'
+  density_color <- COLOR_ACCENT
   
   plot <- ggplot(data = df, aes_string(x=var, y='..density..', fill=var)) +
     geom_histogram(color=hist_color, fill=hist_color, alpha=0.3, binwidth=bw) +

@@ -86,7 +86,7 @@ option_list <- list(
 
   # A semicolon separated string with following possible values
   # yearly, monthly, daily, hourly
-  # example -t yearly;monthly;daily
+  # example -t yearly,monthly,daily
   make_option(c("-t", "--type"), type = "character", default = "yearly")
 )
 opt_parser <- OptionParser(option_list = option_list)
@@ -97,7 +97,7 @@ vars <- parse_list_argument(opts, 'variables')
 required_vars <- c(vars, "measurement_time", "station_id")
 series <- series[, required_vars]
 series$date <- as.Date(utcts(series$measurement_time))
-series$station_id <- sapply(series$station_id, pretty_station_id)
+series$station_id <- sapply(series$station_id, get_pretty_station_id)
 
 target_dir <- opts[["output-dir"]]
 mkdir(target_dir)
@@ -115,7 +115,8 @@ lapply(period_types, function(period_type) {
     "yearly" = draw_yearly,
     "monthly" = draw_monthly,
     "daily" = draw_daily,
-    "hourly" = draw_hourly, {}
+    "hourly" = draw_hourly,
+    {}
   )
   draw(series, vars)
 })

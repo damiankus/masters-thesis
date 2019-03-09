@@ -55,8 +55,8 @@ units <- function(vars) {
   ))
 }
 
-pretty_var <- function(vars) {
-  get_pretty_var <- function(var) {
+get_pretty_var <- function(vars) {
+  get_get_pretty_var <- function(var) {
     switch(var,
       pm1 = "PM1",
       pm2_5 = "PM2.5",
@@ -77,12 +77,12 @@ pretty_var <- function(vars) {
         if (grepl("future_", var)) {
           delim <- "future_"
           split_var <- strsplit(var, delim)[[1]]
-          pvar <- pretty_var(split_var[[2]])
+          pvar <- get_pretty_var(split_var[[2]])
           paste(pvar, "in 24h")
         } else if (grepl("_past_", var)) {
           delim <- "_past_"
           split_var <- strsplit(var, delim)[[1]]
-          pvar <- pretty_var(split_var[[1]])
+          pvar <- get_pretty_var(split_var[[1]])
           lag <- split_var[[2]]
           paste(pvar, " ", lag, "h ago", sep = "")
         } else if (startsWith(var, "min_") ||
@@ -92,14 +92,14 @@ pretty_var <- function(vars) {
           parts <- strsplit(var, '_')[[1]]
           aggr_type <- parts[[1]]
           time_lag <- parts[[2]]         
-          var_name <- pretty_var(
+          var_name <- get_pretty_var(
             paste(
               parts[3:length(parts)], collapse="_"))
           paste(aggr_type, time_lag, "h", var_name)
         } else if (startsWith(var, "sum_")) {
           parts <- strsplit(var, '_')[[1]]
           time_lag <- parts[[2]]         
-          var_name <- pretty_var(
+          var_name <- get_pretty_var(
             paste(
               parts[3:length(parts)], collapse="_"))
           paste(aggr_type, time_lag, "h", var_name)
@@ -110,17 +110,17 @@ pretty_var <- function(vars) {
       }
     )
   }
-  unlist(lapply(vars, get_pretty_var))
+  unlist(lapply(vars, get_get_pretty_var))
 }
 
 
-short_pretty_var <- function(vars) {
+short_get_pretty_var <- function(vars) {
   get_short_var <- function(var) {
     switch(var,
       precip_total = "total. precip",
       precip_rate = "precip. rate",
       solradiation = "sol. radiation", {
-        pretty_var(var)
+        get_pretty_var(var)
       }
     )
   }
@@ -132,7 +132,7 @@ get_or_generate_label <- function (var, label) {
     label
   } else {
     unit <- units(var)
-    pvar <- pretty_var(var)
+    pvar <- get_pretty_var(var)
     if (nchar(unit) > 0) {
       paste(pvar, ' [', unit ,']', sep='')
     } else {
@@ -141,7 +141,7 @@ get_or_generate_label <- function (var, label) {
   }
 }
 
-pretty_station_id <- function(ids) {
+get_pretty_station_id <- function(ids) {
   get_pretty_id <- function(id) {
     parts <- strsplit(id, "_")[[1]]
     paste(toupper(parts[[1]]), cap(parts[[2]]))

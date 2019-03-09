@@ -51,7 +51,7 @@ save_autocorrelation_plot <- function(df, varname, plot_path, id_var = "station_
   })
 
   acf_stats <- do.call(rbind, acf_for_id)
-  y_lab <- paste(pretty_var(varname), switch(acf_method,
+  y_lab <- paste(get_pretty_var(varname), switch(acf_method,
     acf = "autocorrelation [1]",
     pacf = "partial autocorrelation [1]", {
       "Unknown autocorrelation method"
@@ -75,7 +75,7 @@ save_autocorrelation_plot <- function(df, varname, plot_path, id_var = "station_
   names(labels) <- sapply(ids, as.character)
   plot <- ggplot(data = acf_stats, aes_string(x = "lag", y = "acf")) +
     geom_bar(mapping = aes(fill = highlight_flag), stat = "identity", width = 0.5) +
-    scale_fill_manual(values = c(COLORS[1], 'red', 'grey')) +
+    scale_fill_manual(values = c(COLOR_BASE, COLOR_CONTRAST, 'grey')) +
     scale_x_continuous(breaks = seq(0, max_lag, period_length)) +
     xlab("Lag [h]") +
     ylab(y_lab) +

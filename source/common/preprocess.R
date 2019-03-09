@@ -145,7 +145,7 @@ skip_constant_variables <- function (res_formula, df) {
 }
 
 # vars and excluded store names of base variables (without the past_ and future_ prefixes)
-add_aggregated <- function (windows, past_lag, vars_to_aggregate=c(), excluded = c(), na.rm = TRUE) {
+add_aggregated <- function (windows, past_lag, vars_to_aggregate=c(), excluded = c(), aggregate_incomplete = FALSE) {
   if (past_lag <= 0) {
     windows
   }
@@ -189,7 +189,11 @@ add_aggregated <- function (windows, past_lag, vars_to_aggregate=c(), excluded =
         # If the row consitst only of NA values
         # min and max functions raise a warning 
         # about using +- Inf values
-        suppressWarnings(f(row, na.rm = na.rm))
+        
+        # If aggregate_incomplete is set to TRUE the final aggregated
+        # value (assigned to all_stats) is set to NA only if the row is empty (length = 0)
+        # or contains only the following values: NA. NaN, Inf, -Inf
+        suppressWarnings(f(row, na.rm = aggregate_incomplete))
       }))
       row_stats
     })

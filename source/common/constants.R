@@ -2,8 +2,13 @@ source("utils.R")
 packages <- c("scales", "colorspace")
 import(packages)
 
+# Standard ggplot palette
 COLORS <- hue_pal()(4)
 COLORS <- c(COLORS[3], COLORS[1], COLORS[2], COLORS[4])
+COLOR_BASE <- COLORS[1] 
+COLOR_ACCENT <- '#006060'
+COLOR_SECONDARY <- COLORS[2]
+COLOR_CONTRAST <- 'red'
 
 MONTHS <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 MONTHS_ABB <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")

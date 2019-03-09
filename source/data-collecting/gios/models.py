@@ -44,5 +44,5 @@ class Observation(SqlBase):
         super(Observation, self).__init__(**kwargs)
 
     def __repr__(self):
-        return 'Observation({station_id}, {timestamp}, {pm2_5}, {pm10})' \
+        return 'Observation({station_id}, {measurement_time}, {pm2_5}, {pm10})' \
                .format(**vars(self))

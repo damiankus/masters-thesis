@@ -13,7 +13,7 @@ save_bars_plot <- function (df, factor, plot_path, title) {
     geom_bar(aes_string(x = 'timestamp', y = factor), stat = 'identity') +
     ggtitle(title) +
     xlab('Timestamp') + 
-    ylab( cap( paste(pretty_var(factor), '[', units(factor), ']', sep = ' ')))
+    ylab( cap( paste(get_pretty_var(factor), '[', units(factor), ']', sep = ' ')))
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
   print(paste('Plot saved in', plot_path, sep = ' '))
 }
@@ -24,7 +24,7 @@ save_line_plot <- function (df, factor, plot_path, title) {
     ggtitle(title) +
     geom_area(fill = 'lightblue') +
     xlab('Timestamp') + 
-    ylab(paste('Missing', pretty_var(factor), 'values', sep = ' ')) +
+    ylab(paste('Missing', get_pretty_var(factor), 'values', sep = ' ')) +
     scale_x_datetime(date_breaks = '24 hours') +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   ggsave(plot_path, width = 16, height = 10, dpi = 200)
@@ -86,7 +86,7 @@ main <- function () {
       which <- missing_obs[missing_obs$month == month,]
       plot_name <- paste(factor, '_', month, '.png', sep = '')
       plot_path <- file.path(target_dir, plot_name)
-      title <- paste('Time points with missing values of', pretty_var(factor), ' during', month_names[month], sep = ' ')
+      title <- paste('Time points with missing values of', get_pretty_var(factor), ' during', month_names[month], sep = ' ')
       save_line_plot(which, factor, plot_path, title)
     }
   }

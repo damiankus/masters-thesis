@@ -14,11 +14,13 @@ import(packages)
 option_list <- list(
   make_option(c("-f", "--file"), type = "character", default = "preprocessed/observations.Rda"),
   make_option(c("-o", "--output-dir"), type = "character", default = "boxplots"),
+  make_option(c("-v", "--variables"), type = "character", default = "pm2_5"),
 
   # A semicolon separated string with following possible values
   # yearly, monthly, daily, hourly
   # example -t yearly;monthly;daily
-  make_option(c("-g", "--group-by"), type = "character", default = "year")
+  make_option(c("-g", "--group-by"), type = "character", default = "day_of_week,hour_of_day"),
+  make_option(c("-s", "--split-by"), type = "character", default = "")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -34,7 +36,9 @@ valid_grouping_types <- c(
   "day_of_week",
   "hour_of_day"
 )
-grouping_types <- parse_list_argument(opts, "group-by", valid_values = valid_grouping_types)
+grouping_varnames <- parse_list_argument(opts, "group-by", valid_values = valid_grouping_types)
+split_varnames <- parse_list_argument(opts, "split-by")
+varnames <- parse_list_argument(opts, "variables")
 
 series$season <- sapply(series$season, function(season) {
   SEASONS[season]
@@ -51,18 +55,39 @@ series$month <- sapply(series$month, function(month) {
 
 x_orders <- list(
   year = sort(unique(series$year)),
+  season = SEASONS,
   month = MONTHS_ABB,
   day_of_week = WEEKDAYS_ABB,
   hour_of_day = seq(0, 23)
 )
 
-target_dir <- opts[["output-dir"]]
-mkdir(target_dir)
+output_dir <- opts[["output-dir"]]
+mkdir(output_dir)
 
-lapply(grouping_types, function(grouping_type) {
-  lapply(vars, function(var) {
-    plot_name <- paste("boxplot_", var, "_by_", grouping_type, ".png", sep = "")
-    plot_path <- file.path(target_dir, plot_name)
-    save_boxplot(series, grouping_type, var, plot_path, x_order = x_orders[[grouping_type]])
+draw_for_subseries <- function (subseries, subseries_dir, subseries_name = "") {
+  lapply(grouping_varnames, function(grouping_var) {
+    lapply(varnames, function(varname) {
+      plot_name <- paste("boxplot_", subseries_name, "_", varname, "_by_", grouping_var, ".png", sep = "")
+      plot_path <- file.path(subseries_dir, plot_name)
+      save_boxplot(series, grouping_var, varname, plot_path, x_order = x_orders[[grouping_var]])
+    })
   })
-})
+}
+
+if (length(split_varnames) > 0) {
+  lapply(split_varnames, function (split_varname) {
+    split_values <- sort(unique(series[, split_varname]))
+    lapply(split_values, function (split_value) {
+      which_rows <- series[, split_varname] == split_value
+      subseries <- series[which_rows, ]
+      subseries_name <- paste('split_by', split_varname, split_value, sep = "_")
+      subseries_dir <- file.path(output_dir, subseries_name)
+      mkdir(subseries_dir)
+      draw_for_subseries(subseries = subseries,
+                         subseries_dir = subseries_dir,
+                         subseries_name = subseries_name)
+    })
+  })
+} else {
+  draw_for_subseries(subseries = series, subseries_dir = output_dir)
+}

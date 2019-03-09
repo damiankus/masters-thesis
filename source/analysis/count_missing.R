@@ -37,11 +37,11 @@ missing_for_station <- lapply(stations, function(sid) {
 })
 missing <- as.data.frame(t(do.call(rbind, missing_for_station)))
 varnames <- sapply(BASE_VARS, function(var) {
-  paste(pretty_var(var), "[%]")
+  paste(get_pretty_var(var), "[%]")
 })
 missing <- cbind(varnames, missing)
 rownames(missing) <- seq(nrow(missing))
-colnames(missing) <- c('Variable', pretty_station_id(stations))
+colnames(missing) <- c('Variable', get_pretty_station_id(stations))
 missing <- missing[order(missing$Variable), ]
 print(missing)
 tex_file_path <- file.path(output_dir, "missing.tex")
@@ -54,7 +54,7 @@ png(filename = plot_file_path, width = 800, height = 800, pointsize = 18)
 aggr(base_series[, BASE_VARS],
   numbers = TRUE,
   sortVars = TRUE,
-  labels = short_pretty_var(BASE_VARS),
+  labels = short_get_pretty_var(BASE_VARS),
   cex.axis = .8,
   gap = 1,
   ylab = c("Histogram of missing data", "Pattern")

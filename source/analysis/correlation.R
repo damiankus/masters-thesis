@@ -23,7 +23,7 @@ plotCorrMat <- function(df, main_var_idx, file_path, width = 1280, corr_threshol
   M <- cor(data, use = "complete.obs")
   which_order <- order(abs(M[, main_var_idx]), decreasing = T)
   orig_colnames <- colnames(M)
-  colnames(M) <- sapply(orig_colnames, pretty_var)
+  colnames(M) <- sapply(orig_colnames, get_pretty_var)
   rownames(M) <- colnames(M)
   corrplot(M, type = "upper", method = "number", col = palette(100))
   colnames(M) <- orig_colnames
@@ -64,11 +64,11 @@ signif_vars <- lapply(stations, function(sid) {
   })
   signif_vars <- as.data.frame(t(sapply(signif_vars, as.character)), stringsAsFactors = FALSE)
   signif_vars <- data.frame(
-    "Station" = pretty_station_id(sid),
+    "Station" = get_pretty_station_id(sid),
     signif_vars,
     stringsAsFactors = FALSE
   )
-  cnames <- t(as.data.frame(sapply(colnames(signif_vars), pretty_var)))
+  cnames <- t(as.data.frame(sapply(colnames(signif_vars), get_pretty_var)))
   cnames[1, 1] <- ""
   cnames[1, 2] <- ""
   signif_vars <- rbind(cnames, signif_vars)
