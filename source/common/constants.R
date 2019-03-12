@@ -2,11 +2,20 @@ source("utils.R")
 packages <- c("scales", "colorspace")
 import(packages)
 
+# Found at https://gist.github.com/Jfortin1/72ef064469d1703c6b30
+# Credit to the user Jfortin1
+change_color_brightness <- function (color, factor){
+  col <- col2rgb(color)
+  col <- col * factor
+  col <- rgb(t(col), maxColorValue = 255)
+  col
+}
+
 # Standard ggplot palette
-COLORS <- hue_pal()(4)
-COLORS <- c(COLORS[3], COLORS[1], COLORS[2], COLORS[4])
+COLORS <- hue_pal()(3)
+COLORS <- c(COLORS[3], COLORS[1], COLORS[2])
 COLOR_BASE <- COLORS[1] 
-COLOR_ACCENT <- '#006060'
+COLOR_ACCENT <- change_color_brightness(COLOR_BASE, factor = 0.7)
 COLOR_SECONDARY <- COLORS[2]
 COLOR_CONTRAST <- 'red'
 
@@ -16,7 +25,7 @@ MONTHS_ABB <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 WEEKDAYS <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 WEEKDAYS_ABB <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-SEASONS <- c("Winter", "Spring", "Summer", "Autumn")
+SEASONS <- c("winter", "spring", "summer", "autumn")
 
 BASE_VARS <- c(
   "pm2_5",

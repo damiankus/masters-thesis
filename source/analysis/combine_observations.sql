@@ -292,10 +292,10 @@ ALTER TABLE observations ADD COLUMN month INT;
 UPDATE observations
 SET month = EXTRACT(MONTH FROM measurement_time);
 
-ALTER TABLE observations DROP COLUMN IF EXISTS month_scaled;
-ALTER TABLE observations ADD COLUMN month_scaled FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS month_cosine;
+ALTER TABLE observations ADD COLUMN month_cosine FLOAT;
 UPDATE observations
-SET month_scaled = COS(2 * PI() * month / 12.0);
+SET month_cosine = COS(2 * PI() * month / 12.0);
 
 -- ===================================
 
@@ -304,10 +304,10 @@ ALTER TABLE observations ADD COLUMN day_of_week INTEGER;
 UPDATE observations
 SET day_of_week = EXTRACT(DOW FROM measurement_time);
 
-ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week_scaled;
-ALTER TABLE observations ADD COLUMN day_of_week_scaled FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_week_cosine;
+ALTER TABLE observations ADD COLUMN day_of_week_cosine FLOAT;
 UPDATE observations
-SET day_of_week_scaled = COS(2 * PI() * day_of_week / 6.0);
+SET day_of_week_cosine = COS(2 * PI() * day_of_week / 6.0);
 
 -- ===================================
 
@@ -317,10 +317,10 @@ ALTER TABLE observations ADD COLUMN day_of_year INTEGER;
 UPDATE observations 
 SET day_of_year = EXTRACT(DOY FROM measurement_time);
 
-ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year_scaled;
-ALTER TABLE observations ADD COLUMN day_of_year_scaled FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS day_of_year_cosine;
+ALTER TABLE observations ADD COLUMN day_of_year_cosine FLOAT;
 UPDATE observations 
-SET day_of_year_scaled = COS(2 * PI() * day_of_year / 365.0);
+SET day_of_year_cosine = COS(2 * PI() * day_of_year / 366.0);
 
 -- Transform the hour of day to a continuous value
 ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day;
@@ -328,10 +328,10 @@ ALTER TABLE observations ADD COLUMN hour_of_day INTEGER;
 UPDATE observations 
 SET hour_of_day = EXTRACT(HOUR FROM measurement_time);
 
-ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day_scaled;
-ALTER TABLE observations ADD COLUMN hour_of_day_scaled FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS hour_of_day_cosine;
+ALTER TABLE observations ADD COLUMN hour_of_day_cosine FLOAT;
 UPDATE observations 
-SET hour_of_day_scaled = COS(2 * PI() * hour_of_day / 24.0);
+SET hour_of_day_cosine = COS(2 * PI() * hour_of_day / 24.0);
 
 -- ===================================
 
@@ -399,7 +399,7 @@ SET day_of_week = EXTRACT(DOW FROM measurement_time);
 -- ===================================
 
 --------------------------------
-COPY observations TO '/tmp/observations_raw.csv' WITH CSV HEADER DELIMITER ';';
+COPY observations TO '/tmp/observations_raw.csv' WITH CSV HEADER DELIMITER ';';iqr
 COPY meteo_observations TO '/tmp/meteo_observations_raw.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------
 
@@ -483,7 +483,7 @@ $$  LANGUAGE plpgsql;
 -- Additionally it has been assumed that using this method for variables with well defined 
 -- boundaries is redundant and can potentially lead to removing valid values
 -- (for example relative humisity which takes values between 0 and 100, or wind direction expressed in degrees)
-SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature', 'pressure']);
+SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature']);
 
 --------------------------------
 COPY observations TO '/tmp/observations_iqr.csv' WITH CSV HEADER DELIMITER ';';
@@ -686,10 +686,10 @@ $$  LANGUAGE plpgsql;
 -- are the same, let's express this variable using a periodic function 
 -- COS(0) = COS(360 = 2 * PI rad) = 1
 
-ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_scaled;
-ALTER TABLE observations ADD COLUMN wind_dir_scaled FLOAT;
+ALTER TABLE observations DROP COLUMN IF EXISTS wind_dir_cosine;
+ALTER TABLE observations ADD COLUMN wind_dir_cosine FLOAT;
 UPDATE observations 
-SET wind_dir_scaled = COS(2 * PI() * wind_dir_deg / 360.0);
+SET wind_dir_cosine = COS(2 * PI() * wind_dir_deg / 360.0);
 
 --------------------------------
 COPY observations TO '/tmp/observations.csv' WITH CSV HEADER DELIMITER ';';

@@ -103,6 +103,16 @@ get_pretty_var <- function(vars) {
             paste(
               parts[3:length(parts)], collapse="_"))
           paste(aggr_type, time_lag, "h", var_name)
+        } else if (grepl("_of_", var)) {
+          parts <- strsplit(var, "_of_")[[1]]
+          smaller_part <- parts[[1]]
+          transformation_parts <- strsplit(parts[[2]], "_")[[1]]
+          larger_part <- if (length(transformation_parts) > 1) {
+            paste(transformation_parts[[1]], " (",  transformation_parts[[2]], ")", sep = "")
+          } else {
+            transformation_parts[[1]]
+          }
+          paste(smaller_part, "of the", larger_part)
         } else {
           delim <- "_"
           paste(strsplit(var, delim)[[1]], collapse = " ")

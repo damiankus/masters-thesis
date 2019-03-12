@@ -10,7 +10,7 @@ import(packages)
 
 save_autocorrelation_plot <- function(df, varname, plot_path, id_var = "station_id",
                                       acf_method = "acf", max_lag = 168, period_length = 24,
-                                      width = 5, height = 4) {
+                                      width = 7, height = 6) {
   ids <- sort(unique(df[, id_var]))
   acf_function <- get(acf_method)
   format_ts <- function(x) {
@@ -86,7 +86,7 @@ save_autocorrelation_plot <- function(df, varname, plot_path, id_var = "station_
 
 # MAIN
 option_list <- list(
-  make_option(c("-f", "--file"), type = "character", default = "data/time_windows.Rda"),
+  make_option(c("-f", "--file"), type = "character", default = "data/time_windows_aggregated_incomplete.Rda"),
   make_option(c("-o", "--output-dir"), type = "character", default = "autocorrelation"),
   make_option(c("-v", "--variable"), type = "character", default = "pm2_5"),
   make_option(c("-i", "--id-variable"), type = "character", default = "season"),

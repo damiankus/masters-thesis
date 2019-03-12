@@ -16,7 +16,7 @@ default_vars <- BASE_VARS[!which_response]
 option_list <- list(
   make_option(c("-f", "--file"), type = "character", default = "preprocessed/observations.Rda"),
   make_option(c("-t", "--output-file"), type = "character", default = "data/time_windows.Rda"),
-  make_option(c("-i", "--aggregate-incomplete"), type = "logical", action = "store_true", default = FALSE),
+  make_option(c("-c", "--aggregate-only-complete"), type = "logical", action = "store_true", default = FALSE),
   make_option(c("-p", "--past-lag"), type = "numeric", default = 23),
   make_option(c("-l", "--future-lag"), type = "numeric", default = 24)
 )
@@ -37,7 +37,7 @@ mkdir(output_dir)
 series <- series[order(series$measurement_time), ]
 
 # Add scaled non-time variables  
-series$wind_dir_scaled <- cos(2 * pi * series$wind_dir_deg / 360)
+series$wind_dir_cosine <- cos(2 * pi * series$wind_dir_deg / 360)
 
 cols <- colnames(series)
 cols <- cols[cols != "station_id"]
@@ -53,7 +53,7 @@ windows_for_station <- lapply(stations, function(station_id) {
   windows <- add_aggregated(windows,
                             past_lag = opts[["past-lag"]],
                             vars = BASE_VARS,
-                            aggregate_incomplete = opts[["aggregate-incomplete"]])
+                            aggregate_only_complete = opts[["aggregate-only-complete"]])
   windows <- skip_past(windows)
   windows$station_id <- station_id
   windows

@@ -26,11 +26,11 @@ max_ts <- max(series$measurement_time)
 ts_seq <- seq(from = min_ts, to = max_ts, by = "hours")
 expected_measurements_count <- length(ts_seq)
 stations <- unique(series$station_id)
-base_series <- series[, c("station_id", BASE_VARS)]
+base_series <- series[, c("station_id", "measurement_time", BASE_VARS)]
 
 missing_for_station <- lapply(stations, function(sid) {
   series_for_station <- base_series[base_series$station_id == sid, ]
-  missing_for_station <- unlist(lapply(BASE_VARS, function(var) {
+  missing_for_station <- unlist(lapply(BASE_VARS, function (var) {
     sum(is.na(series_for_station[, var])) * 100 / expected_measurements_count
   }))
   missing_for_station

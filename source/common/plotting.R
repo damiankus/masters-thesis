@@ -160,7 +160,7 @@ save_histogram <- function (df, var, plot_path, show_stats_lines=TRUE) {
     geom_histogram(color=hist_color, fill=hist_color, alpha=0.3, binwidth=bw) +
     geom_density(color=density_color, size=0.5) + 
     xlab(get_or_generate_label(var)) +
-    ylab('Density')
+    ylab('Density [1]')
   save_plot_file(plot, plot_path)
 }
 

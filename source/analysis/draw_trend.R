@@ -81,7 +81,7 @@ draw_yearly <- function(df, vars) {
 option_list <- list(
   make_option(c("-f", "--file"), type = "character", default = "preprocessed/observations.Rda"),
   make_option(c("-o", "--output-dir"), type = "character", default = "trend"),
-  make_option(c("-v", "--variables"), type = "character", default = paste(BASE_VARS, collapse = ",")),
+  make_option(c("-v", "--variables"), type = "character", default = 'day_of_year_cosine'),#paste(BASE_VARS, collapse = ",")),
   
 
   # A semicolon separated string with following possible values

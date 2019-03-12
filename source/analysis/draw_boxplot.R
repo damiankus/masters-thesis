@@ -19,7 +19,7 @@ option_list <- list(
   # A semicolon separated string with following possible values
   # yearly, monthly, daily, hourly
   # example -t yearly;monthly;daily
-  make_option(c("-g", "--group-by"), type = "character", default = "day_of_week,hour_of_day"),
+  make_option(c("-g", "--group-by"), type = "character", default = "season"),
   make_option(c("-s", "--split-by"), type = "character", default = "")
 )
 
