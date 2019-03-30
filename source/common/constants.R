@@ -29,7 +29,7 @@ SEASONS <- c("winter", "spring", "summer", "autumn")
 
 BASE_VARS <- c(
   "pm2_5",
-  "temperature", "precip_rate", "humidity", "pressure", "wind_speed", "wind_dir_deg", "solradiation"
+  "temperature", "precip_rate", "humidity", "pressure", "wind_speed", "wind_dir_deg"
 )
 
 # including temporal auxiliary variables

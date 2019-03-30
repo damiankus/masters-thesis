@@ -160,6 +160,12 @@ params_seq <- if (opts[["use-aggregated"]]) {
 }
 
 draw_plots <- function (data, subseries_dir, subseries_name = "") {
+  subseries_name_prefix <- if (nchar(subseries_name) > 0) {
+    paste(subseries_name, "_", sep = "")
+  } else {
+    ""
+  }
+    
   lapply(params_seq, function (params) {
     print(params$message)
     present_vars <- params$variables[params$variables %in% all_vars]
@@ -170,7 +176,7 @@ draw_plots <- function (data, subseries_dir, subseries_name = "") {
       subseries <- data[, present_vars]
       print(params)
       save_relationship_plots(df = subseries,
-                              plot_path = file.path(subseries_dir, paste(subseries_name, params$file_name, sep = "_")),
+                              plot_path = file.path(subseries_dir, paste(subseries_name_prefix, params$file_name, sep = "")),
                               width = opts$width,
                               font_size = opts[["font-size"]],
                               small_font_size = opts[["small-font-size"]])

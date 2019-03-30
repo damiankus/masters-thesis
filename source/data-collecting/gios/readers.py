@@ -36,7 +36,7 @@ class AbstractDataReader(ABC):
             header = []
 
             # Read header
-            for i in range(self.data_line_no):
+            for _ in range(self.data_line_no):
                 header.append(next(reader))
             col_indexes = self.get_var_indexes(header)
 
@@ -50,8 +50,9 @@ class AbstractDataReader(ABC):
                     }
                     for var_name in self.var_names:
                         idx = col_indexes[station_id][var_name]
-                        if idx is not None and row[idx]:
-                            record[var_name] = row[idx].translate(TRANS_NUM)
+                        if idx is not None and idx < len(row) and row[idx]:
+                            value = row[idx].strip().translate(TRANS_NUM)
+                            record[var_name] = value if (value) else None
                     append(record)
         return lines
 

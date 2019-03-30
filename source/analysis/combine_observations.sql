@@ -50,7 +50,6 @@ CREATE TABLE observations (
 	wind_speed NUMERIC(7, 3),
 	wind_dir_deg NUMERIC(6, 3),
 	precip_rate NUMERIC(7, 3),
-	solradiation NUMERIC(8, 3),
 	temperature NUMERIC(6, 3),
 	humidity NUMERIC(6, 3), 
 	pressure NUMERIC(7, 3)
@@ -123,8 +122,7 @@ CREATE TABLE meteo_observations (
 	pressure NUMERIC(7, 3), 
 	wind_speed NUMERIC(7, 3), -- m/s!
 	wind_dir_deg NUMERIC(6, 3),
-	precip_rate NUMERIC(7, 3),
-	solradiation NUMERIC(8, 3)
+	precip_rate NUMERIC(7, 3)
 );
 
 /*
@@ -142,8 +140,8 @@ The TIME column is already a UTC timestamp
 
 INSERT INTO meteo_observations(station_id, measurement_time, temperature,
 	 humidity, pressure, wind_speed, wind_dir_deg, precip_rate)
-SELECT 'agh_meteo', time, ta_hour_avg, ua_hour_avg, pa_hour_avg,
-	sm_hour_avg, dm_hour_avg, ri_hour_avg
+SELECT 'agh_meteo', time, averageAirTemp, averageRelativeHumidity, averageAirPressure,
+	averageWindSpeed, averageWindDirection, rainIntensity
 FROM agh_meteo_observations
 ORDER BY time;
 
@@ -157,10 +155,10 @@ measurements from 12:00 to 12:59
 
 INSERT INTO meteo_observations(station_id, measurement_time, temperature,
 	 humidity, pressure, wind_speed, wind_dir_deg,
-	 precip_rate, solradiation)
+	 precip_rate)
 SELECT station_id, date_trunc('hour', timestamp),
 	AVG(temperature), AVG(humidity), AVG(pressure), AVG(wind_speed),
-	AVG(wind_dir_deg), AVG(precip_rate), AVG(solradiation)
+	AVG(wind_dir_deg), AVG(precip_rate)
 FROM wunderground_observations 
 GROUP BY 1, 2
 ORDER BY 1, 2;
@@ -413,11 +411,11 @@ UPDATE observations SET pm2_5 = NULL WHERE pm2_5 < 0;
 UPDATE observations SET pm10 = NULL WHERE pm10 < 0;
 
 UPDATE meteo_observations SET humidity = NULL WHERE humidity < 0 OR humidity > 100;
-UPDATE meteo_observations SET pressure = NULL WHERE pressure < 970 OR pressure > 1050;
-UPDATE meteo_observations SET precip_rate = NULL WHERE precip_rate < 0;
-UPDATE meteo_observations SET temperature = NULL WHERE temperature < -25 OR temperature > 40;
+UPDATE meteo_observations SET pressure = NULL WHERE pressure < 970 OR pressure > 1060;
+UPDATE meteo_observations SET precip_rate = NULL WHERE precip_rate < 0 OR precip_rate > 180;
+UPDATE meteo_observations SET temperature = NULL WHERE temperature < -30 OR temperature > 40;
 UPDATE meteo_observations SET wind_dir_deg = NULL WHERE wind_dir_deg < 0 OR wind_dir_deg > 360;
-UPDATE meteo_observations SET wind_speed = NULL WHERE wind_speed < 0;
+UPDATE meteo_observations SET wind_speed = NULL WHERE wind_speed < 0 OR wind_speed > 80;
 
 --------------------------------
 COPY observations TO '/tmp/observations_filtered.csv' WITH CSV HEADER DELIMITER ';';
@@ -498,7 +496,6 @@ CREATE INDEX ON meteo_observations(humidity) WHERE humidity IS NOT NULL;
 CREATE INDEX ON meteo_observations(wind_speed) WHERE wind_speed IS NOT NULL;
 CREATE INDEX ON meteo_observations(wind_dir_deg) WHERE wind_dir_deg IS NOT NULL;
 CREATE INDEX ON meteo_observations(precip_rate) WHERE precip_rate IS NOT NULL;
-CREATE INDEX ON meteo_observations(solradiation) WHERE solradiation IS NOT NULL;
 CLUSTER meteo_observations USING "meteo_observations_measurement_time_idx";
 
 CREATE INDEX ON observations(temperature) WHERE temperature IS NULL;
@@ -507,7 +504,6 @@ CREATE INDEX ON observations(humidity) WHERE humidity IS NULL;
 CREATE INDEX ON observations(wind_speed) WHERE wind_speed IS NULL;
 CREATE INDEX ON observations(wind_dir_deg) WHERE wind_dir_deg IS NULL;
 CREATE INDEX ON observations(precip_rate) WHERE precip_rate IS NULL;
-CREATE INDEX ON observations(solradiation) WHERE solradiation IS NULL;
 
 /*
 Find the distances between stations 
@@ -637,7 +633,7 @@ END;
 $$  LANGUAGE plpgsql;
 
 -- SELECT fill_missing('observations', 'observations', 'air_quality_cross_distance', ARRAY['pm2_5', 'pm10']);
-SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_rate', 'solradiation']);
+SELECT fill_missing('observations', 'meteo_observations', 'air_quality_meteo_distance', ARRAY['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_dir_deg', 'precip_rate']);
 
 
 DROP FUNCTION IF EXISTS fill_missing_from_station(TEXT, TEXT, TEXT, TEXT[]);
@@ -702,4 +698,3 @@ DROP INDEX "observations_humidity_idx";
 DROP INDEX "observations_wind_speed_idx";
 DROP INDEX "observations_wind_dir_deg_idx";
 DROP INDEX "observations_precip_rate_idx";
-DROP INDEX "observations_solradiation_idx";

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import csv
+import itertools
+import json
+
 import psycopg2
 import psycopg2.extras
-import itertools
 
 
 class AirlyImporter:
@@ -19,7 +21,8 @@ class AirlyImporter:
             with open(in_path, 'r') as in_file:
                 csv_reader = csv.reader(in_file, delimiter=',')
                 header = next(csv_reader)
-                records = list(itertools.chain(*[line_processor(cols, header) for cols in csv_reader]))
+                records = list(itertools.chain(
+                    *[line_processor(cols, header) for cols in csv_reader]))
                 psycopg2.extras.execute_values(cursor, statement, records)
                 connection.commit()
         except Exception as e:
@@ -29,11 +32,13 @@ class AirlyImporter:
 
     def import_stations(self, in_path):
         colnames = ['id', 'latitude', 'longitude']
+
         def preprocess_stations(cols, header):
             # Wrap columns in a list to allow for concatenation
             # required in the case of observations
             return [tuple([cols[idx] for idx in range(len(cols))])]
-        self.save_from_csv(in_path, 'airly_stations', colnames, preprocess_stations)
+        self.save_from_csv(in_path, 'airly_stations',
+                           colnames, preprocess_stations)
 
     def import_observations(self, in_path):
         colnames = ['utc_time', 'station_id', 'temperature',
@@ -57,22 +62,23 @@ class AirlyImporter:
                 station_header = header[i:(i + record_len)]
                 station_id = station_header[0].split('_')[0]
                 values = [utc_time, station_id] + cols[i:(i + record_len)]
-                record = tuple([values[idx] if values[idx] else None for idx in range(len(values))])
+                record = tuple([values[idx] if values[idx]
+                                else None for idx in range(len(values))])
                 append(record)
             return records
-        
-        self.save_from_csv(in_path, 'airly_observations', colnames, preprocess_observations)
+
+        self.save_from_csv(in_path, 'airly_observations',
+                           colnames, preprocess_observations)
 
 
 if __name__ == '__main__':
-    conn_params = {
-        'dbname': 'air_quality',
-        'user': 'damian',
-        'host': 'localhost',
-        'password': 'pass'
-    }
+
+    def get_config():
+        with open('config.json', 'r') as config_file:
+            return json.load(config_file)
+
     try:
-        connection = psycopg2.connect(**conn_params)
+        connection = psycopg2.connect(**get_config()['db-connection'])
         importer = AirlyImporter(connection)
         importer.import_stations('sensor_locations.csv')
         importer.import_observations('airly-merged.csv')

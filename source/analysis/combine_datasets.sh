@@ -16,12 +16,14 @@ export TIME_WINDOWS_FILE="data/time_windows.Rda";
 export VARS_WITH_OUTLIERS="temperature,pressure"
 export TIME_VARIABLES="measurement_time,is_holiday,is_heating_season,year,season,month,day_of_week,day_of_year,hour_of_day,period_of_day";
 export SCALED_TIME_VARIABLES="is_holiday,is_heating_season,season,month_cosine,day_of_week_cosine,day_of_year_scaled,hour_of_day_scaled"
-export METEO_VARIABLES="pm2_5,pm10,wind_speed,wind_dir_deg,precip_rate,solradiation,temperature,humidity,pressure";
+export METEO_VARIABLES="pm2_5,pm10,wind_speed,wind_dir_deg,precip_rate,temperature,humidity,pressure";
 
 export COMMON_SCATTER_PARAMS="--file $TIME_WINDOWS_FILE --output-dir relationships --response-variable future_pm2_5";
 export TIME_PARAMS="$COMMON_SCATTER_PARAMS --explanatory-variables $TIME_VARIABLES";
 export TIME_PARAMS_COSINE="--explanatory-variables $SCALED_TIME_VARIABLES";
 export METEO_PARAMS="--explanatory-variables $METEO_VARIABLES";
+export PLOTS_DIR="plots-for-thesis";
+
 
 rm -rf $SQL_DUMP_DIR
 rm -rf $PREPROCESSED_DIR
@@ -43,17 +45,17 @@ Rscript draw_distribution.R --file $METEO_RAW_FILE --output-dir distribution/raw
 Rscript draw_distribution.R --file $FILTERED_FILE --output-dir distribution/filtered --variables pm2_5 --group-by month;
 Rscript draw_distribution.R --file $METEO_FILTERED_FILE --output-dir distribution/filtered --variables $VARS_WITH_OUTLIERS --group-by month;
 Rscript draw_distribution.R --file $METEO_IQR_FILE --output-dir distribution/iqr --variables $VARS_WITH_OUTLIERS --group-by month;
-Rscript draw_distribution.R --file $SERIES_FILE --output-dir distribution --variables pm2_5;
+Rscript draw_distribution.R --file $SERIES_FILE --output-dir distribution --variables pm2_5,precip_rate,wind_speed,temperature,pressure,humidity;
 
 # Draw yearly trends
-Rscript draw_trend.R --file $SERIES_FILE --output-dir trend --variables pm2_5 --type yearly,daily;
+Rscript draw_trend.R --file $SERIES_FILE --output-dir trend --variables pm2_5,temperature,day_of_year_cosine,wind_speed,pressure,precip_rate --type yearly;
 
 # Draw boxplots
 Rscript draw_boxplot.R --file $SERIES_FILE --output-dir boxplots --variables pm2_5 --split-by season --group-by hour_of_day,day_of_week;
 Rscript draw_boxplot.R --file $SERIES_FILE --output-dir boxplots --variables pm2_5 --group-by season,month,day_of_week,hour_of_day,;
 
 # Impute missing values
-Rscript save_imputed_series.R --file $SERIES_FILE --output-file $MICE_SERIES_FILE --method mice --test-year 2017;
+# Rscript save_imputed_series.R --file $SERIES_FILE --output-file $MICE_SERIES_FILE --method mice --test-year 2018;
 
 # Create time windows containing aggregated values
 Rscript save_time_windows.R --file $SERIES_FILE --output-file $TIME_WINDOWS_FILE --past-lag 23 --future-lag 24;
@@ -68,5 +70,23 @@ Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS $TIME_PARAMS_COSINE --output-f
 Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS --output-file base_variables_relationships.png;
 Rscript draw_scatterplot.R $COMMON_SCATTER_PARAMS --output-file filtered_base_variables_relationships.png --filter-aggregated;
 
+# Draw complementary heatmaps
+Rscript draw_heatmap.R --file $TIME_WINDOWS_FILE --output-dir relationships --response-variables future_pm2_5 --variables wind_speed,total_24_precip_rate --test-year 2018
+
 # Draw autocorrelation plots (ACF and PACF)
 Rscript draw_acf.R --file $TIME_WINDOWS_FILE --output-dir autocorrelation --variable pm2_5;
+
+# Move plots used in thesis to a common directory
+mkdir $PLOTS_DIR
+
+cp autocorrelation/pm2_5_acf*.png $PLOTS_DIR/pm2_5_acf.png;
+cp boxplots/*.png $PLOTS_DIR;
+cp statistics/statistics.tex $PLOTS_DIR;
+cp missing_records/missing.tex $PLOTS_DIR;
+cp trend/yearly_pm2_5_trend.png $PLOTS_DIR;
+cp trend/yearly_day_of_year_cosine_trend.png $PLOTS_DIR;
+cp trend/yearly_pm2_5_trend.png $PLOTS_DIR;
+cp distribution/histogram_pm2_5.png $PLOTS_DIR;
+cp relationships/heatmap_* $PLOTS_DIR;
+cp relationships/filtered_base_variables_relationships.png $PLOTS_DIR/variables_relationships.png;
+

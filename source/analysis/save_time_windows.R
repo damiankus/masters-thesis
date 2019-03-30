@@ -77,10 +77,10 @@ complete_cases_fname <- paste(
 
 f <- file(file.path(output_dir, complete_cases_fname))
   complete_rows_count <- nrow(windows[complete.cases(windows), ])
-  aggregation_info <- if (opts[['aggregate-incomplete']]) {
-    paste('Aggregated values were calculated using all available data in a row.')
-  } else {
+  aggregation_info <- if (opts[['aggregate-only-complete']]) {
     paste('Aggregated values were calculated only if a row contained no missing values.')
+  } else {
+    paste('Aggregated values were calculated using all available data in a row.')
   }
   message <- paste('Number of complete cases:', complete_rows_count,
                    'out of', nrow(windows),

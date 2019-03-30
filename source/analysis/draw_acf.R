@@ -131,7 +131,7 @@ draw_acf <- if (!length(aggregate_vars)) {
       varname = opts$variable,
       plot_path = file.path(output_dir, paste(opts$variable, "_", acorr_type,
         "_by_", id_var,
-        "aggregated_by_", paste(aggregate_vars, collapse = "_"),
+        "_aggregated_by_", paste(aggregate_vars, collapse = "_"),
         ".png",
         sep = ""
       )),

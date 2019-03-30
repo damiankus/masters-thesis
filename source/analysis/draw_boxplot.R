@@ -65,9 +65,14 @@ output_dir <- opts[["output-dir"]]
 mkdir(output_dir)
 
 draw_for_subseries <- function (subseries, subseries_dir, subseries_name = "") {
+  subseries_name_infix <- if (nchar(subseries_name) > 0) {
+    paste(subseries_name, '_', sep = "")
+  } else {
+    ""
+  }
   lapply(grouping_varnames, function(grouping_var) {
     lapply(varnames, function(varname) {
-      plot_name <- paste("boxplot_", subseries_name, "_", varname, "_by_", grouping_var, ".png", sep = "")
+      plot_name <- paste("boxplot_", subseries_name_infix, varname, "_by_", grouping_var, ".png", sep = "")
       plot_path <- file.path(subseries_dir, plot_name)
       save_boxplot(series, grouping_var, varname, plot_path, x_order = x_orders[[grouping_var]])
     })

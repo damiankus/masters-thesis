@@ -10,7 +10,7 @@ import(packages)
 
 # MAIN
 option_list <- list(
-  make_option(c("-f", "--file"), type = "character", default = "preprocessed/observations.Rda"),
+  make_option(c("-f", "--file"), type = "character", default = "data/time_windows.Rda"),
   make_option(c("-o", "--output-dir"), type = "character", default = "missing_records")
 )
 
@@ -33,12 +33,17 @@ missing_for_station <- lapply(stations, function(sid) {
   missing_for_station <- unlist(lapply(BASE_VARS, function (var) {
     sum(is.na(series_for_station[, var])) * 100 / expected_measurements_count
   }))
-  missing_for_station
+  which_incomplete <- !complete.cases(series_for_station)
+  incomplete_rows_count <- 100 * nrow(series_for_station[which_incomplete, ]) / expected_measurements_count
+  c(missing_for_station, incomplete_rows_count)
 })
 missing <- as.data.frame(t(do.call(rbind, missing_for_station)))
-varnames <- sapply(BASE_VARS, function(var) {
-  paste(get_pretty_var(var), "[%]")
-})
+varnames <- c(sapply(BASE_VARS, function(var) {
+    paste(get_pretty_var(var), "[%]")
+  }),
+  "incomplete rows [%]"
+)
+
 missing <- cbind(varnames, missing)
 rownames(missing) <- seq(nrow(missing))
 colnames(missing) <- c('Variable', get_pretty_station_id(stations))

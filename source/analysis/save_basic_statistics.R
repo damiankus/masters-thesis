@@ -10,7 +10,7 @@ import(packages)
 
 # MAIN
 option_list <- list(
-  make_option(c("-f", "--file"), type = "character", default = "data/time_windows_aggregated_incomplete.Rda"),
+  make_option(c("-f", "--file"), type = "character", default = "data/time_windows.Rda"),
   make_option(c("-o", "--output-dir"), type = "character", default = "statistics"),
   make_option(c("-v", "--variable"), type = "character", default = "pm2_5")
 )
@@ -30,6 +30,7 @@ daily_mean_limit <- 50
 stats <- rbind(data.frame(unclass(summary(col))),
                skewness = skewness(col, na.rm = TRUE),
                kurtosis = kurtosis(col, na.rm = TRUE),
+               number_of_records = sum(!is.na(col)),
                exceeded_daily_limit_percentage = 100 * sum(daily_mean_col > daily_mean_limit, na.rm = TRUE) / length(daily_mean_col)
          )
 stat_names <- c(
@@ -42,6 +43,7 @@ stat_names <- c(
   "number of missing values",
   "skewness",
   "kurtosis",
+  "number of observations",
   "percentage of days with exceeded daily limits"
 )
 stats <- cbind(stat_names, stats)
