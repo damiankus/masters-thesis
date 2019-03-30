@@ -28,7 +28,8 @@ class TestDataImport(unittest.TestCase):
         self.csv_reader = csv.reader(self.valid_values_file,
                                      delimiter=',', quotechar='"')
 
-    def assert_equality_for_columns(self, colnames, condition_colnames):
+    def assert_equality_for_columns(
+            self, colnames, condition_colnames, acceptable_error=10**-2):
         cursor = self.conn.cursor()
         query_builder = QueryBuilder()
 
@@ -36,7 +37,7 @@ class TestDataImport(unittest.TestCase):
         raw_valid_records = [dict(zip(header, values))
                              for values in self.csv_reader]
 
-        # sort the records to make sure their order
+        # sort the records to be sure their order
         # is same as the order of rows fetched from the DB
         valid_records = sorted(
             raw_valid_records, key=itemgetter(*condition_colnames))
@@ -67,8 +68,9 @@ class TestDataImport(unittest.TestCase):
                     self.assertIsNone(actual[colname])
                 else:
                     # Currenlty only numeric values are used for testing
-                    self.assertEqual(
-                        actual[colname], Decimal(expected[colname]))
+                    self.assertLessEqual(
+                        abs(actual[colname] - Decimal(expected[colname])),
+                        acceptable_error)
 
     def test_gios_observations(self):
         self.setup_test_data('../gios/config.json', 'gios/valid_values.csv')
@@ -81,6 +83,22 @@ class TestDataImport(unittest.TestCase):
             ['temperature', 'humidity', 'pressure', 'pm1', 'pm2_5', 'pm10'],
             ['utc_time', 'station_id'])
 
+    def test_agh_meteo_observations(self):
+        self.setup_test_data('../agh-meteo/config.json',
+                             'agh-meteo/valid_values.csv')
+        self.assert_equality_for_columns(
+            ['averageAirPressure', 'averageAirTemp', 'averageRelativeHumidity',
+                'averageWindDirection', 'averageWindSpeed', 'rainIntensity'],
+            ['time'])
+
+    def test_wunderground_observations(self):
+        self.setup_test_data('../wunderground/config.json',
+                             'wunderground/valid_values.csv')
+        self.assert_equality_for_columns(
+            ['humidity', 'precip_rate', 'precip_total', 'pressure',
+                'solradiation', 'temperature', 'wind_dir_deg', 'wind_speed'],
+            ['station_id', 'timestamp'])
+            
     def tearDown(self):
         if self.conn:
             self.conn.close()

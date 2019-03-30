@@ -10,7 +10,4 @@ CREATE TABLE agh_meteo_observations (
     rainIntensity NUMERIC(7, 2)
 );
 
-
--- Files downloaded from http://meteo.ftj.agh.edu.pl/meteo/archiwalneDaneMeteo have extra trailing delimiters which must be removed!
--- You can use the remove_trailing_char.py script from this directory
-\copy agh_meteo_observations (time, averageAirPressure, averageAirTemp, averageRelativeHumidity, averageWindDirection, averageWindSpeed, rainIntensity) FROM 'agh_meteo_2012_2018.csv' WITH HEADER DELIMITER ';' CSV;
+COPY agh_meteo_observations (time, averageAirPressure, averageAirTemp, averageRelativeHumidity, averageWindDirection, averageWindSpeed, rainIntensity) FROM 'agh_meteo_2012_2018.csv' WITH HEADER DELIMITER ';' CSV;

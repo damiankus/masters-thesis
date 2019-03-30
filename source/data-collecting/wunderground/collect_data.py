@@ -88,76 +88,84 @@ def apath(rel_path):
 
 
 if __name__ == '__main__':
-    global_config = None
+    config = None
     stations = None
     with open(apath('config.json'), 'r') as config_file:
-        global_config = json.load(config_file)
+        config = json.load(config_file)
 
-    init_logger(apath(global_config['log-file']))
-    logger.debug(global_config['log-file'])
+    init_logger(apath(config['log-file']))
+    logger.debug(config['log-file'])
     DATE_FORMAT = '%Y-%m-%d'
 
-    for service_name, config in global_config['services'].items():
-        logger.info('Gathering data for {}'.format(service_name))
-        endpoint = config['api-endpoint']
-        api_keys = config['api-keys']
-        max_calls = config['max-calls'] * len(api_keys)
-        retry_period_s = config['retry-period-s'] + 1
-        performed_calls = 0
+    endpoint = config['api-endpoint']
+    api_keys = config['api-keys']
+    max_calls = config['max-calls'] * len(api_keys)
+    retry_period_s = config['retry-period-s'] + 1
+    performed_calls = 0
 
-        connection = None
-        try:
-            connection = psycopg2.connect(**config['db-connection'])
+    connection = None
+    try:
+        connection = psycopg2.connect(**config['db-connection'])
 
-            def get_stations(config):
-                if 'stations-file' in config:
-                    if os.path.isfile(apath(config['stations-file'])):
-                        with open(apath(config['stations-file'])) as stations_file:
-                            return json.load(stations_file)['stations']
-                    else:
-                        logger.debug('Parsing a sample response from API')
-                        return load_stations(apath(config['response-file']),
-                            apath(config['stations-file']))['stations']
+        def get_stations(config):
+            if 'stations-file' in config:
+                if os.path.isfile(apath(config['stations-file'])):
+                    stations_path = apath(config['stations-file'])
+                    with open(stations_path, 'r') as stations_file:
+                        return json.load(stations_file)['stations']
                 else:
-                    return []
+                    logger.debug('Parsing a sample response from API')
+                    return load_stations(
+                        apath(config['response-file']),
+                        apath(config['stations-file'])
+                    )['stations']
+            else:
+                return []
 
-            def get_requested_stations(config):
-                stations = get_stations(config)
-                id_set = set(config['station-ids']) if ('station-ids' in config) else set() 
-                is_valid = (lambda station: station['id'] in id_set) if ('station-ids' in config) else (lambda station: True)
-                return list(filter(is_valid, stations))                
+        def get_requested_stations(config):
+            stations = get_stations(config)
+            id_set = set(config['station-ids']
+                         ) if ('station-ids' in config) else set()
+            is_valid = (lambda station: station['id'] in id_set) if (
+                'station-ids' in config) else (lambda station: True)
+            return list(filter(is_valid, stations))
 
-            for station in get_requested_stations(config):
-                start_date = dt.strptime(config['date-start'], DATE_FORMAT)
-                end_date = dt.strptime(config['date-end'], DATE_FORMAT)
-                date = start_date
-                const_params = dict([(param, station[param])
-                                        for param in config['url-params']])
-                url_template = endpoint.format(**const_params)
-                target_dir = os.path.join(
-                    config['target-dir'], station['id'])
-                if not os.path.exists(target_dir):
-                    os.makedirs(target_dir)
+        for station in get_requested_stations(config):
+            start_date = dt.strptime(config['date-start'], DATE_FORMAT)
+            end_date = dt.strptime(config['date-end'], DATE_FORMAT)
+            date = start_date
+            const_params = dict([(param, station[param])
+                                 for param in config['url-params']])
+            url_template = endpoint.format(**const_params)
+            target_dir = os.path.join(
+                config['target-dir'], station['id'])
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir)
 
-                while date != end_date:
-                    key_idx = performed_calls % len(api_keys)
-                    var_params = {
-                        'date': date.strftime(DATE_FORMAT).replace('-', ''),
-                        'api_key': api_keys[key_idx]
-                    }
-                    url = url_template.format(**var_params)
-                    date = date + tdelta(days=1)
-                    get_and_save(url, os.path.join(
-                        target_dir, 'observation_' + var_params['date'] + '.json'))
+            while date != end_date:
+                key_idx = performed_calls % len(api_keys)
+                var_params = {
+                    'date': date.strftime(DATE_FORMAT).replace('-', ''),
+                    'api_key': api_keys[key_idx]
+                }
+                url = url_template.format(**var_params)
+                date = date + tdelta(days=1)
+                get_and_save(url, os.path.join(
+                    target_dir,
+                    'observation_' + var_params['date'] + '.json')
+                )
 
-                    performed_calls += 1
-                    if performed_calls % max_calls == 0 and performed_calls >= max_calls:
-                        logger.info(
-                            'Waiting [{} s] to prevent max API calls exceedance'
-                            .format(retry_period_s))
-                        time.sleep(retry_period_s)
+                performed_calls += 1
+                if performed_calls % max_calls == 0 and \
+                        performed_calls >= max_calls:
 
-                logger.debug(log_separator)
-        finally:
-            if connection is not None:
-                connection.close()
+                    logger.info(
+                        'Waiting [{} s] to prevent\
+                            max API calls exceedance'
+                        .format(retry_period_s))
+                    time.sleep(retry_period_s)
+
+            logger.debug(log_separator)
+    finally:
+        if connection is not None:
+            connection.close()
