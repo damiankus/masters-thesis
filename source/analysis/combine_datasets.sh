@@ -49,13 +49,11 @@ Rscript draw_distribution.R --file $SERIES_FILE --output-dir distribution --vari
 
 # Draw yearly trends
 Rscript draw_trend.R --file $SERIES_FILE --output-dir trend --variables pm2_5,temperature,day_of_year_cosine,wind_speed,pressure,precip_rate --type yearly;
+Rscript draw_trend.R --file $SERIES_FILE --output-dir trend --variables pm2_5 --type daily;
 
 # Draw boxplots
 Rscript draw_boxplot.R --file $SERIES_FILE --output-dir boxplots --variables pm2_5 --split-by season --group-by hour_of_day,day_of_week;
 Rscript draw_boxplot.R --file $SERIES_FILE --output-dir boxplots --variables pm2_5 --group-by season,month,day_of_week,hour_of_day,;
-
-# Impute missing values
-# Rscript save_imputed_series.R --file $SERIES_FILE --output-file $MICE_SERIES_FILE --method mice --test-year 2018;
 
 # Create time windows containing aggregated values
 Rscript save_time_windows.R --file $SERIES_FILE --output-file $TIME_WINDOWS_FILE --past-lag 23 --future-lag 24;
@@ -76,6 +74,10 @@ Rscript draw_heatmap.R --file $TIME_WINDOWS_FILE --output-dir relationships --re
 # Draw autocorrelation plots (ACF and PACF)
 Rscript draw_acf.R --file $TIME_WINDOWS_FILE --output-dir autocorrelation --variable pm2_5;
 
+Rscript draw_training_validation_test_split.R --file $TIME_WINDOWS_FILE --output-dir data-split --variables pm2_5
+
+Rscript draw_activation_function.R
+
 # Move plots used in thesis to a common directory
 mkdir $PLOTS_DIR
 
@@ -89,4 +91,6 @@ cp trend/yearly_pm2_5_trend.png $PLOTS_DIR;
 cp distribution/histogram_pm2_5.png $PLOTS_DIR;
 cp relationships/heatmap_* $PLOTS_DIR;
 cp relationships/filtered_base_variables_relationships.png $PLOTS_DIR/variables_relationships.png;
+cp data-split/* $PLOTS_DIR;
+mv tanh.png $PLOTS_DIR;
 
