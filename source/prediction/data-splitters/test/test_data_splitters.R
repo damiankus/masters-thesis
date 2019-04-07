@@ -31,23 +31,23 @@ test_that("Splitting fails if", {
 
 test_that("Split based on year", {
   test_that("fails if", {
-    test_that("validation test sets overlap", {
+    test_that("training and test sets overlap", {
       expect_error(
         split_data_by_year(series,
-          validation_years = c(2015, 2016),
+          training_years = c(2015, 2016),
           test_years = c(2016, 2017)
         ),
-        "Max year of a validation set.*"
+        "Training years.*"
       )
     })
 
-    test_that("validation and test sets are intertwined", {
+    test_that("training and test sets are intertwined", {
       expect_error(
         split_data_by_year(series,
-          validation_years = c(2015, 2017),
+          training_years = c(2015, 2017),
           test_years = c(2016, 2018)
         ),
-        "Max year of a validation set.*"
+        "Training years.*"
       )
     })
   })
@@ -59,41 +59,37 @@ test_that("Split based on year", {
     expect_equal(length(all_split), 1)
   })
 
-  test_that("sets a valid default validation year", {
-    years <- sort(unique(subsets$validation_set$year))
-    expect_equal(length(years), 1)
-    expect_equal(years[[1]], 2017)
-  })
-
-  test_that("sets a valid default test year", {
-    years <- sort(unique(subsets$test_set$year))
-    expect_equal(length(years), 1)
-    expect_equal(years[[1]], 2018)
-  })
-
-  test_that("includes observations from the remaining years as a training set", {
-    years <- sort(unique(subsets$training$year))
-    expect_true(all(years == seq(2012, 2016)))
-  })
-
   test_that("includes a correct number of observations", {
     rows_count <- nrow(subsets$training_set) +
-      nrow(subsets$validation_set) +
       nrow(subsets$test_set)
     expect_equal(nrow(series), rows_count)
   })
 
-  test_that("applies custom validation years", {
+  test_that("sets default training years to all available years except the last one", {
+    years <- sort(unique(series$year))
+    training_years <- sort(unique(subsets$training_set$year))
+    expect_equal(length(training_years), length(years) - 1)
+    expect_true(all(head(years) == training_years))
+  })
+  
+  test_that("sets default test year to the last available one", {
+    years <- sort(unique(series$year))
+    test_years <- sort(unique(subsets$test_set$year))
+    expect_equal(length(test_years), 1)
+    expect_equal(tail(years, 1), test_years[1])
+  })
+  
+  test_that("applies custom training years", {
     expected_years <- c(2014, 2015, 2017)
-    validation_set <- split_data_by_year(
+    training_set <- split_data_by_year(
       series,
-      validation_years = expected_years
-    )[[1]]$validation_set
-    actual_years <- sort(unique(validation_set$year))
+      training_years = expected_years
+    )[[1]]$training_set
+    actual_years <- sort(unique(training_set$year))
     expect_true(all(expected_years == actual_years))
   })
 
-  test_that("applies custom testing years", {
+  test_that("applies custom test years", {
     expected_years <- c(2013, 2014, 2016)
     test_set <- split_data_by_year(
       series,
@@ -102,19 +98,22 @@ test_that("Split based on year", {
     actual_years <- sort(unique(test_set$year))
     expect_true(all(expected_years == actual_years))
   })
-
-  test_that(paste(
-    "for custom validation and test years includes all observations",
-    "from before the validation set in the training set"
-  ), {
-    training_set <- split_data_by_year(
+  
+  test_that("applies custom test and training years", {
+    expected_training_years <- c(2012, 2013, 2015)
+    expected_test_years <- c(2016, 2018)
+    
+    subsets <- split_data_by_year(
       series,
-      validation_years = c(2014, 2016),
-      test_years = c(2017)
-    )[[1]]$training_set
-    actual_years <- sort(unique(training_set$year))
-    expected_years <- c(2012, 2013)
-    expect_true(all(expected_years == actual_years))
+      training_years = expected_training_years,
+      test_years = expected_test_years
+    )[[1]]
+    
+    actual_training_years <- sort(unique(subsets$training_set$year))
+    actual_test_years <- sort(unique(subsets$test_set$year))
+    
+    expect_true(all(expected_training_years == actual_training_years))
+    expect_true(all(expected_test_years == actual_test_years))
   })
 })
 
@@ -137,7 +136,6 @@ test_that("Split based on season and year", {
       subsets <- seasonal_split[[season]]
       seasons_in_subsets <- unique(c(
         unique(subsets$training_set$season),
-        unique(subsets$validation_set$season),
         unique(subsets$test_set$season)
       ))
       length(seasons_in_subsets) == 1 && seasons_in_subsets[[1]] == season
@@ -145,17 +143,17 @@ test_that("Split based on season and year", {
     expect_true(all(seasons_in_subsets_valid))
   })
 
-  test_that("preserves custom validation years", {
+  test_that("preserves custom training years", {
     expected_years <- c(2015, 2016)
     custom_seasonal_split <- split_data_by_season_and_year(
       series,
-      validation_years = expected_years
+      training_years = expected_years
     )
-    years_in_subsplits_valid <- lapply(seq(4), function(season) {
+    years_in_subsplits_valid <- lapply(seq(4), function (season) {
       subsets <- custom_seasonal_split[[season]]
-      all(expected_years == unique(
-        subsets$validation_set$year
-      ))
+      all(expected_years == sort(unique(
+        subsets$training_set$year
+      )))
     })
     expect_true(all(years_in_subsplits_valid))
   })
