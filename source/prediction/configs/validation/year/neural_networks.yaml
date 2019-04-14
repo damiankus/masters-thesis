@@ -3,8 +3,14 @@ test_years: [2017]
 stations: [gios_krasinskiego]
 models:
   - type: neural
-    threshold: 1
-    stepmax: 1e+05
+    threshold: 3
+    stepmax: 1e5
     act_fun: tanh
     children:
     - hidden: '5'
+    - hidden: '10'
+    - hidden: '15'
+    - hidden: '5-3'
+    - hidden: '10-5'
+    - hidden: '15-7'
+    - hidden: '10-5-3'

@@ -1,0 +1,13 @@
+install.packages("acepack", dependencies = T)
+install.packages("httr", dependencies = T)
+install.packages("igraph", dependencies = T)
+install.packages("usethis", dependencies = T)
+install.packages("devtools", dependencies = T)
+install.packages("git2r", dependencies = T)
+install.packages("gh", dependencies = T)
+install.packages("gdtools", dependencies = T)
+install.packages("xml2", dependencies = T)
+install.packages("rgdal", dependencies = T)
+install.packages("rgeos", dependencies = T)
+install.packages("sf", dependencies = T)
+
