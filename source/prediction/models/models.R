@@ -83,17 +83,13 @@ create_neural_network <- function(hidden, threshold, stepmax = 1e+06, act_fun = 
     # of a column. If the column contains constant values it becomes
     # division by 0!
     res_formula <- get_formula(res_var, expl_vars)
-    all_data <- rbind(training_set[, expl_vars], test_set[, expl_vars])
     
-    # Means and standard deviations of the response
-    # variable can be calculated only based on historical data,
-    # without the future values which are yet to be measured
-    means <- apply(all_data, 2, mean, na.rm = TRUE)
-    means[[res_var]] <- mean(training_set[[res_var]], na.rm = TRUE)
-    sds <- apply(all_data, 2, sd, na.rm = TRUE)
-    sds[[res_var]] <- sd(training_set[[res_var]], na.rm = TRUE)
+    # Means and standard deviations of can be calculated
+    # only based on historical data, without the futurevalues,
+    # which are yet to be measured
+    means <- apply(training_set, 2, mean, na.rm = TRUE)
+    sds <- apply(training_set, 2, sd, na.rm = TRUE)
     
-    rm(all_data)
     std_training_set <- standardize_with(training_set, means = means, sds = sds)
     std_test_set <- standardize_with(test_set, means = means, sds = sds)
 
@@ -129,10 +125,8 @@ create_svr <- function(kernel, gamma, epsilon, cost) {
     # Standardization of the data
     all_data <- rbind(training_set, test_set)
     
-    means <- apply(all_data, 2, mean, na.rm = TRUE)
-    means[[res_var]] <- mean(training_set[[res_var]], na.rm = TRUE)
-    sds <- apply(all_data, 2, sd, na.rm = TRUE)
-    sds[[res_var]] <- sd(training_set[[res_var]], na.rm = TRUE)
+    means <- apply(training_set, 2, mean, na.rm = TRUE)
+    sds <- apply(training_set, 2, sd, na.rm = TRUE)
     
     rm(all_data)
     std_training_set <- standardize_with(training_set, means = means, sds = sds)
