@@ -20,13 +20,6 @@ normalize_vec_with <- function(vals, min_val, max_val) {
   (vals - min_val) / (max_val - min_val)
 }
 
-reverse_normalize_with <- function(data, mins, maxs) {
-  data <- data.frame(data)
-  sapply(colnames(data), function(col) {
-    data[, col] * (maxs[col] - mins[col]) + mins[col]
-  })
-}
-
 reverse_normalize_vec_with <- function(vals, min_val, max_val) {
   vals * (max_val - min_val) + min_val
 }
@@ -39,13 +32,6 @@ standardize_with <- function(data, means, sds) {
   data <- data.frame(data)
   sapply(colnames(data), function(col) {
     (data[, col] - means[col]) / sds[col]
-  })
-}
-
-reverse_standardize_with <- function(data, means, sds) {
-  data <- data.frame(data)
-  sapply(colnames(data), function(col) {
-    (data[, col] * sds[col]) + means[col]
   })
 }
 

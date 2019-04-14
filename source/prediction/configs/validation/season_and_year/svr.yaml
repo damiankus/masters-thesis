@@ -1,0 +1,19 @@
+split_type: season_and_year
+test_years: [2017]
+stations: [gios_krasinskiego]
+models:
+  - type: svr
+    random: true
+    kernel: radial
+    exp_base: 2
+    exp_step: 2
+    model_count: 1
+    gamma:
+      min: -12
+      max: -4
+    epsilon:
+      min: -5
+      max: 1
+    cost:
+      min: -2
+      max: 10

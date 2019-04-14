@@ -28,9 +28,9 @@ save_comparison_plot <- function(df, res_var, plot_path, hour_units = 1) {
   # longer than a week, we plot them with two charts
   # to skip the missing values and thus save the space
 
-  df$group <- c(0, cumsum(diff(df$timestamp) > hour_units * 24 * 7))
-  melted <- melt(df, id = c("timestamp", "group"))
-  plot <- ggplot(data = melted, aes(x = timestamp, y = value, colour = variable)) +
+  df$group <- c(0, cumsum(diff(df$measurement_time) > hour_units * 24 * 7))
+  melted <- melt(df, id = c("measurement_time", "group"))
+  plot <- ggplot(data = melted, aes(x = measurement_time, y = value, colour = variable)) +
     geom_line() +
     facet_grid(~group, scales = "free_x", space = "free_x") +
     xlab("Date") +

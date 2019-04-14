@@ -3,13 +3,15 @@ setwd("../../common")
 source("utils.R")
 setwd(wd)
 
-split_data_based_on_type <- function(split_type, df,
+split_data_based_on_type <- function(split_type,
+                                     df,
                                      training_years = NULL,
                                      test_years = NULL,
                                      time_col = "measurement_time") {
   split_data <- switch(split_type,
     year = split_data_by_year,
-    season = split_data_by_season_and_year, {
+    season_and_year = split_data_by_season_and_year,
+    {
       stop(paste("Unknown split type:", split_type))
     }
   )

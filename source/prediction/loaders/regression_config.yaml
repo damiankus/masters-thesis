@@ -1,0 +1,4 @@
+split_strategy: all
+models: 
+  - regression
+station_id: gios_krasinskiego

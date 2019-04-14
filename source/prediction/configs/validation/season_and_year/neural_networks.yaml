@@ -1,0 +1,17 @@
+split_type: season_and_year
+test_years: [2017]
+stations: [gios_krasinskiego]
+models:
+  - type: neural
+    threshold: 0.7
+    stepmax: 1e6
+    act_fun: tanh
+    children:
+    - hidden: 5
+    - hidden: 10
+    - hidden: 15
+    - hidden: 5-3
+    - hidden: 10-5
+    - hidden: 15-7
+    - hidden: 10-5-3
+    

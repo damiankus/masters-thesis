@@ -12,5 +12,6 @@ auxilliary_variables <- c(
 )
 
 series <- series[, c(base_variables, auxilliary_variables)]
+series <- series[complete.cases(series), ]
 series <- series[order(series$station_id, series$measurement_time), ]
 save(series, file = "time_series.Rda")
