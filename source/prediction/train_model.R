@@ -1,7 +1,3 @@
-
-# Log output to file and stdout
-sink("log.txt", append = TRUE, split = TRUE)
-
 train_model_wd <- getwd()
 setwd("../common")
 source("utils.R")
@@ -19,14 +15,14 @@ Sys.setenv(LC_ALL = "en_US.UTF-8")
 limit_cpu_usage <- function(percentage_limit) {
   command <- paste('cpulimit -p', Sys.getpid(), '-l', percentage_limit, '&')
   response <- system(command)
-  print(paste('Limiting CPU usage:', command, 'Response:', response))
+  print(paste('Limiting CPU usage:', command, ', returned code:', response))
 }
 
 # Main logic
 
 option_list <- list(
-  make_option(c("-c", "--config-file"), type = "character", default = "configs/validation/year/neural_networks.yaml"),
-  make_option(c("-m", "--max-cpu-percentage"), type = "numeric", default = 99)
+  make_option(c("-c", "--config-file"), type = "character", default = "configs/validation/year/regression.yaml"),
+  make_option(c("-m", "--max-cpu-percentage"), type = "numeric", default = 60)
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -36,12 +32,19 @@ config <- load_yaml_config(opts[["config-file"]])
 mkdir(config$output_dir)
 datetime_format <- "%Y-%m-%d_%H:%M:%S"
 
-cluster <- makeCluster(detectCores(), outfile = "log.txt", type = )
+core_count <- detectCores()
+cluster <- makeCluster(core_count, outfile = "log_common.txt", type = )
 clusterExport(
   cl = cluster,
   varlist = ls(),
   envir = environment()
 )
+
+# Log output to file and stdout
+clusterApply(cluster, seq_along(cluster), function(worker_idx) {
+  worker_log_path <- paste("log_worker_", worker_idx, ".txt", sep = "")
+  sink(file = worker_log_path, append = TRUE)
+})
 
 lapply(config$stations, function(station_id) {
   result_dir <- file.path(config$output_dir, station_id, config$split_type)
@@ -52,7 +55,7 @@ lapply(config$stations, function(station_id) {
     source("models.R")
     setwd(train_model_wd)
     
-    # Limit max cpu usage to prevent making 
+    # Limit max cpu usage to prevent making
     # the host unresponsive
     limit_cpu_usage(opts[['max-cpu-percentage']])
 
@@ -62,7 +65,7 @@ lapply(config$stations, function(station_id) {
 
       which_test <- data_split$test_set$station_id == station_id
       test_set <- data_split$test_set[which_test, ]
-      
+
       get_forecast(
         fit_model = model$fit,
         res_var = config$res_var,
@@ -79,7 +82,9 @@ lapply(config$stations, function(station_id) {
   })
 })
 
-stopCluster(cluster)
-
 # Redirect all output back to stdout
-sink()
+# clusterApply(cluster, seq_along(cluster), {
+#   sink()
+# })
+
+stopCluster(cluster)

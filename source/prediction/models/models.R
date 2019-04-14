@@ -131,7 +131,7 @@ create_svr <- function(kernel, gamma, epsilon, cost) {
                  gamma = gamma,
                  cost = cost,
                  type = 'eps-regression',
-                 cachesize = 2048)
+                 cachesize = 1024)
     predicted <- predict(model, std_test_set)
 
     # Reverse the initial transformations

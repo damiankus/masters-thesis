@@ -1,0 +1,25 @@
+Model,Season,Training type,Station,RMSE [$\mu g/m^3$],MAE [$\mu g/m^3$],MAPE [$\%$],R2 [$1$]
+MLR                       ,winter ,all data,GIO? Bujaka,55.634,38.165,121.460, 0.330
+MLR                        ,winter ,same season,GIO? Bujaka,55.349,41.592,158.581, 0.333
+MLR                     ,winter ,all data,GIO? Bulwarowa,43.912,32.168,117.894, 0.334
+MLR LASSO                  ,winter ,same season,GIO? Bulwarowa,45.958,35.550,143.292, 0.266
+MLR       ,winter ,all data,GIO? Krasi?skiego,51.676,36.081,78.782, 0.429
+MLR       ,winter ,same season,GIO? Krasi?skiego,52.197,37.871,91.895,0.416
+"ANN (6, 5), threshold = 0.7",spring ,all data,GIO? Bujaka,15.585, 9.909, 67.350, 0.131
+"SVR $\gamma$ = 0.000977, $\epsilon$ = 0.25, C = 0.25 ",spring ,same season,GIO? Bujaka,15.388, 9.832, 65.815, 0.154
+"ANN (6. 5), threshold = 0.7         ",spring ,all data,GIO? Bulwarowa,14.875,10.461, 89.299, 0.134
+"SVR $\gamma$ = 0.000977, $\epsilon$ = 0.25, C = 0.25 ",spring ,same season,GIO? Bulwarowa,14.408, 9.870, 78.377, 0.189
+"SVR $\gamma$ = 0.000977, $\epsilon$ = 2, C = 1         ",spring ,all data,GIO? Krasi?skiego,16.306,11.209,55.841, 0.167
+"SVR $\gamma$ = 0.000977, $\epsilon$ = 0.25, C = 0.25  ",spring ,same season,GIO? Krasi?skiego,16.072,11.326,60.077,0.191
+MLR ln(PM2.5)                        ,summer ,all data,GIO? Bujaka, 6.855, 5.242, 66.407, 0.138
+"SVR $\gamma$ = 0.000244, $\epsilon$ = 0.5, C = 0.25 ",summer ,same season,GIO? Bujaka, 6.870, 5.334, 70.300, 0.134
+"SVR $\gamma$ = 0.00391, $\epsilon$ = 0.0312, C = 0.25 ",summer ,all data,GIO? Bulwarowa, 7.765, 5.723, 71.145, 0.099
+"SVR $\gamma$ = 0.000244, $\epsilon$ = 0.5, C = 0.25 ",summer ,same season,GIO? Bulwarowa, 7.777, 5.768, 71.923, 0.097
+"SVR $\gamma$ = 0.00391, $\epsilon$ = 0.0312, C = 0.25  ",summer ,all data,GIO? Krasi?skiego, 8.856, 6.850,48.531, 0.151
+MLR LASSO ,summer ,same season,GIO? Krasi?skiego, 8.575, 6.645,51.192,0.203
+"ANN (5, 5), threshold = 0.5           ",autumn ,all data,GIO? Bujaka,21.978,15.857,103.397, 0.177
+"SVR $\gamma$ = 0.000244, $\epsilon$ = 0.5, C = 16 ",autumn ,same season,GIO? Bujaka,22.055,15.733, 97.139, 0.171
+MLR                       ,autumn ,all data,GIO? Bulwarowa,21.768,15.579,104.767, 0.204
+MLR LASSO                  ,autumn ,same season,GIO? Bulwarowa,22.074,15.951,107.828, 0.179
+"ANN (5, 5), threshold = 0.5",autumn ,all data,GIO? Krasi?skiego,25.743,18.756,70.534, 0.225
+"ANN (3, 2), threshold = 0.3",autumn ,same season,GIO? Krasi?skiego,25.870,18.889,73.834,0.213

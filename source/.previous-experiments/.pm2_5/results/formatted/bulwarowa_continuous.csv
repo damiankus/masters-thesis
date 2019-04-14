@@ -1,0 +1,21 @@
+Model,Season,RMSE [$\mu g/m^3$],MAE [$\mu g/m^3$],MAPE [$%$],R2 [$1$]
+MLR                     ,winter ,43.912,32.168,117.894, 0.334
+MLR LASSO,winter ,44.025,31.246,109.325, 0.331
+MLR ln(PM2.5)                   ,winter ,49.170,31.676, 89.260, 0.165
+ANN (5) threshold = 0.7,winter ,52.457,38.254,140.131, 0.044
+"SVR gamma = 0.000244, epsilon = 0.5, C = 1 ",winter ,45.690,29.716, 83.751, 0.279
+MLR                     ,spring ,15.147,10.895, 85.575, 0.102
+MLR LASSO      ,spring ,15.560,11.660,107.070, 0.053
+MLR ln(PM2.5)                 ,spring ,15.100, 9.457, 61.687, 0.108
+ANN (6. 5) th 0.7         ,spring ,14.875,10.461, 89.299, 0.134
+"SVR gamma = 0.000977, epsilon = 2, C = 1 ",spring ,14.923, 9.750, 66.893, 0.129
+MLR                            ,summer , 8.901, 6.751, 77.983,-0.184
+MLR LASSO                      ,summer , 8.486, 6.503, 80.773,-0.076
+MLR ln(PM2.5)                        ,summer , 7.822, 5.687, 67.675, 0.086
+"ANN (4, 2) threshold = 0.5                ",summer , 8.142, 6.304, 87.275, 0.009
+"SVR gamma = 0.00391, epsilon = 0.0312, C = 0.25 ",summer , 7.765, 5.723, 71.145, 0.099
+MLR                       ,autumn ,21.768,15.579,104.767, 0.204
+MLR LASSO                 ,autumn ,21.846,16.002,114.083, 0.198
+MLR ln(PM2.5)                   ,autumn ,23.301,15.184, 69.311, 0.088
+"ANN (5, 5) threshold = 0.5           ",autumn ,21.901,15.437,100.561, 0.194
+"SVR gamma = 0.000244, epsilon = 0.5, C = 4 ",autumn ,21.945,14.868, 82.599, 0.191
