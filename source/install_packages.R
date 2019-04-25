@@ -9,5 +9,6 @@ install.packages("gdtools", dependencies = T)
 install.packages("xml2", dependencies = T)
 install.packages("rgdal", dependencies = T)
 install.packages("rgeos", dependencies = T)
+install.packages("units", dependencies = T)
 install.packages("sf", dependencies = T)
 
