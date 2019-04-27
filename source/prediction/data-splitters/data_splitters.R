@@ -29,10 +29,12 @@ split_data_by_season_and_year <- function(df,
   seasons <- sort(unique(df$season))
   lapply(seasons, function (season) {
     seasonal_data <- df[df$season == season, ]
-    split_data_by_year(df = seasonal_data, 
+    split <- split_data_by_year(df = seasonal_data, 
                       training_years = training_years,
                       test_years = test_years,
                       time_col = time_col)[[1]]
+    split$id <- season
+    split
   })
 }
 
@@ -87,6 +89,7 @@ split_data_by_year <- function(df,
 
   list(
     list(
+      id = 1,
       training_set = data[which_training, ],
       test_set = data[which_test, ]
     )
@@ -108,3 +111,4 @@ prepare_data <- function(df, time_col) {
   }
   df[order(df[time_col]), ]
 }
+

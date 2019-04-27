@@ -11,7 +11,7 @@ import(packages)
 get_forecast <- function(fit_model, res_var, expl_vars, training_set, test_set) {
   handle_error_and_get_na_predictions <- function(message) {
     print(message)
-    
+
     # cat displays new lines properly but does not add one at the end
     cat(paste(deparse(fit_model), collapse = "\n"))
     cat("\n")
@@ -71,21 +71,23 @@ fit_lasso_mlr <- function(res_var, expl_vars, training_set, test_set) {
   c(predict(fit, s = "lambda.1se", newx = test_mat, type = "response"))
 }
 
-create_neural_network <- function(hidden, threshold, stepmax = 1e+06, act_fun = 'tanh', lifesign = "full") {
+create_neural_network <- function(hidden, threshold, stepmax = 1e+06, act_fun = "tanh", lifesign = "full") {
   fit_neural_network <- function(res_var, expl_vars, training_set, test_set) {
-    print(paste('Fitting a neural network (',
-          'hidden layers:', paste(hidden, collapse = ', '),
-          'threshold:', threshold,
-          'stepmax:', stepmax,
-          'activation function:', act_fun, 
-          ')'))
-    
+    print(paste(
+      "Fitting a neural network (",
+      "hidden layers:", paste(hidden, collapse = ", "),
+      "threshold:", threshold,
+      "stepmax:", stepmax,
+      "activation function:", act_fun,
+      ")"
+    ))
+
     # Means and standard deviations of can be calculated
     # only based on historical data, without the futurevalues,
     # which are yet to be measured
     means <- apply(training_set, 2, mean, na.rm = TRUE)
     sds <- apply(training_set, 2, sd, na.rm = TRUE)
-    
+
     std_training_set <- standardize_with(training_set, means = means, sds = sds)
     std_test_set <- standardize_with(test_set, means = means, sds = sds)
 
@@ -108,30 +110,34 @@ create_neural_network <- function(hidden, threshold, stepmax = 1e+06, act_fun = 
 
 create_svr <- function(kernel, gamma, epsilon, cost) {
   fit_custom_svr <- function(res_var, expl_vars, training_set, test_set) {
-    print(paste('Fitting an SVR (kernel:', kernel,
-          'gamma:', gamma,
-          'epsilon:', epsilon,
-          'cost:', cost,
-          ')'))
+    print(paste(
+      "Fitting an SVR (kernel:", kernel,
+      "gamma:", gamma,
+      "epsilon:", epsilon,
+      "cost:", cost,
+      ")"
+    ))
 
     # Standardization of the data
     all_data <- rbind(training_set, test_set)
-    
+
     means <- apply(training_set, 2, mean, na.rm = TRUE)
     sds <- apply(training_set, 2, sd, na.rm = TRUE)
-    
+
     rm(all_data)
     std_training_set <- standardize_with(training_set, means = means, sds = sds)
     std_test_set <- standardize_with(test_set, means = means, sds = sds)
 
     res_formula <- get_formula(res_var, expl_vars)
-    model <- svm(formula = res_formula,
-                 data = std_training_set,
-                 kernel = kernel,
-                 gamma = gamma,
-                 cost = cost,
-                 type = 'eps-regression',
-                 cachesize = 1024)
+    model <- svm(
+      formula = res_formula,
+      data = std_training_set,
+      kernel = kernel,
+      gamma = gamma,
+      cost = cost,
+      type = "eps-regression",
+      cachesize = 1024
+    )
     predicted <- predict(model, std_test_set)
 
     # Reverse the initial transformations
@@ -210,7 +216,7 @@ get_neural_network_name <- function(hidden, threshold, stepmax, act_fun) {
     "__hidden_", hidden,
     "__threshold_", threshold,
     "__stepmax_", stepmax,
-    "__act_fun_", act_fun,
+    "__actfun_", act_fun,
     sep = ""
   )
 }

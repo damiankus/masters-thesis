@@ -1,42 +1,74 @@
-data_file: data/
-split_type: all
-output_dir: /results/test
-test_years:
-  - 2017
-stations:
-  - gios_krasinskiego
-models: 
-  - type: regression
-  
-  # simple neural network config
-  - type: neural
-    threshold: 0.7
-    stepmax: 1e6
-    hidden: 10-5-2
-      
-  # neural network config with inheritance
-  - type: neural
-    threshold: 0.7
-    stepmax: 1e6
-    children:
-      - hidden: 10-5-2
-        threshold: 0.5
-      - hidden: 20
-        threshold: 0.2
-
-  # simple SVR config
-  - type: svr
-    kernel: radial
-    gamma: 1e-5
-    epsilon: 1e-3
-    cost: 1e3
+- data_file: '../../data/time_series.Rda'
+  repetitions: 5
+  split_type: year
+  output_dir: /results/test
+  test_years:
+    - 2017
+  stations:
+    - gios_krasinskiego
+  models: 
+    - type: regression
     
-  # SVR config with inheritance
-  - type: svr
-    kernel: radial
-    gamma: 1e-5
-    epsilon: 1e-3
-    children:
-    - cost: 1e5
-      gamma: 0.01
-    - cost: 16
+    # simple neural network config
+    - type: neural
+      threshold: 0.7
+      stepmax: 1e6
+      hidden: 10-5-2
+        
+    # neural network config with inheritance
+    - type: neural
+      threshold: 0.7
+      stepmax: 1e6
+      children:
+        - hidden: 10-5-2
+          threshold: 0.5
+        - hidden: 20
+          threshold: 0.2
+  
+    # simple SVR config
+    - type: svr
+      kernel: radial
+      gamma: 1e-5
+      epsilon: 1e-3
+      cost: 1e3
+      
+    # SVR config with inheritance
+    - type: svr
+      kernel: radial
+      gamma: 1e-5
+      epsilon: 1e-3
+      children:
+        - cost: 1e5
+          gamma: 0.01
+        - cost: 16
+      
+- data_file: '../../data/time_series.Rda'
+  split_type: season_and_year
+  repetitions: 3
+  stations: [gios_krasinskiego]
+  models:
+    - type: neural
+      children:
+        - split_id: 1
+          hidden: 10
+          
+        - threshold: 2
+          hidden: 5-3
+          children:
+            - split_id: 1
+            - split_id: 2
+            
+        - split_id: 3
+          threshold: 3
+          hidden: 10-5
+          
+        - threshold: 4
+          children:
+            - hidden: 10-7-3
+              split_id: 2
+              
+            - hidden: 10-5-5
+              children:
+              - split_id: 3
+              - split_id: 4
+              
