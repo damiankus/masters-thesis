@@ -16,3 +16,5 @@ sudo apt-get install -y libxml2-dev;
 sudo apt-get install -y libgdal-dev;
 sudo apt-get install -y cpulimit;
 sudo apt-get install -y libudunits2-dev;
+sudo apt-get install -y python3-pip;
+sudo pip3 install virtualenv;

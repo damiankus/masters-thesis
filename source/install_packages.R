@@ -11,4 +11,7 @@ install.packages("rgdal", dependencies = T)
 install.packages("rgeos", dependencies = T)
 install.packages("units", dependencies = T)
 install.packages("sf", dependencies = T)
+install.packages("keras", dependencies = T)
+library(keras)
+install_keras()
 

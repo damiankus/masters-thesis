@@ -289,30 +289,8 @@
             - 1
             - 10
           children:
-            - epsilon:
-                - 11
-                - 12
-              children:
-                - cost: 13
-              
-    - type: neural
-      hidden:
-        - '10'
-        - '10-5-3'
-      children:
-        - random: true
-          l2:
-            - 1
-            - 2
-          children:
-            - epsilon:
-              - 3
-              - 4
-              children:
-                - random: true
-                  model_count: 2
-                  learning_rate: 
-                    - 5
-                    - 6
-                  children:
-                    - activation: tanh
+            epsilon:
+              - 11
+              - 12
+            children:
+              - cost: 13

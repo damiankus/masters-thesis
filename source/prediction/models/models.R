@@ -5,27 +5,27 @@ source("plotting.R")
 source("preprocess.R")
 setwd(wd)
 
-packages <- c("e1071", "neuralnet", "glmnet")
+packages <- c("glmnet", "keras", "e1071", "ggplot2")
 import(packages)
 
-get_forecast <- function(fit_model, res_var, expl_vars, training_set, test_set) {
+get_forecast <- function(model, res_var, expl_vars, training_set, test_set) {
   handle_error_and_get_na_predictions <- function(message) {
     print(message)
 
     # cat displays new lines properly but does not add one at the end
-    cat(paste(deparse(fit_model), collapse = "\n"))
+    cat(paste(deparse(model$fit), collapse = "\n"))
     cat("\n")
     rep(NA, nrow(test_set))
   }
 
-  training_set_only_used_vars <- training_set[, c(res_var, expl_vars)]
-  test_set_only_used_vars <- test_set[, c(res_var, expl_vars)]
   predicted <- tryCatch({
-    fit_model(
+    print(get_model_description(model))
+    model$fit(
       res_var = res_var,
       expl_vars = expl_vars,
-      training_set = training_set_only_used_vars,
-      test_set = test_set_only_used_vars
+      training_set = training_set,
+      test_set = test_set,
+      config = model
     )
   },
   warning = handle_error_and_get_na_predictions,
@@ -39,6 +39,18 @@ get_forecast <- function(fit_model, res_var, expl_vars, training_set, test_set) 
   )
 }
 
+get_model_description <- function (model) {
+  raw_model_type <- strsplit(model$name, "__")[[1]][[1]]
+  model_type <- gsub('_', ' ', x = raw_model_type)
+  param_names <- lapply(names(model$spec), function (name) {
+    gsub('_', ' ', name)
+  })
+  name_val_pairs <- lapply(seq_along(param_names), function (idx) {
+    paste(param_names[[idx]], model$spec[[idx]], sep = ": ")
+  })
+  paste(model_type, " (", paste(name_val_pairs, collapse = ", "), ")", sep = "")
+}
+
 get_formula <- function(res_var, expl_vars) {
   as.formula(paste(
     res_var, "~", paste(expl_vars, collapse = "+"),
@@ -47,23 +59,23 @@ get_formula <- function(res_var, expl_vars) {
 }
 
 # Predicted value is the last registered value
-fit_persistence <- function(res_var, expl_vars, training_set, test_set) {
+fit_persistence <- function(res_var, expl_vars, training_set, test_set, ...) {
   base_var <- gsub("future_", "", res_var)
   test_set[, base_var]
 }
 
-fit_mlr <- function(res_var, expl_vars, training_set, test_set) {
+fit_mlr <- function(res_var, expl_vars, training_set, test_set, ...) {
   model <- lm(get_formula(res_var, expl_vars), data = training_set)
   predict(model, test_set)
 }
 
-fit_log_mlr <- function(res_var, expl_vars, training_set, test_set) {
+fit_log_mlr <- function(res_var, expl_vars, training_set, test_set, ...) {
   res_formula <- as.formula(paste("log(", res_var, ") ~", paste(expl_vars, collapse = "+"), sep = ""))
   model <- lm(res_formula, data = training_set)
   predict(model, test_set)
 }
 
-fit_lasso_mlr <- function(res_var, expl_vars, training_set, test_set) {
+fit_lasso_mlr <- function(res_var, expl_vars, training_set, test_set, ...) {
   res_formula <- get_all_vars(res_var, expl_vars)
   training_mat <- model.matrix(res_formula, data = training_set)
   fit <- cv.glmnet(x = training_mat, y = training_set[, res_var], alpha = 1)
@@ -71,62 +83,109 @@ fit_lasso_mlr <- function(res_var, expl_vars, training_set, test_set) {
   c(predict(fit, s = "lambda.1se", newx = test_mat, type = "response"))
 }
 
-create_neural_network <- function(hidden, threshold, stepmax = 1e+06, act_fun = "tanh", lifesign = "full") {
-  fit_neural_network <- function(res_var, expl_vars, training_set, test_set) {
-    print(paste(
-      "Fitting a neural network (",
-      "hidden layers:", paste(hidden, collapse = ", "),
-      "threshold:", threshold,
-      "stepmax:", stepmax,
-      "activation function:", act_fun,
-      ")"
-    ))
+create_neural_network <- function(hidden, activation, epochs, min_delta, patience_ratio, batch_size, learning_rate, epsilon, l2, ...) {
+  fit_neural_network <- function(res_var, expl_vars, training_set, test_set, config, ...) {
+    training_years <- sort(unique(training_set$year))
+    validation_year <- tail(training_years, n = 1)
+    which_training <- training_set$year < validation_year
+    which_validation <- training_set$year == validation_year
+      
+    used_vars <- c(res_var, expl_vars)
+    actual_training_set <- training_set[which_training, used_vars]
+    actual_validation_set <- training_set[which_validation, used_vars]
+    actual_test_set <- test_set[, used_vars]
 
     # Means and standard deviations of can be calculated
     # only based on historical data, without the futurevalues,
     # which are yet to be measured
-    means <- apply(training_set, 2, mean, na.rm = TRUE)
-    sds <- apply(training_set, 2, sd, na.rm = TRUE)
+    means <- apply(actual_training_set, 2, mean, na.rm = TRUE)
+    sds <- apply(actual_training_set, 2, sd, na.rm = TRUE)
 
-    std_training_set <- standardize_with(training_set, means = means, sds = sds)
-    std_test_set <- standardize_with(test_set, means = means, sds = sds)
+    std_training_set <- standardize_with(actual_training_set, means = means, sds = sds)
+    std_validation_set <- standardize_with(actual_validation_set, means = means, sds = sds)
+    std_test_set <- standardize_with(actual_test_set, means = means, sds = sds)
 
-    res_formula <- get_formula(res_var, expl_vars)
-    nn <- neuralnet(res_formula,
-      data = std_training_set,
-      hidden = hidden,
-      stepmax = stepmax,
-      threshold = threshold,
-      act.fct = act_fun,
-      linear.output = TRUE,
-      lifesign = lifesign
+    base_output_path <- file.path(config$result_dir, config$name)
+    best_model_path <- paste(base_output_path, '.hdf5', sep="")
+    
+    callbacks <- list(
+      callback_progbar_logger(),
+      callback_early_stopping(monitor = 'val_loss',
+                              min_delta = min_delta,
+                              patience = floor(epochs * patience_ratio),
+                              verbose = 1),
+      callback_model_checkpoint(filepath = best_model_path,
+                                monitor = 'val_loss',
+                                mode = 'min',
+                                save_best_only = TRUE, 
+                                verbose = 1)
     )
-    predicted <- c(compute(nn, std_test_set[, expl_vars])$net.result)
-
-    # Reverse the initial transformations
-    reverse_standardize_vec_with(predicted, means[[res_var]], sds[[res_var]])
+    
+    model <- keras_model_sequential()
+    model %>% add_layers(
+      hidden = hidden,
+      activation = activation,
+      input_shape = length(expl_vars), 
+      l2 = l2) %>%
+    compile(
+      loss = 'mean_squared_error',
+      optimizer = optimizer_adam(lr = learning_rate, epsilon = epsilon),
+      metrics = c('mae'))
+    
+    summary(model)
+    
+    history <- model %>% fit(
+      x = data.matrix(std_training_set[, expl_vars]),
+      y = std_training_set[, res_var],
+      epochs = epochs,
+      batch_size = batch_size,
+      callbacks = callbacks,
+      validation_data = list(
+        data.matrix(std_validation_set[, expl_vars]),
+        std_validation_set[, res_var]),
+      verbose = 0
+    )
+    
+    # Save training history to a CSV file
+    write.csv(history, file = paste(base_output_path, '_history.csv', sep = ""))
+    
+    best_model <- load_model_hdf5(filepath = best_model_path)
+    std_predicted <- predict(best_model, as.matrix(std_test_set[, expl_vars]))
+    reverse_standardize_vec_with(std_predicted, means[[res_var]], sds[[res_var]])
   }
 }
 
-create_svr <- function(kernel, gamma, epsilon, cost) {
-  fit_custom_svr <- function(res_var, expl_vars, training_set, test_set) {
-    print(paste(
-      "Fitting an SVR (kernel:", kernel,
-      "gamma:", gamma,
-      "epsilon:", epsilon,
-      "cost:", cost,
-      ")"
-    ))
+add_layers <- function (model, hidden, activation, input_shape, l2) {
+  parsed_hidden <- if (is.numeric(hidden)) {
+    hidden
+  } else {
+    as.numeric(strsplit(hidden, split = "-")[[1]])
+  }
+  
+  if (!length(parsed_hidden)) {
+    model
+  } else {
+    model %>% layer_dense(input_shape = input_shape, units = hidden[[1]], activation = activation, kernel_regularizer = regularizer_l2(l = l2))
+    for (unit_count in parsed_hidden[-1]) {
+      model %>% layer_dense(units = unit_count, activation = activation, kernel_regularizer = regularizer_l2(l = l2))
+    }
+    model %>% layer_dense(units = 1, activation = 'linear')
+    model
+  }
+}
 
+create_svr <- function(kernel, gamma, epsilon, cost, ...) {
+  fit_custom_svr <- function(res_var, expl_vars, training_set, test_set, config, ...) {
+    used_vars <- c(res_var, expl_vars)
+    actual_training_set <- training_set[, used_vars]
+    actual_test_set <- test_set[, used_vars]
+    
     # Standardization of the data
-    all_data <- rbind(training_set, test_set)
+    means <- apply(actual_training_set, 2, mean, na.rm = TRUE)
+    sds <- apply(actual_training_set, 2, sd, na.rm = TRUE)
 
-    means <- apply(training_set, 2, mean, na.rm = TRUE)
-    sds <- apply(training_set, 2, sd, na.rm = TRUE)
-
-    rm(all_data)
-    std_training_set <- standardize_with(training_set, means = means, sds = sds)
-    std_test_set <- standardize_with(test_set, means = means, sds = sds)
+    std_training_set <- standardize_with(actual_training_set, means = means, sds = sds)
+    std_test_set <- standardize_with(actual_test_set, means = means, sds = sds)
 
     res_formula <- get_formula(res_var, expl_vars)
     model <- svm(
@@ -145,88 +204,21 @@ create_svr <- function(kernel, gamma, epsilon, cost) {
   }
 }
 
-# Min and max values for SVR hyperparameters were taken from:
-# A Practical Guide to Support Vector Classification
-# Chih-Wei Hsu, Chih-Chung Chang, and Chih-Jen Lin
-# https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
-generate_random_svr_power_grid <- function(model_count,
-                                           gamma_exp_bounds,
-                                           epsilon_exp_bounds,
-                                           cost_exp_bounds,
-                                           exp_base = 2,
-                                           exp_step = 2) {
-  gamma_exponents <- seq(gamma_exp_bounds[[1]], gamma_exp_bounds[[2]], exp_step)
-  gammas <- sapply(gamma_exponents, function(exponent) {
-    exp_base^exponent
+get_model_name <- function (model_type, call_instance, separator = "__", assignment_symbol = "=") {
+  # get argument names and values as a named list
+  args <- as.list(call_instance)[-1]
+  arg_names <- names(args)
+  parts <- lapply(seq_along(args), function (idx) {
+    paste(arg_names[[idx]], args[[idx]], sep = assignment_symbol)
   })
-
-  epsilon_exponents <- seq(epsilon_exp_bounds[[1]], epsilon_exp_bounds[[2]], exp_step)
-  epsilons <- sapply(epsilon_exponents, function(exponent) {
-    exp_base^exponent
-  })
-
-  cost_exponents <- seq(cost_exp_bounds[[1]], cost_exp_bounds[[2]], exp_step)
-  costs <- sapply(cost_exponents, function(exponent) {
-    exp_base^exponent
-  })
-
-  params <- expand.grid(gammas, epsilons, costs)
-  colnames(params) <- c("gamma", "epsilon", "cost")
-  params[sample(nrow(params), model_count), ]
+  paste(c(model_type, parts), collapse = separator)
 }
 
-
-# Observations:
-# * gamma greater or equal to 0.25 makes SVM not learn
-generate_random_pow_svrs <- function(model_count,
-                                     gamma_exp_bounds,
-                                     epsilon_exp_bounds,
-                                     cost_exp_bounds,
-                                     exp_base = 2,
-                                     exp_step = 2,
-                                     kernel = "radial") {
-  param_sets <- generate_random_svr_power_grid(
-    model_count = model_count,
-    exp_base = exp_base,
-    exp_step = exp_step,
-    gamma_exp_bounds = gamma_exp_bounds,
-    epsilon_exp_bounds = epsilon_exp_bounds,
-    cost_exp_bounds = cost_exp_bounds
-  )
-  svrs <- apply(param_sets, 1, function(params) {
-    list(
-      name = get_svr_name(
-        kernel = kernel,
-        gamma = params[["gamma"]],
-        epsilon = params[["epsilon"]],
-        cost = params[["cost"]]
-      ),
-      fit = create_svr(
-        kernel = kernel,
-        gamma = params[["gamma"]],
-        epsilon = params[["epsilon"]],
-        cost = params[["cost"]]
-      )
-    )
-  })
+get_neural_network_name <- function(hidden, activation, epochs, min_delta, patience_ratio, batch_size, learning_rate, epsilon, ...) {
+  get_model_name('neural_network', match.call())
 }
 
-get_neural_network_name <- function(hidden, threshold, stepmax, act_fun) {
-  paste("neural_network",
-    "__hidden_", hidden,
-    "__threshold_", threshold,
-    "__stepmax_", stepmax,
-    "__actfun_", act_fun,
-    sep = ""
-  )
+get_svr_name <- function(kernel, gamma, epsilon, cost, ...) {
+  get_model_name('svr', match.call())
 }
 
-get_svr_name <- function(kernel, gamma, epsilon, cost, signif_digits = 3) {
-  paste("svr",
-    "__kernel_", kernel,
-    "__gamma_", signif(gamma, signif_digits),
-    "__epsilon_", signif(epsilon, signif_digits),
-    "__cost_", signif(cost, signif_digits),
-    sep = ""
-  )
-}

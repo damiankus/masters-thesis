@@ -18,6 +18,16 @@ limit_cpu_usage <- function(percentage_limit) {
   print(paste("Limiting CPU usage: ", command, ", returned code: ", response, sep = ""))
 }
 
+prepare_for_parallel_execution <- function (max_cpu_usage) {
+  setwd("models")
+  source("models.R")
+  setwd(train_model_wd)
+  
+  # Limit max cpu usage to prevent making
+  # the host unresponsive
+  limit_cpu_usage(max_cpu_usage)
+}
+
 # Main logic
 
 option_list <- list(
@@ -31,10 +41,16 @@ opts <- parse_args(opt_parser)
 configs <- load_yaml_configs(opts[["config-file"]])
 datetime_format <- "%Y-%m-%d_%H:%M:%S"
 
+
+# Redirect messages from stdout to a file
 log_dir <- file.path("log", format(Sys.time(), datetime_format))
 mkdir(log_dir)
 common_log_path <- file.path(log_dir, "common.txt")
+common_log_file <- file(common_log_path, open = "a+")
+sink(file = common_log_file, append = TRUE, type = "output", split = TRUE)
+sink(file = common_log_file, append = TRUE, type = "message")
 
+# Create a worker cluster
 core_count <- detectCores()
 cluster <- makeCluster(core_count, outfile = common_log_path, type = )
 clusterExport(
@@ -68,35 +84,49 @@ lapply(configs, function(config) {
         which_test <- data_split$test_set$station_id == station_id
         test_set <- data_split$test_set[which_test, ]
 
-        parLapply(cluster, dataset_with_models$models, function(model) {
-          setwd("models")
-          source("models.R")
-          setwd(train_model_wd)
+        train_in_parallel <- function (models, FUN) {
+          parLapply(cluster, models, function(model) {
+            prepare_for_parallel_execution(opts[["max-cpu-percentage"]])
+            FUN(model)
+          })
+        }
+        
+        train_models <- if (dataset_with_models$parallelizable) {
+          train_in_parallel
+        } else {
+          function(models, FUN) {
+            lapply(models, function (model) {
+              train_in_parallel(list(model), FUN)
+            })
+          }
+        }
 
-          # Limit max cpu usage to prevent making
-          # the host unresponsive
-          limit_cpu_usage(opts[["max-cpu-percentage"]])
-
+        train_models(dataset_with_models$models, function(model) {
           print(paste("Min training time:", min(training_set$measurement_time)))
           print(paste("Max training time:", max(training_set$measurement_time)))
           print(paste("Min test time:", min(test_set$measurement_time)))
           print(paste("Max test time:", max(test_set$measurement_time)))
 
+          now <- format(Sys.time(), datetime_format)
+          model$name <- paste(
+            model$name, "@",
+            station_id, "@",
+            now, "@",
+            "dataset_", dataset_with_models$id,
+            sep = ""
+          )
+          model$result_dir <- result_dir
+
           forecast <- get_forecast(
-            fit_model = model$fit,
+            model = model,
             res_var = config$res_var,
             expl_vars = config$expl_vars,
             training_set = training_set,
             test_set = test_set
           )
 
-          now <- format(Sys.time(), datetime_format)
-          print(result_dir)
-          output_path <- file.path(result_dir, paste(
-            model$name, "@", station_id, "@", now, "@dataset_", dataset_with_models$id, ".csv",
-            sep = ""
-          ))
-          write.csv(forecast, file = output_path, row.names = FALSE)
+          result_path <- file.path(result_dir, paste(model$name, ".csv", sep = ""))
+          write.csv(forecast, file = result_path, row.names = FALSE)
         })
       })
     })
