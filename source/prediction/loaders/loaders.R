@@ -120,10 +120,10 @@ get_neural_networks <- function(spec) {
   numeric_params <- c("epochs", "min_delta", "batch_size", "learning_rate", "epsilon", "patience_ratio", "l2")
   default_spec <- list(
     activation = "relu",
-    min_delta = 0.5,
+    min_delta = 1e-4,
     batch_size = 32,
     learning_rate = 0.001,
-    epsilon = 1e-07,
+    epsilon = 1e-7,
     patience_ratio = 0.25,
     l2 = 0
   )

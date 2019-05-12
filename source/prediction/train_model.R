@@ -18,11 +18,11 @@ limit_cpu_usage <- function(percentage_limit) {
   print(paste("Limiting CPU usage: ", command, ", returned code: ", response, sep = ""))
 }
 
-prepare_for_parallel_execution <- function (max_cpu_usage) {
+prepare_for_parallel_execution <- function(max_cpu_usage) {
   setwd("models")
   source("models.R")
   setwd(train_model_wd)
-  
+
   # Limit max cpu usage to prevent making
   # the host unresponsive
   limit_cpu_usage(max_cpu_usage)
@@ -31,7 +31,7 @@ prepare_for_parallel_execution <- function (max_cpu_usage) {
 # Main logic
 
 option_list <- list(
-  make_option(c("-c", "--config-file"), type = "character", default = "configs/validation/year/regression.yaml"),
+  make_option(c("-c", "--config-file"), type = "character", default = "configs/test/year/neural_default.yaml"),
   make_option(c("-m", "--max-cpu-percentage"), type = "numeric", default = 60)
 )
 
@@ -52,7 +52,7 @@ sink(file = common_log_file, append = TRUE, type = "message")
 
 # Create a worker cluster
 core_count <- detectCores()
-cluster <- makeCluster(core_count, outfile = common_log_path, type = )
+cluster <- makeCluster(core_count, outfile = common_log_path)
 clusterExport(
   cl = cluster,
   varlist = ls(),
@@ -63,7 +63,7 @@ clusterExport(
 clusterApply(cluster, seq_along(cluster), function(worker_idx) {
   log_path <- file.path(log_dir, paste("worker_", worker_idx, ".txt", sep = ""))
   log_file <- file(log_path, open = "a+")
-  sink(file = log_file, append = TRUE, type = "output")
+  sink(file = log_file, append = TRUE, type = "output", split = TRUE)
   sink(file = log_file, append = TRUE, type = "message")
 })
 
@@ -84,18 +84,18 @@ lapply(configs, function(config) {
         which_test <- data_split$test_set$station_id == station_id
         test_set <- data_split$test_set[which_test, ]
 
-        train_in_parallel <- function (models, FUN) {
+        train_in_parallel <- function(models, FUN) {
           parLapply(cluster, models, function(model) {
             prepare_for_parallel_execution(opts[["max-cpu-percentage"]])
             FUN(model)
           })
         }
-        
+
         train_models <- if (dataset_with_models$parallelizable) {
           train_in_parallel
         } else {
           function(models, FUN) {
-            lapply(models, function (model) {
+            lapply(models, function(model) {
               train_in_parallel(list(model), FUN)
             })
           }
