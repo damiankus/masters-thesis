@@ -31,8 +31,8 @@ prepare_for_parallel_execution <- function(max_cpu_usage) {
 # Main logic
 
 option_list <- list(
-  make_option(c("-c", "--config-file"), type = "character", default = "configs/test/year/neural_default.yaml"),
-  make_option(c("-m", "--max-cpu-percentage"), type = "numeric", default = 60)
+  make_option(c("-c", "--config-file"), type = "character"),
+  make_option(c("-m", "--max-cpu-percentage"), type = "numeric", default = 70)
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -70,8 +70,8 @@ clusterApply(cluster, seq_along(cluster), function(worker_idx) {
 lapply(configs, function(config) {
   mkdir(config$output_dir)
 
-  lapply(seq(config$repetitions), function(i) {
-    lapply(config$stations, function(station_id) {
+  lapply(config$stations, function(station_id) {
+    lapply(seq(config$repetitions), function(repetition) {
       result_dir <- file.path(config$output_dir, station_id, config$split_type)
       mkdir(result_dir)
 
@@ -112,7 +112,8 @@ lapply(configs, function(config) {
             model$name, "@",
             station_id, "@",
             now, "@",
-            "dataset_", dataset_with_models$id,
+            "dataset_", dataset_with_models$id, "@",
+            "repetition", repetition,
             sep = ""
           )
           model$result_dir <- result_dir

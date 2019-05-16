@@ -7,10 +7,10 @@
   models:
     - type: svr
       random: true
-      model_count: 50
+      model_count: 100
       kernel: radial
-      exp_base: 2
-      exp_step: 2
+      exp_base: 10
+      exp_step: 1
       gamma:
         min: -12
         max: -4

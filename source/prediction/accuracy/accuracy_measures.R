@@ -19,6 +19,11 @@ mse <- function(results) {
   sse(results) / nrow(results)
 }
 
+# Root Mean Squared Error
+rmse <- function(results) {
+  sqrt(mse(results))
+}
+
 # Mean Absolute Error
 mae <- function(results) {
   sum(abs(results$actual - results$predicted)) / (nrow(results)) 
@@ -36,5 +41,7 @@ r2 <- function(results) {
 
 # Mean Absolute Percentage Error
 mape <- function(results) {
-  100 / nrow(results) * sum(abs(results$actual - results$predicted) / results$actual)
+  non_zero_actual <- results$actual
+  non_zero_actual[non_zero_actual == 0] <- 1e-7
+  (100 / nrow(results)) * sum(abs(results$actual - results$predicted) / non_zero_actual)
 }

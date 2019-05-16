@@ -1,5 +1,5 @@
-- split_type: year
-  test_years: [2017]
+- split_type: season_and_year
+  test_years: [2018]
   stations: 
     - gios_bujaka
     - gios_bulwarowa
@@ -7,7 +7,7 @@
   models:
     - type: svr
       random: true
-      model_count: 50
+      model_count: 200
       kernel: radial
       exp_base: 2
       exp_step: 2

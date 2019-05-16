@@ -81,7 +81,7 @@ load_yaml_configs <- function(config_path) {
 
     c(config, list(
       expl_vars = expl_vars,
-      stations = if (is.na(config$stations)) sort(unique(series$station_id)) else config$stations,
+      stations = if (length(config$station)) config$stations else sort(unique(series$station_id)),
       datasets_with_models = datasets_with_models
     ))
   })
@@ -94,7 +94,8 @@ are_models_parallelizable <- function(models) {
 
   # Neural networks are trained, using all available cores
   # so other models need to wait
-  !any(grepl("neural", model_names))
+  # !any(grepl("neural", model_names))
+  TRUE
 }
 
 get_models <- function(config) {
@@ -248,7 +249,7 @@ get_list_names <- function(spec, excluded = c("children")) {
   )
 }
 
-get_extended_spec <- function(spec, parent_spec = list(), excluded = c("children")) {
+get_extended_spec <- function(spec, parent_spec = list(), excluded = c("children", "type")) {
   params <- union(names(spec), names(parent_spec))
   params_to_copy <- setdiff(params, excluded)
 

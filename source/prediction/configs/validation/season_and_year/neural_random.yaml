@@ -1,0 +1,41 @@
+- split_type: season_and_year
+  repetitions: 5
+  output_dir: results/validation/
+  test_years:
+    - 2017
+  stations:
+    - gios_bujaka
+    - gios_bulwarowa
+    - gios_krasinskiego
+  models:
+    - type: neural
+      # Randomized parameters (exponents used to generate a power grid)
+      random: true
+      model_count: 20
+      exp_base: 10
+      exp_step: 1
+      learning_rate:
+        - -4
+        - -1
+      epsilon:
+        - -8
+        - -3
+      l2:
+        - -3
+        - 0
+      
+      # Constant parameters
+      activation: relu
+      epochs: 100
+      patience_ratio: 0.25
+      min_delta: 1e-4
+      children:
+        - hidden:
+          - '5'
+          - '10'
+          - '15'
+          - '5-3'
+          - '10-5'
+          - '10-5-3'
+          - '20-10-5-3'
+

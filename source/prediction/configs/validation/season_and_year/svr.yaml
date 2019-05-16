@@ -1,13 +1,16 @@
 - split_type: season_and_year
   test_years: [2017]
-  stations: [gios_krasinskiego]
+  stations: 
+    - gios_bujaka
+    - gios_bulwarowa
+    - gios_krasinskiego
   models:
     - type: svr
       random: true
+      model_count: 50
       kernel: radial
       exp_base: 2
       exp_step: 2
-      model_count: 1
       gamma:
         min: -12
         max: -4
