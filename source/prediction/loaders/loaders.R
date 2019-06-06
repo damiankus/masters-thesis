@@ -94,7 +94,7 @@ are_models_parallelizable <- function(models) {
 
   # Neural networks are trained, using all available cores
   # so other models need to wait
-  # !any(grepl("neural", model_names))
+  # !any(grepl("neural_network", model_names))
   TRUE
 }
 
@@ -102,7 +102,7 @@ get_models <- function(config) {
   grouped_models <- lapply(config$models, function(spec) {
     switch(spec$type,
       regression = get_regression_models(spec),
-      neural = get_neural_networks(spec),
+      neural_network = get_neural_networks(spec),
       svr = get_svrs(spec)
     )
   })

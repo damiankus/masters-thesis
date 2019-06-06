@@ -7,16 +7,156 @@
   models:
     - type: svr
       random: true
-      model_count: 50
       kernel: radial
-      exp_base: 2
-      exp_step: 2
-      gamma:
-        min: -12
-        max: -4
-      epsilon:
-        min: -5
-        max: 1
-      cost:
-        min: -2
-        max: 10
+      children:
+        - gamma: 0.015625
+          epsilon: 0.5
+          cost: 16.0
+        - gamma: 0.015625
+          epsilon: 2.0
+          cost: 256.0
+        - gamma: 0.015625
+          epsilon: 0.125
+          cost: 256.0
+        - gamma: 0.0625
+          epsilon: 0.125
+          cost: 64.0
+        - gamma: 0.0009766
+          epsilon: 0.125
+          cost: 1.0
+        - gamma: 0.015625
+          epsilon: 0.03125
+          cost: 16.0
+        - gamma: 0.0625
+          epsilon: 2.0
+          cost: 1.0
+        - gamma: 0.0625
+          epsilon: 0.5
+          cost: 1.0
+        - gamma: 0.0039062
+          epsilon: 2.0
+          cost: 1024.0
+        - gamma: 0.0002441
+          epsilon: 0.125
+          cost: 0.25
+        - gamma: 0.0039062
+          epsilon: 0.125
+          cost: 1.0
+        - gamma: 0.0009766
+          epsilon: 2.0
+          cost: 16.0
+        - gamma: 0.0002441
+          epsilon: 0.5
+          cost: 4.0
+        - gamma: 0.015625
+          epsilon: 0.5
+          cost: 0.25
+        - gamma: 0.0625
+          epsilon: 0.5
+          cost: 1024.0
+        - gamma: 0.0625
+          epsilon: 0.5
+          cost: 64.0
+        - gamma: 0.0039062
+          epsilon: 0.125
+          cost: 0.25
+        - gamma: 0.0625
+          epsilon: 0.03125
+          cost: 0.25
+        - gamma: 0.0009766
+          epsilon: 0.5
+          cost: 1024.0
+        - gamma: 0.0625
+          epsilon: 0.125
+          cost: 256.0
+        - gamma: 0.0625
+          epsilon: 0.5
+          cost: 16.0
+        - gamma: 0.0002441
+          epsilon: 2.0
+          cost: 256.0
+        - gamma: 0.0002441
+          epsilon: 0.5
+          cost: 256.0
+        - gamma: 0.0039062
+          epsilon: 0.125
+          cost: 4.0
+        - gamma: 0.0039062
+          epsilon: 0.125
+          cost: 256.0
+        - gamma: 0.0002441
+          epsilon: 2.0
+          cost: 4.0
+        - gamma: 0.0002441
+          epsilon: 2.0
+          cost: 16.0
+        - gamma: 0.0002441
+          epsilon: 0.5
+          cost: 1024.0
+        - gamma: 0.015625
+          epsilon: 0.5
+          cost: 1024.0
+        - gamma: 0.0039062
+          epsilon: 0.5
+          cost: 64.0
+        - gamma: 0.0039062
+          epsilon: 0.03125
+          cost: 16.0
+        - gamma: 0.0625
+          epsilon: 0.03125
+          cost: 1024.0
+        - gamma: 0.015625
+          epsilon: 0.125
+          cost: 1024.0
+        - gamma: 0.015625
+          epsilon: 2.0
+          cost: 1024.0
+        - gamma: 0.015625
+          epsilon: 2.0
+          cost: 4.0
+        - gamma: 0.0009766
+          epsilon: 2.0
+          cost: 1.0
+        - gamma: 0.015625
+          epsilon: 0.125
+          cost: 0.25
+        - gamma: 0.0002441
+          epsilon: 0.5
+          cost: 64.0
+        - gamma: 0.0625
+          epsilon: 0.03125
+          cost: 16.0
+        - gamma: 0.0002441
+          epsilon: 0.03125
+          cost: 16.0
+        - gamma: 0.0625
+          epsilon: 0.125
+          cost: 0.25
+        - gamma: 0.015625
+          epsilon: 0.125
+          cost: 16.0
+        - gamma: 0.0625
+          epsilon: 2.0
+          cost: 0.25
+        - gamma: 0.0002441
+          epsilon: 2.0
+          cost: 0.25
+        - gamma: 0.0009766
+          epsilon: 2.0
+          cost: 4.0
+        - gamma: 0.0002441
+          epsilon: 0.125
+          cost: 1.0
+        - gamma: 0.0625
+          epsilon: 0.03125
+          cost: 64.0
+        - gamma: 0.0002441
+          epsilon: 0.03125
+          cost: 1.0
+        - gamma: 0.0625
+          epsilon: 0.03125
+          cost: 256.0
+        - gamma: 0.0039062
+          epsilon: 2.0
+          cost: 16.0
+  

@@ -1,0 +1,35 @@
+- split_type: year
+  repetitions: 1
+  output_dir: results/test/
+  test_years:
+    - 2018
+  stations:
+    - gios_bujaka
+  models:
+    - type: regression
+    - type: svr
+      kernel: radial
+      children:
+
+# svr__kernel=radial__gamma=0.000244140625__epsilon=2__cost=64__type=svr	1	1	35.2748361700049	NA	56.2625224630893	NA	98.8658110339515	NA	0.293368920925042	NA
+        - gamma: 0.000244140625
+          epsilon: 2
+          cost: 64
+
+# svr__kernel=radial__gamma=0.015625__epsilon=0.03125__cost=256__type=svr	2	1	10.5221960810465	NA	15.7259013148498	NA	81.7746381909675	NA	0.139314690745941	NA
+        - gamma: 0.015625
+          epsilon: 0.03125
+          cost: 256
+
+# svr__kernel=radial__gamma=0.015625__epsilon=0.5__cost=1__type=svr	3	1	5.94454809296947	NA	7.54783836656527	NA	87.8774408236322	NA	-0.0716313657622309	NA
+        - gamma: 0.015625
+          epsilon: 0.5
+          cost: 1
+
+# svr__kernel=radial__gamma=0.000244140625__epsilon=0.5__cost=16__type=svr	4	1	15.9988131060756	NA	23.1093650882944	NA	94.4024196618665	NA	0.186206998836704	NA
+        - gamma: 0.000244140625
+          epsilon: 0.5
+          cost: 16
+
+
+

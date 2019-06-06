@@ -38,6 +38,7 @@ option_list <- list(
 opt_parser <- OptionParser(option_list = option_list)
 opts <- parse_args(opt_parser)
 
+
 configs <- load_yaml_configs(opts[["config-file"]])
 datetime_format <- "%Y-%m-%d_%H:%M:%S"
 
@@ -102,6 +103,9 @@ lapply(configs, function(config) {
         }
 
         train_models(dataset_with_models$models, function(model) {
+          
+          print(model$name)
+          
           print(paste("Min training time:", min(training_set$measurement_time)))
           print(paste("Max training time:", max(training_set$measurement_time)))
           print(paste("Min test time:", min(test_set$measurement_time)))

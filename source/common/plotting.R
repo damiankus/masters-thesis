@@ -23,23 +23,39 @@ save_line_plot <- function(df, var_x, var_y, plot_path, title) {
   save_plot_file(plot, plot_path)
 }
 
-save_comparison_plot <- function(df, res_var, plot_path, hour_units = 1) {
+save_comparison_plot <- function(df, res_var, plot_path, date_breaks_unit = "1 week") {
   # If the observations are separated by a period
   # longer than a week, we plot them with two charts
   # to skip the missing values and thus save the space
 
-  df$group <- c(0, cumsum(diff(df$measurement_time) > hour_units * 24 * 7))
-  melted <- melt(df, id = c("measurement_time", "group"))
+  # create pairs of consequent timestamps and calculate the difference
+  diffs <- mapply(
+    difftime,
+    time1 = tail(df$measurement_time, -1),
+    time2 = head(df$measurement_time, -1),
+    MoreArgs = list(units = "hours"))
+  week_hrs <- 24 * 7
+  df$group <- c(0, cumsum(diffs > week_hrs)) + 1
+  melted <- melt(df, measure.vars = c("actual", "predicted"))
+  
   plot <- ggplot(data = melted, aes(x = measurement_time, y = value, colour = variable)) +
     geom_line() +
-    facet_grid(~group, scales = "free_x", space = "free_x") +
-    xlab("Date") +
+    xlab("Time") +
     ylab(get_or_generate_label(res_var)) +
     scale_x_datetime(
       labels = date_format("%Y-%m-%d", tz = "UTC"),
-      breaks = date_breaks("1 week")
+      breaks = date_breaks(date_breaks_unit)
     ) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    theme(
+      axis.text.x = element_text(angle = 30, hjust = 1),
+      legend.position = "none"
+    )
+  
+  plot <- if (length(unique(df$group)) > 1) {
+    plot + facet_grid(~group, scales = "free_x", space = "free_x")
+  } else {
+    plot
+  }
   save_plot_file(plot, plot_path)
 }
 

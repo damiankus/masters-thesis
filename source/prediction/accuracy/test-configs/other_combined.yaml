@@ -1,0 +1,192 @@
+- split_type: year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_krasinskiego
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.5'
+    cost: '4'
+    type: svr
+  - kernel: radial
+    gamma: '0.0039062'
+    epsilon: '0.125'
+    cost: '256'
+    type: svr
+  - kernel: radial
+    gamma: '0.0039062'
+    epsilon: '0.125'
+    cost: '0.25'
+    type: svr
+  - kernel: radial
+    gamma: '0.015625'
+    epsilon: '2'
+    cost: '4'
+    type: svr
+
+- split_type: season_and_year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_krasinskiego
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.03125'
+    cost: '16'
+    type: svr
+    split_id: 1
+  - kernel: radial
+    gamma: '0.0009766'
+    epsilon: '2'
+    cost: '4'
+    type: svr
+    split_id: 2
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.03125'
+    cost: '1'
+    type: svr
+    split_id: 3
+  - kernel: radial
+    gamma: '0.015625'
+    epsilon: '0.03125'
+    cost: '16'
+    type: svr
+    split_id: 4
+
+- split_type: year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_bulwarowa
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.5'
+    cost: '4'
+    type: svr
+  - kernel: radial
+    gamma: '0.015625'
+    epsilon: '0.125'
+    cost: '0.25'
+    type: svr
+  - kernel: radial
+    gamma: '0.0625'
+    epsilon: '0.5'
+    cost: '1'
+    type: svr
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.5'
+    cost: '4'
+    type: svr
+
+- split_type: season_and_year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_bulwarowa
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.03125'
+    cost: '16'
+    type: svr
+    split_id: 1
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.125'
+    cost: '0.25'
+    type: svr
+    split_id: 2
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.125'
+    cost: '0.25'
+    type: svr
+    split_id: 3
+  - kernel: radial
+    gamma: '0.0009766'
+    epsilon: '0.125'
+    cost: '1'
+    type: svr
+    split_id: 4
+
+- split_type: year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_bujaka
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.5'
+    cost: '64'
+    type: svr
+  - kernel: radial
+    gamma: '0.015625'
+    epsilon: '0.125'
+    cost: '256'
+    type: svr
+  - kernel: radial
+    gamma: '0.0039062'
+    epsilon: '0.5'
+    cost: '64'
+    type: svr
+  - kernel: radial
+    gamma: '0.0009766'
+    epsilon: '0.125'
+    cost: '1'
+    type: svr
+
+- split_type: season_and_year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_bujaka
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.5'
+    cost: '64'
+    type: svr
+    split_id: 1
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.125'
+    cost: '0.25'
+    type: svr
+    split_id: 2
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.03125'
+    cost: '1'
+    type: svr
+    split_id: 3
+  - kernel: radial
+    gamma: '0.0009766'
+    epsilon: '0.125'
+    cost: '1'
+    type: svr
+    split_id: 4
+

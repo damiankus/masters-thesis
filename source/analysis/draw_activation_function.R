@@ -3,13 +3,14 @@ setwd(file.path("..", "common"))
 source("constants.R")
 setwd(wd)
 
-packages <- c('ggplot2')
-import(packages)
+relu <- function (xs) {
+  sapply(xs, function (x) {
+    max(0, x)
+  })
+}
 
-xs <- seq(-10, 10, 0.1)
-ys <- tanh(xs)
-df <- data.frame(x = xs, y = ys)
-plot <- ggplot(df, aes(x = x, y = y)) +
-  geom_line(size = 2, color = COLORS[1]) +
-  theme(text = element_text(size=24))
-ggsave(plot, filename = 'tanh.png', width = 6, height = 5)
+xs <- seq(-10, 10, 1)
+d <- data.frame(x = xs, y = relu(xs))
+
+p <- ggplot(data = d, aes(x = x, y = y)) + geom_line(color = COLOR_BASE, size = 2) + ylab('ReLU(x)')
+ggsave(filename = 'activation.png', plot = p, width = 6, height = 5)

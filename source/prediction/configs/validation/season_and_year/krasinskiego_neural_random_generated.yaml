@@ -1,0 +1,53 @@
+- split_type: season_and_year
+  repetitions: 1
+  output_dir: results/validation/
+  test_years:
+    - 2017
+  stations:
+    - gios_krasinskiego
+  models:
+    - type: neural
+      activation: relu
+      epochs: 100
+      patience_ratio: 0.25
+      min_delta: 1e-4
+      hidden:
+          - '5'
+          - '10'
+          - '15'
+          - '5-3'
+          - '10-5'
+          - '10-5-3'
+          - '20-10-5-3'
+      children:
+          - learning_rate: 0.001
+            epsilon: 1.0e-05
+            l2: 0.01
+          - learning_rate: 0.1
+            epsilon: 1.0e-08
+            l2: 0.1
+          - learning_rate: 0.01
+            epsilon: 1.0e-07
+            l2: 1.0
+          - learning_rate: 0.001
+            epsilon: 1.0e-05
+            l2: 0.001
+          - learning_rate: 0.01
+            epsilon: 1.0e-05
+            l2: 0.001
+          - learning_rate: 0.01
+            epsilon: 1.0e-06
+            l2: 0.001
+          - learning_rate: 0.001
+            epsilon: 1.0e-08
+            l2: 1.0
+          - learning_rate: 0.001
+            epsilon: 0.0001
+            l2: 0.001
+          - learning_rate: 0.001
+            epsilon: 0.0001
+            l2: 0.1
+          - learning_rate: 0.0001
+            epsilon: 1.0e-06
+            l2: 1.0
+

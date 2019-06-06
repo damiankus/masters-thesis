@@ -49,3 +49,5 @@ lapply(c('month', 'weekday', 'season'), function (name) {
   assign(paste('pretty', name, sep = "_"), formatter, envir = globalenv())
 })
 
+A4_WIDTH <- 210
+A4_HEIGHT <- 297

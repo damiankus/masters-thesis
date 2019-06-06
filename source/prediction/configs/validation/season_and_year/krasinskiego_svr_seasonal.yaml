@@ -1,8 +1,6 @@
 - split_type: season_and_year
   test_years: [2017]
   stations: 
-    - gios_bujaka
-    - gios_bulwarowa
     - gios_krasinskiego
   models:
     - type: svr

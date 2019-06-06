@@ -1,0 +1,32 @@
+- split_type: year
+  repetitions: 1
+  output_dir: results/test/
+  test_years:
+    - 2018
+  stations:
+    - gios_krasinskiego
+  models:
+    - type: regression
+    - type: svr
+      kernel: radial
+      children:
+
+# svr__kernel=radial__gamma=0.000244140625__epsilon=0.5__cost=4__type=svr	1	1	35.5022389675897	NA	53.3890215493526	NA	67.7066622884806	NA	0.321724996481095	NA
+        - gamma: 0.000244140625
+          epsilon: 0.5
+          cost: 4
+
+# svr__kernel=radial__gamma=0.0039062__epsilon=0.125__cost=256	2	1	11.3147900572761	NA	16.611814638264	NA	61.964990165298	NA	0.151293437508413	NA
+        - gamma: 0.0039062
+          epsilon: 0.125
+          cost: 256
+
+# svr__kernel=radial__gamma=0.00390625__epsilon=0.5__cost=0.25__type=svr	3	1	6.90105420907498	NA	8.97351742747654	NA	53.5445234210243	NA	0.148271582995695	NA
+        - gamma: 0.00390625
+          epsilon: 0.5
+          cost: 0.25
+
+# svr__kernel=radial__gamma=0.015625__epsilon=0.5__cost=4__type=svr	4	1	18.5435883930834	NA	26.1380341348329	NA	62.601857780021	NA	0.23222226026938	NA
+        - gamma: 0.015625
+          epsilon: 0.5
+          cost: 4
