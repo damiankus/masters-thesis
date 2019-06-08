@@ -87,6 +87,24 @@ get_pretty_model_name <- function(raw_name) {
   }
 }
 
+raw_name <- "neural_network__hidden=10__activation=relu__epochs=100__min_delta=1e-04__patience_ratio=0.25__batch_size=32__learning_rate=0.1__epsilon=1e-08__l2=0.1__split_id=1"
+
+make_cell <- function (content, align = "tl") {
+  paste(
+    paste("\\makecell[", align, "] {", sep = ""),
+    content,
+    "}"
+  )
+}
+
+get_tex_model_name <- function (raw_name) {
+  make_cell(
+    get_pretty_model_name(raw_name) %>%
+      gsub(",", ", \\\\", ., fixed = TRUE) %>%
+      gsub(":", ": \\\\", ., fixed = TRUE)
+  )
+}
+
 get_tex_measure_name <- function(measure_name) {
   switch(
     measure_name,
@@ -126,17 +144,16 @@ get_tex_column_name <- function(colname) {
   } else {
     ""
   }
-
+  
   if (nchar(raw_remainder)) {
     # It is an accurracy measure
     main_part <- get_tex_measure_name(raw_main_part)
     parts <- c(prefix, main_part, suffix, get_tex_measure_unit(main_part))
     non_empty_parts <- parts[sapply(parts, nchar) > 0]
-    paste(
-      "\\makecell[tr]{",
+    make_cell(
       cap(paste(non_empty_parts, collapse = " \\\\ ")),
-      "}",
-      sep = "")
+      align = "tr"
+    )
   } else {
     cap(raw_main_part)
   }
@@ -172,15 +189,13 @@ get_pretty_column_name <- function(colname) {
 }
 
 get_tex_measure_column_name <- function (measure_name) {
-  paste(
-    "\\makecell[tr]{",
+  make_cell(
     paste(
       get_tex_measure_name(measure_name),
-      "mean $\\pm$ std dev.",
       get_tex_measure_unit(measure_name),
       sep = "\\\\"
     ),
-    "}"
+    align = "tr"
   )
 }
 
