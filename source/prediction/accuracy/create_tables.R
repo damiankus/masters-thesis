@@ -65,7 +65,9 @@ lapply(stats_paths, function (stats_path) {
   # Prepare columns with grouping variables
   grouping_cols <- setdiff(cols, all_measure_cols)
   grouping_data <- top_stats[, grouping_cols]
-  grouping_data$model <- lapply(as.character(top_stats$model), get_tex_model_name)
+  grouping_data$model <- lapply(as.character(top_stats$model), function (raw_name) {
+    makecell(get_tex_model_name(raw_name))
+  })
   col_sep <- " & "
   indent <- "\n\t"
   
@@ -106,7 +108,7 @@ lapply(stats_paths, function (stats_path) {
   
   table <- xtable(
     x = table_content,
-    align = c("r", "l", rep("r", ncol(table_content) - 1)),
+    align = c("r", "l", "l", rep("r", ncol(table_content) - 2)),
     digits = 2,
     caption = paste("Results for station ", get_pretty_station_id(meta$station_id),
                     ' and a data-splitting strategy based on ', gsub("_", " ", meta$training_strategy),

@@ -106,35 +106,6 @@ get_pretty_model_name <- function(raw_name) {
   }
 }
 
-get_pretty_column_name <- function(colname) {
-  parts <- strsplit(colname, "\\.")[[1]]
-  raw_main_part <- parts[[1]]
-  raw_remainder <- if (length(parts) > 1) {
-    parts[-1]
-  } else {
-    ""
-  }
-  
-  prefix <- if (raw_remainder == "mean") {
-    "mean "
-  } else {
-    ""
-  }
-  suffix <- if (raw_remainder == "sd") {
-    " std dev."
-  } else {
-    ""
-  }
-  
-  main_part <- if (nchar(prefix) > 0 || nchar(suffix) > 0) {
-    get_tex_measure_name(raw_main_part)
-  } else {
-    raw_main_part
-  }
-  
-  cap(paste(prefix, main_part, suffix, sep = ""))
-}
-
 # LaTex helpers
 
 makecell <- function (content, align = "tl") {
@@ -165,51 +136,56 @@ multirow <- function (content, row_count, width = "*") {
   )
 }
 
-get_tex_model_name <- function (raw_name) {
-  params <- get_model_params_from_name(raw_name)
-  model_type <- get_model_type_from_name(raw_name)
-  numeric_base <- switch(
+get_exponent <- function (value, base = 10) {
+  exponent <- log(value, base)
+  sign(exponent) * floor(abs(exponent))
+}
+
+get_numeric_base_for_model <- function (model_type) {
+  switch(
     tolower(model_type),
     svr = 2,
     10
   )
-  
+} 
+
+get_tex_model_name <- function (raw_name) {
+  params <- get_model_params_from_name(raw_name)
+  model_type <- get_model_type_from_name(raw_name)
+  numeric_base <- get_numeric_base_for_model(model_type)
   seemingly_numeric_params <- c("hidden")
   upper_case_params <- c("l2")
   param_info <- if (nrow(params)) {
     tex_params <- sapply(seq(nrow(params)), function (idx) {
       param <- params[idx, ]
       numeric_val <- as.numeric(param$value)
-      value <- paste(
-        "$",
-        if (is.na(numeric_val) || param$key %in% seemingly_numeric_params) {
-          gsub("-", " \\\\mbox{-} ", param$value)
-        } else {
-          exponent <- log(numeric_val, numeric_base)
-          rounded_exponent <- sign(exponent) * floor(abs(exponent))
-          paste(numeric_base, "^{", rounded_exponent, "}", sep = "")
-        },
-        "$",
-        sep = ""
-      )
+      
+      value <- if (is.na(numeric_val) || param$key %in% seemingly_numeric_params) {
+        if (param$key == "hidden") {
+          paste("(", gsub("-", ",\\ ", param$value), ")", sep = "")
+        } else { 
+          param$key
+        }
+      } else {
+        paste(numeric_base, "^{", get_exponent(numeric_val, base = numeric_base), "}", sep = "")
+      }
+      
       formatted_key <- if (param$key %in% upper_case_params) {
         toupper(param$key)
       } else {
         param$key
       }
       key <- paste("\\textit{", formatted_key, "}", sep = "")
-      paste("\t", key, " = ", value, sep = "")
+      paste(key, " = $", value, "$", sep = "")
     })
-    paste("\\\\", paste(tex_params, collapse = "\\\\"))
+    paste("\\\\", paste(tex_params, collapse = " \\\\ "))
   } else {
     ""
   }
-  makecell(
-    paste(
-      "\\textbf{", model_type, "}",
-      param_info,
-      sep = ""
-    )
+  paste(
+    "\\textbf{", model_type, "}",
+    param_info,
+    sep = ""
   )
 }
 
@@ -223,12 +199,11 @@ get_tex_measure_name <- function(measure_name) {
 
 get_tex_measure_unit <- function(measure_name) {
   base_unit <- switch(
-    toupper(measure_name),
-    MAE = "\\mu g / m^3",
-    MAPE = "\\%",
-    RMSE = "\\mu g / m^3",
-    `$R^2$` = "1",
-    R2 = '1'
+    tolower(measure_name),
+    mae = "\\mu g / m^3",
+    mape = "\\%",
+    rmse = "\\mu g / m^3",
+    r2 = "1"
   )
   paste("{[$", base_unit, "$]}", sep = "")
 }
