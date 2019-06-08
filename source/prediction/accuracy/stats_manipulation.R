@@ -51,45 +51,93 @@ get_file_name_from_metadata <- function(meta, extension = "", prefix = "") {
 
 get_excluded_parameters_for_model_type <- function(model_type) {
   common_excluded <- list("split_id")
-  excluded_for_specific_model <- if (startsWith(model_type, "neural")) {
+  lowercase_type <- tolower(model_type)
+  excluded_for_specific_model <- if (startsWith(lowercase_type, "neural")) {
     list("activation", "epochs", "min_delta", "patience_ratio", "batch_size")
-  } else {
+  } else if (startsWith(lowercase_type, "svr")) {
     list("kernel")
+  } else {
+    list()
   }
   c(common_excluded, excluded_for_specific_model)
 }
 
-get_pretty_model_type <- function(model_type) {
+get_model_type_from_name <- function(raw_name) {
+  parts <- strsplit(raw_name, "__")[[1]]
+  model_type <- parts[[1]]
   type <- tolower(gsub("_", " ", model_type))
   gsub("svr", "SVR", type)
 }
 
-get_pretty_model_name <- function(raw_name) {
+get_model_params_from_name <- function (raw_name) {
   parts <- strsplit(raw_name, "__")[[1]]
   model_type <- parts[[1]]
-  excluded <- get_excluded_parameters_for_model_type(model_type)
-  params <- do.call(rbind, lapply(parts[-1], function(param) {
-    key_value <- strsplit(param, "=")[[1]]
-    data.frame(key = key_value[[1]], value = key_value[[2]])
-  }))
+  
+  if (length(parts) < 2) {
+    data.frame(key = c(), value = c())
+  } else {
+    excluded <- get_excluded_parameters_for_model_type(model_type)
+    params <- do.call(rbind, lapply(parts[-1], function(param) {
+      key_value <- strsplit(param, "=")[[1]]
+      data.frame(key = key_value[[1]], value = key_value[[2]])
+    }))
+    which_to_exclude <- params$key %in% excluded
+    
+    formatted_params <- data.frame(params)
+    formatted_params$value <- as.character(params$value)
+    formatted_params$key <- lapply(params$key, function (key) {
+      gsub("_", " ", key)
+    })
+    formatted_params[!which_to_exclude, ]
+  }
+}
 
-  which_to_exclude <- params$key %in% excluded
-  final_params <- params[!which_to_exclude, ]
-  pretty_params <- lapply(seq(nrow(final_params)), function(idx) {
-    row <- final_params[idx, ]
+get_pretty_model_name <- function(raw_name) {
+  params <- get_model_params_from_name(raw_name)
+  pretty_params <- lapply(seq(nrow(params)), function(idx) {
+    row <- params[idx, ]
     paste(gsub("_", " ", row$key), row$value, sep = " = ")
   })
 
   if (length(pretty_params)) {
-    paste(get_pretty_model_type(model_type), ": ", paste(pretty_params, collapse = ", "), sep = "")
+    paste(get_model_type_from_name(raw_name), ": ", paste(pretty_params, collapse = ", "), sep = "")
   } else {
-    get_pretty_model_type(model_type)
+    get_model_type_from_name(raw_name)
   }
 }
 
-raw_name <- "neural_network__hidden=10__activation=relu__epochs=100__min_delta=1e-04__patience_ratio=0.25__batch_size=32__learning_rate=0.1__epsilon=1e-08__l2=0.1__split_id=1"
+get_pretty_column_name <- function(colname) {
+  parts <- strsplit(colname, "\\.")[[1]]
+  raw_main_part <- parts[[1]]
+  raw_remainder <- if (length(parts) > 1) {
+    parts[-1]
+  } else {
+    ""
+  }
+  
+  prefix <- if (raw_remainder == "mean") {
+    "mean "
+  } else {
+    ""
+  }
+  suffix <- if (raw_remainder == "sd") {
+    " std dev."
+  } else {
+    ""
+  }
+  
+  main_part <- if (nchar(prefix) > 0 || nchar(suffix) > 0) {
+    get_tex_measure_name(raw_main_part)
+  } else {
+    raw_main_part
+  }
+  
+  cap(paste(prefix, main_part, suffix, sep = ""))
+}
 
-make_cell <- function (content, align = "tl") {
+# LaTex helpers
+
+makecell <- function (content, align = "tl") {
   paste(
     paste("\\makecell[", align, "] {", sep = ""),
     content,
@@ -97,11 +145,71 @@ make_cell <- function (content, align = "tl") {
   )
 }
 
+multicolumn <- function (content, col_count, align = "r") {
+  paste(
+    "\\multicolumn",
+    "{", col_count, "}",
+    "{", align, "}",
+    "{", content, "}",
+    sep = ""
+  )
+}
+
+multirow <- function (content, row_count, width = "*") {
+  paste(
+    "\\multirow",
+    "{", row_count, "}",
+    "{", width, "}",
+    "{", content, "}",
+    sep = ""
+  )
+}
+
 get_tex_model_name <- function (raw_name) {
-  make_cell(
-    get_pretty_model_name(raw_name) %>%
-      gsub(",", ", \\\\", ., fixed = TRUE) %>%
-      gsub(":", ": \\\\", ., fixed = TRUE)
+  params <- get_model_params_from_name(raw_name)
+  model_type <- get_model_type_from_name(raw_name)
+  numeric_base <- switch(
+    tolower(model_type),
+    svr = 2,
+    10
+  )
+  
+  seemingly_numeric_params <- c("hidden")
+  upper_case_params <- c("l2")
+  param_info <- if (nrow(params)) {
+    tex_params <- sapply(seq(nrow(params)), function (idx) {
+      param <- params[idx, ]
+      numeric_val <- as.numeric(param$value)
+      value <- paste(
+        "$",
+        if (is.na(numeric_val) || param$key %in% seemingly_numeric_params) {
+          gsub("-", " \\\\mbox{-} ", param$value)
+        } else {
+          exponent <- log(numeric_val, numeric_base)
+          rounded_exponent <- sign(exponent) * floor(abs(exponent))
+          paste(numeric_base, "^{", rounded_exponent, "}", sep = "")
+        },
+        "$",
+        sep = ""
+      )
+      formatted_key <- if (param$key %in% upper_case_params) {
+        toupper(param$key)
+      } else {
+        param$key
+      }
+      key <- paste("\\textit{", formatted_key, "}", sep = "")
+      paste("\t", key, " = ", value, sep = "")
+    })
+    paste("\\\\", paste(tex_params, collapse = "\\\\"))
+  } else {
+    ""
+  }
+  makecell(
+    paste(
+      "\\textbf{", model_type, "}",
+      param_info,
+      sep = ""
+    )
   )
 }
 
@@ -127,75 +235,21 @@ get_tex_measure_unit <- function(measure_name) {
 
 get_tex_column_name <- function(colname) {
   parts <- strsplit(colname, "\\.")[[1]]
-  raw_main_part <- parts[[1]]
-  raw_remainder <- if (length(parts) > 1) {
-    parts[-1]
-  } else {
-    ""
-  }
-
-  prefix <- if (raw_remainder == "mean") {
-    raw_remainder
-  } else {
-    ""
-  }
-  suffix <- if (raw_remainder == "sd") {
-    "std dev."
-  } else {
-    ""
-  }
-  
-  if (nchar(raw_remainder)) {
-    # It is an accurracy measure
-    main_part <- get_tex_measure_name(raw_main_part)
-    parts <- c(prefix, main_part, suffix, get_tex_measure_unit(main_part))
-    non_empty_parts <- parts[sapply(parts, nchar) > 0]
-    make_cell(
-      cap(paste(non_empty_parts, collapse = " \\\\ ")),
-      align = "tr"
-    )
-  } else {
-    cap(raw_main_part)
-  }
-}
-
-get_pretty_column_name <- function(colname) {
-  parts <- strsplit(colname, "\\.")[[1]]
-  raw_main_part <- parts[[1]]
-  raw_remainder <- if (length(parts) > 1) {
-    parts[-1]
-  } else {
-    ""
-  }
-  
-  prefix <- if (raw_remainder == "mean") {
-    "mean "
-  } else {
-    ""
-  }
-  suffix <- if (raw_remainder == "sd") {
-    " std dev."
-  } else {
-    ""
-  }
-  
-  main_part <- if (nchar(prefix) > 0 || nchar(suffix) > 0) {
-    gsub('\\$', '', get_tex_measure_name(raw_main_part))
-  } else {
-    raw_main_part
-  }
-  
-  cap(paste(prefix, main_part, suffix, sep = ""))
+  multirow(cap(parts[[1]]), row_count = 3)
 }
 
 get_tex_measure_column_name <- function (measure_name) {
-  make_cell(
-    paste(
-      get_tex_measure_name(measure_name),
-      get_tex_measure_unit(measure_name),
-      sep = "\\\\"
+  multicolumn(
+    makecell(
+      paste(
+        get_tex_measure_name(measure_name),
+        "\\\\",
+        get_tex_measure_unit(measure_name)
+      ),
+      align = "tc"
     ),
-    align = "tr"
+    col_count = 2,
+    align = "c"
   )
 }
 

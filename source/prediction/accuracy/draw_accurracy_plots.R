@@ -60,7 +60,7 @@ plot_data$Measure <- factor(sapply(stats_with_mean_col$mean, function (mean_meas
 }), levels = c(
   "MAE",
   "RMSE",
-  "R^2"
+  "$R^2$"
 ))
 
 levels(plot_data$Measure) <- c(

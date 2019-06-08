@@ -9,6 +9,13 @@ setwd(accuracy_wd)
 packages <- c("optparse", "yaml", "xtable", "ggplot2", "latex2exp")
 import(packages)
 
+
+combine_names <- function (prefixes, sufixes, sep = ".") {
+  unlist(lapply(prefixes, function (prefix) {
+    as.list(paste(prefix, sufixes, sep = sep))
+  }))
+}
+
 # Main logic
 
 option_list <- list(
@@ -30,45 +37,72 @@ options(xtable.sanitize.text.function = identity)
 lapply(stats_paths, function (stats_path) {
   meta <- get_stats_metadata(basename(stats_path))
   top_stats <- read.csv(stats_path)
-  
-  # Mean Absolute Percentage Errors turned out to be huge (order of magnitude of 1e6)
-  # due to zero PM2.5 values in the test set
   cols <- colnames(top_stats)
+  
+  # Prepare accurracy columns
   stat_types <- c('mean', 'sd')
   measure_search_key <- stat_types[[1]]
   all_measures <- gsub(paste('.', measure_search_key, sep = ""), '', cols[grepl(measure_search_key, cols)])
-  measures <- all_measures[!grepl('mape', all_measures)]
-  decimal_format <- paste("%#.", opts[["decimal-digits"]], "f", sep = "")
-  combined_stats_format <- make_cell(paste(decimal_format, "$\\pm$", decimal_format), align = "tr")
-  zero_sd_sufix <- " $\\pm$ 0.00"
-  zero_sd_sufix_replacement <- paste(rep("\\ ", nchar(zero_sd_sufix) + 2), collapse = "")
+  all_measure_cols <- combine_names(all_measures, stat_types)
+  decimal_format <- "%.2f"
   
-  combined_measures <- lapply(measures, function (measure) {
-    measure_cols <- paste(measure, stat_types, sep = ".")
-    mapply(
-      function (stat1, stat2) {
-        if (is.na(stat2) || stat2 == 0) {
-          mean_with_sd <- sprintf(fmt = combined_stats_format, stat1, 0)
-          gsub(zero_sd_sufix, zero_sd_sufix_replacement, mean_with_sd, fixed = TRUE)
-        } else {
-          sprintf(fmt = combined_stats_format, stat1, stat2)
-        }
-      },
-      top_stats[[measure_cols[[1]]]],
-      top_stats[[measure_cols[[2]]]]
-    )
+  # Mean Absolute Percentage Errors turned out to be huge (order of magnitude of 1e6)
+  # due to zero PM2.5 values in the test set
+  measures <- all_measures[!grepl('mape', all_measures)]
+  measure_cols <- combine_names(measures, stat_types)
+  sd_cols <- measure_cols[grepl("sd", measure_cols)]
+  means_and_sds <- top_stats[, measure_cols]
+  means_and_sds[, sd_cols] <- lapply(sd_cols, function (sd_col) {
+    lapply(means_and_sds[, sd_col], function (sd_val) {
+      if (is.na(sd_val) || sd_val == 0) {
+        ""
+      } else {
+        sprintf(fmt = decimal_format, sd_val)      
+      }
+    })
   })
-  combined_stats <- do.call(cbind, combined_measures)
-  colnames(combined_stats) <- sapply(measures, get_tex_measure_column_name)
-  cols_per_measure <- lapply(all_measures, function (measure) {
-    as.list(paste(measure, stat_types, sep = "."))
+  
+  # Prepare columns with grouping variables
+  grouping_cols <- setdiff(cols, all_measure_cols)
+  grouping_data <- top_stats[, grouping_cols]
+  grouping_data$model <- lapply(as.character(top_stats$model), get_tex_model_name)
+  col_sep <- " & "
+  indent <- "\n\t"
+  
+  grouping_header <- paste(sapply(grouping_cols, get_tex_column_name), collapse = col_sep)
+  measure_header <- paste(sapply(measures, get_tex_measure_column_name), collapse = col_sep)
+  measure_subheader <- paste(
+    paste(rep("", length(grouping_cols)), collapse = col_sep),
+    paste(rep(stat_types, length(measures)), collapse = col_sep)
+  )
+  
+  table_content <- cbind(grouping_data, means_and_sds)
+  season_palette <- c(
+    winter = "99FFFF",
+    spring = "88FF99",
+    summer = "FFFF88",
+    autumn = "FFAA88"
+  )
+  table_content$season <- lapply(grouping_data$season, function (season_idx) {
+    paste("\\cellcolor[HTML]{", season_palette[[season_idx]], "}{", SEASONS[[season_idx]], "}", sep = "")
   })
-  all_measure_cols <- do.call(cbind, unlist(cols_per_measure, recursive = FALSE))
-  non_measure_cols <- setdiff(cols, all_measure_cols)
-  non_measure_data <- top_stats[, non_measure_cols]
-  non_measure_data$model <- lapply(as.character(top_stats$model), get_tex_model_name)
-  colnames(non_measure_data) <- sapply(colnames(non_measure_data), get_tex_column_name)
-  table_content <- cbind(non_measure_data, combined_stats)
+  
+  table_header <- paste(
+    indent,
+    grouping_header,
+    col_sep,
+    measure_header,
+    " \\\\",
+    indent,
+    col_sep,
+    measure_subheader,
+    " \\\\\n",
+    sep = ""
+  )
+  header_config <- list(
+    pos = list(0),
+    command = table_header
+  )
   
   table <- xtable(
     x = table_content,
@@ -83,8 +117,11 @@ lapply(stats_paths, function (stats_path) {
   print(
     x = table,
     file = table_path,
-    tabular.environment = "tabularx",
+    tabular.environment = "longtable",
     width = "\\textwidth",
-    include.rownames = FALSE
+    include.colnames = FALSE,
+    include.rownames = FALSE,
+    add.to.row = header_config,
+    booktabs = TRUE
   )
 })
