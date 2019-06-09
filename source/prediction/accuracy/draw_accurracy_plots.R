@@ -13,7 +13,7 @@ import(packages)
 
 option_list <- list(
   make_option(c("-d", "--stats-dir"), type = "character", default = "stats"),
-  make_option(c("-o", "--output-dir"), type = "character", default = "accurracy-plots")
+  make_option(c("-o", "--output-dir"), type = "character", default = "plots/accurracy")
 )
 
 opt_parser <- OptionParser(option_list = option_list)

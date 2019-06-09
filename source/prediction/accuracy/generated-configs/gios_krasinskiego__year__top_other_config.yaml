@@ -1,0 +1,29 @@
+- split_type: year
+  test_years:
+  - 2018.0
+  output_dir: results/test/
+  stations:
+  - gios_krasinskiego
+  repetitions: 1.0
+  models:
+  - type: regression
+  - kernel: radial
+    gamma: '0.0002441'
+    epsilon: '0.5'
+    cost: '4'
+    type: svr
+  - kernel: radial
+    gamma: '0.0039062'
+    epsilon: '0.125'
+    cost: '256'
+    type: svr
+  - kernel: radial
+    gamma: '0.0039062'
+    epsilon: '0.125'
+    cost: '0.25'
+    type: svr
+  - kernel: radial
+    gamma: '0.015625'
+    epsilon: '2'
+    cost: '4'
+    type: svr

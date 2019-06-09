@@ -110,9 +110,10 @@ get_pretty_model_name <- function(raw_name) {
 
 makecell <- function (content, align = "tl") {
   paste(
-    paste("\\makecell[", align, "] {", sep = ""),
+    paste("\\makecell[", align, "]{", sep = ""),
     content,
-    "}"
+    "}",
+    sep = ""
   )
 }
 
@@ -134,6 +135,10 @@ multirow <- function (content, row_count, width = "*") {
     "{", content, "}",
     sep = ""
   )
+}
+
+cellcolor <- function (content, color) {
+  paste("\\cellcolor[HTML]{", color, "}{", content, "}", sep = "")
 }
 
 get_exponent <- function (value, base = 10) {
@@ -209,8 +214,13 @@ get_tex_measure_unit <- function(measure_name) {
 }
 
 get_tex_column_name <- function(colname) {
-  parts <- strsplit(colname, "\\.")[[1]]
-  multirow(cap(parts[[1]]), row_count = 3)
+  sep <- "[\\._]"
+  parts <- strsplit(colname, sep)[[1]]
+  content <- if (length(parts) > 1) {
+    makecell(cap(gsub(sep, " \\\\\\\\ ", colname)))
+  } else {
+    multirow(cap(parts[[1]]), row_count = 3)
+  }
 }
 
 get_tex_measure_column_name <- function (measure_name) {
