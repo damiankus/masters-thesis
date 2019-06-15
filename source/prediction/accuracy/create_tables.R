@@ -42,14 +42,10 @@ lapply(stats_paths, function (stats_path) {
   # Prepare accurracy columns
   stat_types <- c('mean', 'sd')
   measure_search_key <- stat_types[[1]]
-  all_measures <- gsub(paste('.', measure_search_key, sep = ""), '', cols[grepl(measure_search_key, cols)])
-  all_measure_cols <- combine_names(all_measures, stat_types)
+  measures <- gsub(paste('.', measure_search_key, sep = ""), '', cols[grepl(measure_search_key, cols)])
+  measure_cols <- combine_names(measures, stat_types)
   decimal_format <- "%.2f"
   
-  # Mean Absolute Percentage Errors turned out to be huge (order of magnitude of 1e6)
-  # due to zero PM2.5 values in the test set
-  measures <- all_measures[!grepl('mape', all_measures)]
-  measure_cols <- combine_names(measures, stat_types)
   sd_cols <- measure_cols[grepl("sd", measure_cols)]
   means_and_sds <- top_stats[, measure_cols]
   means_and_sds[, sd_cols] <- lapply(sd_cols, function (sd_col) {
@@ -64,7 +60,7 @@ lapply(stats_paths, function (stats_path) {
 
   # Prepare columns with grouping variables
   excluded <- c('model.type')
-  grouping_cols <- setdiff(cols, c(all_measure_cols, excluded))
+  grouping_cols <- setdiff(cols, c(measure_cols, excluded))
   grouping_data <- top_stats[, grouping_cols]
   grouping_data$model <- lapply(as.character(top_stats$model), function (raw_name) {
     makecell(get_tex_model_name(raw_name))
@@ -112,28 +108,33 @@ lapply(stats_paths, function (stats_path) {
       year = "FFFFFF",
       season_and_year = "EADAFF"
     )
-    cellcolor(makecell(gsub("_", " \\\\\\\\ ", strategy)), color = color)
+    
+    content <- switch(
+      strategy,
+      year = "all",
+      season_and_year = "seasonal"
+    )
+    
+    # cellcolor(makecell(gsub("_", " \\\\\\\\ ", strategy)), color = color)
+    cellcolor(content, color = color)
   })
   
   table <- xtable(
     x = table_content,
     align = c("r", "l", "l", "l", "r", rep("r", length(measure_cols))),
     digits = 2,
-    caption = paste("Results for station ", get_pretty_station_id(meta$station_id),
-                    ' and a data-splitting strategy based on ', gsub("_", " ", meta$training_strategy),
-                    ' (', meta$phase, ' phase)', sep = ""),
+    caption = paste("Best results for station ", get_pretty_station_id(meta$station_id), ' (', meta$phase, ' phase)', sep = ""),
     label = paste("tab:results", meta$phase, meta$station_id, meta$training_strategy, sep = "-")
   )
   table_path <- file.path(output_dir, paste('results', meta$phase, meta$station_id, meta$training_strategy, '.tex', sep = "__"))
   print(
     x = table,
     file = table_path,
-    tabular.environment = "longtable",
-    floating = FALSE,
     include.colnames = FALSE,
     include.rownames = FALSE,
     add.to.row = header_config,
     booktabs = TRUE,
-    size = "\\scriptsize"
+    size = "\\scriptsize",
+    caption.placement = "top"
   )
 })

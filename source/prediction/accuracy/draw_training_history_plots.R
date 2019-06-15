@@ -49,7 +49,8 @@ top_stats_per_file <- lapply(stats_paths, function (stats_path) {
       plot <- ggplot(data = plot_data, aes(x = epoch, y = value, color = data)) +
         geom_line() +
         xlab("Epoch") + 
-        ylab(y_label)
+        ylab(y_label) +
+        theme(legend.position = "none")
       
       history_file_name <- gsub("\\@repetition(\\d+)_history\\.csv", "", basename(history_path))
       plot_path <- file.path(

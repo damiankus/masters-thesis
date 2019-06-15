@@ -216,11 +216,12 @@ get_tex_measure_unit <- function(measure_name) {
 get_tex_column_name <- function(colname) {
   sep <- "[\\._]"
   parts <- strsplit(colname, sep)[[1]]
-  content <- if (length(parts) > 1) {
-    makecell(cap(gsub(sep, " \\\\\\\\ ", colname)))
+  content <- if (colname == "training.strategy") {
+    "Used data"
   } else {
-    multirow(cap(parts[[1]]), row_count = 3)
+    paste(parts, collapse = " ")
   }
+  multirow(cap(content), row_count = 3)
 }
 
 get_tex_measure_column_name <- function (measure_name) {
