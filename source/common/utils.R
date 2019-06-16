@@ -188,3 +188,44 @@ parse_list_argument <- function(options, argname, valid_values = c(), sep = ",")
   }
   unlist(lapply(value_parts, process_value))
 }
+
+
+# LaTex helpers
+
+makecell <- function (content, align = "tl") {
+  paste(
+    paste("\\makecell[", align, "]{", sep = ""),
+    content,
+    "}",
+    sep = ""
+  )
+}
+
+multicolumn <- function (content, col_count, align = "r") {
+  paste(
+    "\\multicolumn",
+    "{", col_count, "}",
+    "{", align, "}",
+    "{", content, "}",
+    sep = ""
+  )
+}
+
+multirow <- function (content, row_count, width = "*") {
+  paste(
+    "\\multirow",
+    "{", row_count, "}",
+    "{", width, "}",
+    "{", content, "}",
+    sep = ""
+  )
+}
+
+cellcolor <- function (content, color) {
+  paste("\\cellcolor[HTML]{", color, "}{", content, "}", sep = "")
+}
+
+get_exponent <- function (value, base = 10) {
+  exponent <- log(value, base)
+  sign(exponent) * floor(abs(exponent))
+}

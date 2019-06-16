@@ -106,53 +106,13 @@ get_pretty_model_name <- function(raw_name) {
   }
 }
 
-# LaTex helpers
-
-makecell <- function (content, align = "tl") {
-  paste(
-    paste("\\makecell[", align, "]{", sep = ""),
-    content,
-    "}",
-    sep = ""
-  )
-}
-
-multicolumn <- function (content, col_count, align = "r") {
-  paste(
-    "\\multicolumn",
-    "{", col_count, "}",
-    "{", align, "}",
-    "{", content, "}",
-    sep = ""
-  )
-}
-
-multirow <- function (content, row_count, width = "*") {
-  paste(
-    "\\multirow",
-    "{", row_count, "}",
-    "{", width, "}",
-    "{", content, "}",
-    sep = ""
-  )
-}
-
-cellcolor <- function (content, color) {
-  paste("\\cellcolor[HTML]{", color, "}{", content, "}", sep = "")
-}
-
-get_exponent <- function (value, base = 10) {
-  exponent <- log(value, base)
-  sign(exponent) * floor(abs(exponent))
-}
-
 get_numeric_base_for_model <- function (model_type) {
   switch(
     tolower(model_type),
     svr = 2,
     10
   )
-} 
+}
 
 get_tex_model_name <- function (raw_name) {
   params <- get_model_params_from_name(raw_name)
