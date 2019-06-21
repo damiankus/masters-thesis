@@ -34,6 +34,11 @@ sst <- function(results) {
   sum((results$actual - mean(results$actual))^2)
 }
 
+# Pearson correlation coefficient
+r <- function (results) {
+  cor(x = results$actual, y = results$predicted, method = "pearson")
+}
+
 # Coefficient of determination
 r2 <- function(results) {
   1 - sse(results) / sst(results)

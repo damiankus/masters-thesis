@@ -1,0 +1,29 @@
+% latex table generated in R 3.4.4 by xtable 1.8-3 package
+% Mon Jun 10 20:47:10 2019
+\begin{table}[ht]
+\centering
+\caption{Best results for station GIOS Krasinskiego (test phase)} 
+\label{tab:results-test-gios_krasinskiego-.csv}
+\begingroup\scriptsize
+\begin{tabular}{lllrrrrrrrrr}
+  \toprule
+  
+	\multirow{3}{*}{Model} & \multirow{3}{*}{Season} & \multirow{3}{*}{Used data} & \multirow{3}{*}{N} & \multicolumn{2}{c}{\makecell[tc]{MAE \\ {[$\mu g / m^3$]}}} & \multicolumn{2}{c}{\makecell[tc]{RMSE \\ {[$\mu g / m^3$]}}} & \multicolumn{2}{c}{\makecell[tc]{MAPE \\ {[$\%$]}}} & \multicolumn{2}{c}{\makecell[tc]{$R^2$ \\ {[$1$]}}} \\
+	 &  &  &  &  mean & SD & mean & SD & mean & SD & mean & SD \\
+ \midrule
+\makecell[tl]{\textbf{SVR}\\ \textit{gamma} = $2^{-12}$ \\ \textit{epsilon} = $2^{-1}$ \\ \textit{cost} = $2^{2}$} & \cellcolor[HTML]{99FFFF}{winter} & \cellcolor[HTML]{FFFFFF}{all} &   1 & 23.24 &  & 30.49 &  & 64.93 &  & 0.18 &  \\ 
+  \makecell[tl]{\textbf{regression}} & \cellcolor[HTML]{99FFFF}{winter} & \cellcolor[HTML]{FFFFFF}{all} &   1 & 24.30 &  & 30.53 &  & 80.93 &  & 0.18 &  \\ 
+  \makecell[tl]{\textbf{neural network}\\ \textit{hidden} = $(10)$ \\ \textit{learning rate} = $10^{-4}$ \\ \textit{epsilon} = $10^{-6}$ \\ \textit{L2} = $10^{0}$} & \cellcolor[HTML]{99FFFF}{winter} & \cellcolor[HTML]{FFFFFF}{all} &  25 & 24.33 & 0.13 & 30.56 & 0.13 & 81.07 & 0.93 & 0.17 & 0.01 \\ 
+  \makecell[tl]{\textbf{SVR}\\ \textit{gamma} = $2^{-8}$ \\ \textit{epsilon} = $2^{-3}$ \\ \textit{cost} = $2^{8}$} & \cellcolor[HTML]{88FF99}{spring} & \cellcolor[HTML]{FFFFFF}{all} &   1 & 10.26 &  & 13.85 &  & 38.65 &  & 0.37 &  \\ 
+  \makecell[tl]{\textbf{neural network}\\ \textit{hidden} = $(15)$ \\ \textit{learning rate} = $10^{-3}$ \\ \textit{epsilon} = $10^{-5}$ \\ \textit{L2} = $10^{-3}$} & \cellcolor[HTML]{88FF99}{spring} & \cellcolor[HTML]{EADAFF}{seasonal} &  25 & 10.30 & 0.11 & 13.77 & 0.13 & 38.60 & 0.53 & 0.38 & 0.01 \\ 
+  \makecell[tl]{\textbf{regression}} & \cellcolor[HTML]{88FF99}{spring} & \cellcolor[HTML]{EADAFF}{seasonal} &   1 & 10.53 &  & 14.13 &  & 38.30 &  & 0.34 &  \\ 
+  \makecell[tl]{\textbf{SVR}\\ \textit{gamma} = $2^{-8}$ \\ \textit{epsilon} = $2^{-3}$ \\ \textit{cost} = $2^{-2}$} & \cellcolor[HTML]{FFFF88}{summer} & \cellcolor[HTML]{FFFFFF}{all} &   1 & 8.02 &  & 10.31 &  & 41.80 &  & 0.27 &  \\ 
+  \makecell[tl]{\textbf{regression}} & \cellcolor[HTML]{FFFF88}{summer} & \cellcolor[HTML]{EADAFF}{seasonal} &   1 & 8.14 &  & 10.39 &  & 43.71 &  & 0.26 &  \\ 
+  \makecell[tl]{\textbf{neural network}\\ \textit{hidden} = $(5)$ \\ \textit{learning rate} = $10^{-2}$ \\ \textit{epsilon} = $10^{-7}$ \\ \textit{L2} = $10^{0}$} & \cellcolor[HTML]{FFFF88}{summer} & \cellcolor[HTML]{EADAFF}{seasonal} &  25 & 8.23 & 0.15 & 10.43 & 0.20 & 43.32 & 1.49 & 0.25 & 0.03 \\ 
+  \makecell[tl]{\textbf{SVR}\\ \textit{gamma} = $2^{-6}$ \\ \textit{epsilon} = $2^{1}$ \\ \textit{cost} = $2^{2}$} & \cellcolor[HTML]{FFAA88}{autumn} & \cellcolor[HTML]{FFFFFF}{all} &   1 & 19.91 &  & 25.20 &  & 62.56 &  & 0.29 &  \\ 
+  \makecell[tl]{\textbf{neural network}\\ \textit{hidden} = $(5)$ \\ \textit{learning rate} = $10^{-2}$ \\ \textit{epsilon} = $10^{-7}$ \\ \textit{L2} = $10^{0}$} & \cellcolor[HTML]{FFAA88}{autumn} & \cellcolor[HTML]{FFFFFF}{all} &  25 & 20.30 & 0.50 & 25.23 & 0.45 & 71.92 & 4.96 & 0.29 & 0.03 \\ 
+  \makecell[tl]{\textbf{regression}} & \cellcolor[HTML]{FFAA88}{autumn} & \cellcolor[HTML]{FFFFFF}{all} &   1 & 20.31 &  & 25.11 &  & 73.61 &  & 0.30 &  \\ 
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}

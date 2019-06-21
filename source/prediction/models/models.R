@@ -31,6 +31,7 @@ get_forecast <- function(model, res_var, expl_vars, training_set, test_set) {
   warning = handle_error_and_get_na_predictions,
   error = handle_error_and_get_na_predictions
   )
+  
   data.frame(
     measurement_time = test_set$future_measurement_time,
     actual = test_set[, res_var],
@@ -108,6 +109,14 @@ create_neural_network <- function(hidden, activation, epochs, min_delta, patienc
     base_output_path <- file.path(config$result_dir, config$name)
     best_model_path <- paste(base_output_path, ".hdf5", sep = "")
 
+    
+    # WARNING:
+    # During some experiments I've encountered the following error
+    # OSError: Unable to create file (Unable to lock file, errno = 11, error message = 'resource temporarily unavailable')
+    # It is raised if the callback_model_checkpoint function is executed in an concurrent environment
+    # As of 2019-06-21 I don't know a reliable way of avoiding it without decreasing the number of threads being used.
+    # Maybe this discussion: https://github.com/keras-team/keras/issues/11101 will eventually contain a solution
+    
     callbacks <- list(
       callback_progbar_logger(),
       callback_early_stopping(

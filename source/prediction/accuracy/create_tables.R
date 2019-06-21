@@ -127,9 +127,8 @@ lapply(stats_paths, function (stats_path) {
     label = paste("tab:results", meta$phase, meta$station_id, meta$training_strategy, sep = "-")
   )
   table_path <- file.path(output_dir, paste('results', meta$phase, meta$station_id, meta$training_strategy, '.tex', sep = "__"))
-  print(
+  formatted_table <- print(
     x = table,
-    file = table_path,
     include.colnames = FALSE,
     include.rownames = FALSE,
     add.to.row = header_config,
@@ -137,4 +136,16 @@ lapply(stats_paths, function (stats_path) {
     size = "\\scriptsize",
     caption.placement = "top"
   )
+  
+  write(
+    paste(
+      "{",
+      "\\setlength{\\tabcolsep}{4pt}",
+      formatted_table,
+      "}",
+      sep = "\n"
+    ),
+    file = table_path
+  )
+  
 })

@@ -16,7 +16,9 @@ calculate_accurracy <- function(results) {
     mae = mae(non_zero_results),
     rmse = rmse(non_zero_results),
     mape = mape(non_zero_results),
-    r2 = r2(non_zero_results))
+    r = r(non_zero_results),
+    r2 = r2(non_zero_results)
+  )
 }
 
 calculate_aggregated_stats <- function(samples) {
@@ -99,24 +101,43 @@ lapply(phases, function(phase) {
         results <- read.csv(file = file.path(training_strategy_dir, results_path), header = TRUE)
         model <- strsplit(results_path, split = "@")[[1]][[1]]
         
-        seasonal_accs <- lapply(sort(unique(results$season)), function(season) {
-          season_results <- results[results$season == season, ]
-          acc <- calculate_accurracy(season_results)
-          acc$model <- model
-          acc$season <- season
-          acc
-        })
-
-        do.call(rbind, seasonal_accs)
+        if (sd(results$predicted) == 0) {
+          data.frame(error = "Same predicted results")
+          
+        } else if (sum(is.na(results$predicted)) > 0) {
+          data.frame(error = "NAs among predicted values")
+          
+        } else {
+          seasonal_accs <- lapply(sort(unique(results$season)), function(season) {
+            season_results <- results[results$season == season, ]
+            acc <- calculate_accurracy(season_results)
+            acc$model <- model
+            acc$season <- season
+            acc
+          })
+  
+          do.call(rbind, seasonal_accs)
+        }
       })
       
-      browser()
-
       if (length(seasonal_accs_per_file)) {
-        seasonal_accs <- do.call(rbind, seasonal_accs_per_file)
+        which_valid <- unlist(lapply(seasonal_accs_per_file, function (accs) {
+          !("error" %in% colnames(accs))
+        }))
+        seasonal_accs <- do.call(rbind, seasonal_accs_per_file[which_valid])
         seasonal_aggr <- aggregate(. ~ model + season, data = seasonal_accs, FUN = calculate_aggregated_stats)
         seasonal_stats <- transform_aggregated(seasonal_aggr)
-        sorted_stats <- seasonal_stats[order(seasonal_stats[["season"]], seasonal_stats[["mae mean"]]), ]
+        
+        model_types <- unlist(unname(as_model_types(seasonal_stats$model)))
+        min_repetitions_for_neural <- 5
+        which_enough_repetitions <- (model_types != "neural_network") | (seasonal_stats$n >= min_repetitions_for_neural)
+        seasonal_stats_with_enough_repetitions <- seasonal_stats[which_enough_repetitions, ]
+        
+        sorted_stats <- seasonal_stats_with_enough_repetitions[
+          order(
+            seasonal_stats_with_enough_repetitions[["season"]],
+            seasonal_stats_with_enough_repetitions[["mae mean"]]
+          ), ]
 
         seasonal_top_per_model <- if (phase == "test") {
 
@@ -137,17 +158,17 @@ lapply(phases, function(phase) {
           test_keys <- get_keys_to_match_results(sorted_stats$model, sorted_stats$season)
 
           which_test_stats_to_include <- sapply(test_keys, function(key) {
-            key %in% validation_keys
+            i <- key %in% validation_keys
           })
 
           if (sum(which_test_stats_to_include) != length(validation_keys)) {
-            stop("Warning! The number of matchin test models doesn't equal the number original best validation models!")
+            stop("Warning! The number of matching test models doesn't equal the number original best validation models!")
           }
           sorted_stats[which_test_stats_to_include, ]
         } else {
           get_top_stats_per_season_and_model(sorted_stats)
         }
-
+        
         stats_file_name <- paste("accurracy", phase, station, training_strategy, ".csv", sep = "__")
         write.csv(
           x = sorted_stats,

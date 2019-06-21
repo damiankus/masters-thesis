@@ -158,6 +158,7 @@ get_tex_measure_name <- function(measure_name) {
   switch(
     measure_name,
     r2 = "$R^2$",
+    r = "r",
     toupper(measure_name)
   )
 }
@@ -168,7 +169,8 @@ get_tex_measure_unit <- function(measure_name) {
     mae = "\\mu g / m^3",
     mape = "\\%",
     rmse = "\\mu g / m^3",
-    r2 = "1"
+    r2 = "1",
+    r = "1"
   )
   paste("{[$", base_unit, "$]}", sep = "")
 }

@@ -1,7 +1,7 @@
 - split_type: year
   test_years:
   - 2018.0
-  output_dir: results/test/
+  output_dir: vultr-repeated-results/test/
   stations:
   - gios_bujaka
   repetitions: 5.0
@@ -50,7 +50,7 @@
 - split_type: season_and_year
   test_years:
   - 2018.0
-  output_dir: results/test/
+  output_dir: vultr-repeated-results/test/
   stations:
   - gios_bujaka
   repetitions: 5.0
@@ -103,7 +103,7 @@
 - split_type: season_and_year
   test_years:
   - 2018.0
-  output_dir: results/test/
+  output_dir: vultr-repeated-results/test/
   stations:
   - gios_bulwarowa
   repetitions: 5.0

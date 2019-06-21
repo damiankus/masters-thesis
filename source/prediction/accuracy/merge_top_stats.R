@@ -34,6 +34,8 @@ common_paths <- unname(sapply(year_stats_paths, function (stats_path) {
   gsub(search_key, "", stats_path)
 }))
 
+print(common_paths)
+
 lapply(common_paths, function (common_path) {
   stats_with_strategy <- do.call(
     rbind,

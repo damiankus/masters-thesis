@@ -92,8 +92,8 @@ save_table <- function (
       "{",
       "\\renewcommand\\arraystretch{2}",
       sub("\\midrule", "", fixed = T, formatted) %>%
-        sub(midrule_placeholder, "\\midrule", fixed = TRUE, .) %>%
-        sub("\\bottomrule", "", fixed = T, .) %>%
+        gsub("\\\\\\\\\\s+\\n\\s+\\\\bottomrule", "", .) %>%
+        gsub(midrule_placeholder, "\\midrule", fixed = TRUE, .) %>%
         sub(continuation_message_placeholder, continuation_message, fixed = TRUE, .) %>%
         sub(footer_placeholder, formated_footer, fixed = TRUE, .),
       "}",
@@ -250,3 +250,61 @@ save_table(
   footer = air_quality_footer
 )
 
+# Other variables
+other_vars_content <- read.csv(file = "other-variables.csv")
+other_vars_colnames <- unlist(lapply(colnames(other_vars_content), function (colname) {
+  makecell(gsub("\\.", " \\\\ ", colname))
+}))
+
+save_table(
+  content = other_vars_content,
+  align = c("r", p(0.1), p(0.5), p(0.3)),
+  caption = paste("Other variables used in related work"),
+  label = "tab:related-work-other-variables",
+  col_names = other_vars_colnames,
+  file = file.path(output_dir, "other-variables.tex")
+)
+
+# Model types
+
+model_type_vars <- read.csv(file = "model-types.csv", quote = '"', sep = ",")
+model_type_content <- data.frame(Source = model_type_vars$Source)
+
+model_type_usage_count <- unlist(lapply(model_type_vars[, -1], function (col) {
+  sum(as.numeric(col == TRUE & !is.na(col)))  
+}))
+model_type_usage_order <- order(model_type_usage_count, decreasing = TRUE)
+model_type_usage_count_sorted <- model_type_usage_count[model_type_usage_order]
+
+model_type_ticks <- do.call(
+  cbind,
+  lapply(model_type_vars[, -1], function (col) {
+    ifelse(col == TRUE & !is.na(col), "\\checkmark", "")
+  })
+)
+model_type_content <- cbind(
+  data.frame(Source = as.character(model_type_vars$Source)),
+  model_type_ticks[, model_type_usage_order]
+)
+
+model_type_colnames <- lapply(colnames(model_type_content), function (colname) {
+  makecell(gsub("\\.", " \\\\\\\\ ", colname))
+})
+
+model_type_footer <- paste(
+  c(
+    list("Usage count"),
+    as.list(model_type_usage_count_sorted)
+  ),
+  collapse = " & "
+)
+
+save_table(
+  content = model_type_content,
+  align = c("r", rep("c", ncol(model_type_content))),
+  caption = paste("Types of forecasting models used in related work"),
+  label = "tab:related-work-model-types",
+  col_names = model_type_colnames,
+  file = file.path(output_dir, "model-types.tex"),
+  footer = model_type_footer
+)

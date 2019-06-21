@@ -1,7 +1,7 @@
 {
 \renewcommand\arraystretch{2}
 % latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Jun 17 01:24:35 2019
+% Mon Jun 17 15:10:12 2019
 \begingroup\scriptsize
 \begin{longtable}{>{\raggedright\arraybackslash}p{0.075\linewidth}%
 >{\raggedright\arraybackslash}p{0.1\linewidth}%
@@ -32,14 +32,14 @@
   \cite{GARCIANIETO201450} &  Gijón, Spain &  MARS &  monthly mean \nox[2], \sox[2], PM10 &  2006 - 2008 & \makecell[tl]{ \nox[2] \detcoef = 0.92 \\ \sox[2] \detcoef = 0.95 \\ PM10 \detcoef = 0.77} \\ 
   \cite{GARDNER1999709} &  London, UK &  MLR, MLP &  hourly \nox[2], \nox[x] 1 h and 24 h ahead &  1990 - 1991 & \makecell[tl]{ MLP(20, 20), \\ \nox[2], 24 h ahead \\ MAE = 9.5 ppb \\ RMSE = 17.1 ppb \\ \detcoef =  0.51} \\ 
   \cite{PEREZ20024555} &  Santiago, Chile &  MLP &  maximum of 24 h PM10 moving averages &  1998 - 2000 & \makecell[tl]{ MLP(4, 3), \\ APE: 16 \%} \\ 
-  \cite{KUKKONEN2003} &  Helsinki, Finland &  DET, linear model, MLP, HetGaussNN &  hourly \nox[2] and PM10 24 h ahead &  1996 - 1999 & \makecell[tl]{ HetGaussNN, \\ \nox[2]: \\ IA = 0.73 - 0.77 \\ \detcoef =  0.59 - 0.70 \\\\ PM10: \\ \detcoef = 0.31 - 0.42} \\ 
+  \cite{KUKKONEN2003} &  Helsinki, Finland &  DET, MLR, MLP, HetGaussNN &  hourly \nox[2] and PM10 24 h ahead &  1996 - 1999 & \makecell[tl]{ HetGaussNN, \\ \nox[2]: \\ IA = 0.73 - 0.77 \\ \detcoef =  0.59 - 0.70 \\\\ PM10: \\ \detcoef = 0.31 - 0.42} \\ 
   \cite{CORANI2005513} &  Milan, Italy &  MLP, lazy learning model &  daily max \ozone 8 h moving average, daily mean PM10 &  1999 - 2001 (\ozone), 1999 - 2002 (PM10) & \makecell[tl]{ lazy learning, \\ \ozone: \\ $r$ = 0.86 \\ MAE = 15.49 \\ IA = 0.92 \\\\ PM10: \\ $r$ = 0.90 \\ MAE = 8.25 \\ IA = 0.94} \\ 
   \cite{LOZOWICKA2005} &  Krakow, Poland &  MLP &  sum of daily mean PM10, \sox[2], \nox[2] and \cox during the next day divided by their allowed maximum levels &  winter periods between 1998 and 2001 & \makecell[tl]{ MLP(5), \\ RMSE = 0 - 0.211} \\ 
-  \cite{AGIRREBASURKO2006430} &  Bilbao, Spain &  MLR, MLP &  \ozone and \nox[2] up to 8 h ahead &  1993 - 1994 & \makecell[tl]{ MLP \\ 1 hidden layer \\ (unknown number \\ of neurons), \\ \nox[2]: \\ r = 0.501 - 0.663 \\ NMSE = 0.004 - 0.02 \\\\ \ozone: \\ r = 0.426 - 0.575 \\ NMSE = 0.0003 - 0.065} \\ 
+  \cite{AGIRREBASURKO2006430} &  Bilbao, Spain &  MLR, MLP &  \ozone and \nox[2] up to 8 h ahead &  1993 - 1994 & \makecell[tl]{ MLP \\ 1 hidden layer \\ unknown number \\ of neurons, \\ \nox[2]: \\ r = 0.501 - 0.663 \\ NMSE = 0.004 - 0.02 \\\\ \ozone: \\ r = 0.426 - 0.575 \\ NMSE = 0.0003 - 0.065} \\ 
   \cite{VLACHOGIANNI20111559} &  Athens, Greece, Helsinki, Finland &  MLR, MLP &  daily max PM10, \nox[x] averaged by hour, daily mean PM10 &  2005 & \makecell[tl]{ MLP, \\ Athens, \\ hourly maximum: \\ \nox[x] r = 0.62 - 0.85 \\ PM10 r = 0.32 - 0.72 \\ daily average: \\ PM10 r = 0.6 - 0.9 \\\\ Helsinki, \\ hourly maximum: \\ \nox[x] r = 0.44 - 0.79 \\ PM10 r = 0.73 - 0.79 \\ daily average: \\ PM10 R = 0.80 - 0.91} \\ 
-  \cite{SINGH2012244} &  Lucknow, India &  PLSR, MPR, MLP, GRNN, RBFNN &  \sox[2], \nox[2], RSPM (4h and 8h sampling intervals) &  2005 – 2009 & \makecell[tl]{ GRNN \\ (985 pattern units, \\ 2 summation units), \\ RSPM r =  0.932 \\ \nox[2] r = 0.768 \\ \sox[2] r = 0.729} \\ 
+  \cite{SINGH2012244} &  Lucknow, India &  PLSR, MPR, MLP, GRNN, RBFNN &  \sox[2], \nox[2], RSPM (4h and 8h sampling intervals) &  2005 – 2009 & \makecell[tl]{ GRNN \\ 985 pattern units, \\ 2 summation units, \\ RSPM r =  0.932 \\ \nox[2] r = 0.768 \\ \sox[2] r = 0.729} \\ 
   \cite{Chellali2016} &  Algiers, Algieria &  MLP &  daily mean PM10 &  2002 – 2006 & \makecell[tl]{ MLP(15), \\ IA = 0.81 \\ \detcoef = 0.75 \\ RMSE = 10.75 \mugcm} \\ 
-  \cite{PEREZ201622} &  Santiago, Chile &  MLR, MLP, persistence model &  hourly PM2.5 and PM10 up to 15 h ahead &  2010 - 2012 & \makecell[tl]{ MLP \\ (unknown architecture), \\ 15 h ahead: \\ r = 0.6} \\ 
+  \cite{PEREZ201622} &  Santiago, Chile &  MLR, MLP, persistence model &  hourly PM2.5 and PM10 up to 15 h ahead &  2010 - 2012 & \makecell[tl]{ MLP, \\ unknown architecture, \\ 15 h ahead: \\ r = 0.6} \\ 
   \cite{Pawul2016} &  Krakow, Poland &  MLP &  daily mean PM10 &  2014 - 2015 & \makecell[tl]{ MLP (13), (15), (18) \\ r = 0.908 - 0.933} \\ 
   \cite{BIANCOFIORE2017652} &  Pescara, Italy &  ElmanNN, MLR, MLP &  daily mean concentrations of PM2.5 and PM10 1, 2 and 3 days ahead &  2011 - 2013 & \makecell[tl]{ ElmanNN, \\ 1 day ahead, \\ PM2.5: \\ r = 0.89 \\ NRMSE = 0.559 \\\\ PM10: \\ r = 0.85 \\ NMSE = 0.0624} \\ 
   \cite{LUO201834} &  Beijing, China &  ARIMA, GRNN, ELM + time series decomposition + Cuckoo Search &  daily PM10 &  2015 - 2016 & \makecell[tl]{ ELM, \\ MAE = 9.191 \mugcm \\ RMSE = 12.630 \mugcm \\ MAPE = 15.320 \%} \\ 
@@ -54,8 +54,7 @@
   \cite{DOMANSKA20127673} &  Poland (city/cities not specified) &  FTS &  hourly PM10, PM2.5, \sox[2], \nox, \cox, \ozone  12, 24, 36 h ahead &  2004 - 2012 & \makecell[tl]{ 12 h ahead: \\ MPE = 20.27 \% \\ 24 h ahead: \\ MPE = 22.19 \% \\ 36 h ahead: \\ MPE = 21.46 \%} \\ 
   \cite{GULERDINCER2018157} &  Turkey &  FTS &  weekly \sox[2] &  2013 - 2016 & \makecell[tl]{ RMSE = 8.84 - 55.3 \\ (unit unknown)} \\ 
   \cite{SIWEK2016} &  Warsaw, Poland &  (RF, SVR, MLP, RBFNN) + input selection (stepwise fit, genetic algorithm) &  next day mean PM10, \sox[2], \nox[2], \ozone &  2001 - 2014 & \makecell[tl]{ RF + genetic algorithm \\ input selection, \\ MAE = 5.405 \mugcm \\ MAPE = 17.92 \% \\ r = 0.924 \\ RMSE = 8.36 \mugcm} \\ 
-  \cite{SUN201393} &  Concord and Sacramento, USA &  HMM + wavelet decomposition &  exceedances of PM2.5 limit &  1999 - 2008 (Concord), 2000 - 2011 (Sacramento) & \makecell[tl]{ Concord, \\ log-normal dist., \\ TPR = 91.67\% \\\\ Sacramento, \\ GEV dist., \\ TPR = 100\%} \\ 
-   
+  \cite{SUN201393} &  Concord and Sacramento, USA &  HMM + wavelet decomposition &  exceedances of PM2.5 limit &  1999 - 2008 (Concord), 2000 - 2011 (Sacramento) & \makecell[tl]{ Concord, \\ log-normal dist., \\ TPR = 91.67\% \\\\ Sacramento, \\ GEV dist., \\ TPR = 100\%} 
 \label{tab:related-work-summary}
 \end{longtable}
 \endgroup

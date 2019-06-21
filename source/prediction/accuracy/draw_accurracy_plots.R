@@ -53,11 +53,12 @@ measures <- sapply(stats_with_mean_col$mean, function (mean_measure_name) {
   gsub(".mean", "", mean_measure_name)
 })
 
-plot_data$Measure <- factor(measures, levels = c("mae", "rmse", "mape", "r2"))
+plot_data$Measure <- factor(measures, levels = c("mae", "rmse", "mape", "r", "r2"))
 levels(plot_data$Measure) <- c(
   expression(paste('MAE [', mu, 'g/', m^{3}, ']')),
   expression(paste('RMSE [', mu, 'g/', m^{3}, ']')),
   expression(paste('MAPE [%]')),
+  expression(paste('r [1]')),
   expression(paste(R ^ 2, ' [1]'))
 )
 
