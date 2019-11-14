@@ -127,11 +127,11 @@ get_pretty_var <- function(vars) {
 short_get_pretty_var <- function(vars) {
   get_short_var <- function(var) {
     switch(var,
-      precip_total = "total. precip",
-      precip_rate = "precip. rate",
-      solradiation = "sol. radiation", {
-        get_pretty_var(var)
-      }
+           precip_total = "total. precip",
+           precip_rate = "precip. rate",
+           solradiation = "sol. radiation", {
+             get_pretty_var(var)
+           }
     )
   }
   unlist(lapply(vars, get_short_var))
@@ -153,7 +153,7 @@ get_or_generate_label <- function (var, label) {
 
 get_pretty_station_id <- function(ids) {
   get_pretty_id <- function(id) {
-    parts <- strsplit(id, "_")[[1]]
+    parts <- strsplit(as.character(id), "_")[[1]]
     paste(toupper(parts[[1]]), cap(parts[[2]]))
   }
   unlist(lapply(ids, get_pretty_id))
@@ -189,8 +189,25 @@ parse_list_argument <- function(options, argname, valid_values = c(), sep = ",")
   unlist(lapply(value_parts, process_value))
 }
 
+round_numeric <- function (numeric_val, digits = 2) {
+  format(round(numeric_val, digits), nsmall = digits)
+}
+
 
 # LaTex helpers
+
+packages <- c("optparse", "xtable", "latex2exp")
+import(packages)
+
+p <- function (width_fraction, align = "left") {
+  alignment_command <- switch (
+    align,
+    left = "\\raggedright",
+    right = "\\raggedleft",
+    { "" }
+  )
+  paste(">{", alignment_command, "\\arraybackslash}p{", width_fraction, "\\linewidth}%\n", sep = "")
+}
 
 makecell <- function (content, align = "tl") {
   paste(
@@ -199,6 +216,10 @@ makecell <- function (content, align = "tl") {
     "}",
     sep = ""
   )
+}
+
+makecell_and_add_new_lines <- function (content, align = "tl") {
+  makecell(gsub("\\s+", " \\\\\\\\ ", content), align = align)
 }
 
 multicolumn <- function (content, col_count, align = "r") {
@@ -229,3 +250,150 @@ get_exponent <- function (value, base = 10) {
   exponent <- log(value, base)
   sign(exponent) * floor(abs(exponent))
 }
+
+write_table_with_linespacing <- function (content, file, line_spacing) {
+  write(
+    x = paste(
+      "{",
+      paste("\\renewcommand\\arraystretch{", line_spacing, "}", sep = ""),
+      content,
+      "}",
+      sep = "\n"
+    ),
+    file = file
+  )
+}
+
+save_table <- function (
+  content,
+  align,
+  caption,
+  label,
+  col_names,
+  file,
+  digits = 2,
+  line_spacing = 2,
+  footer = "\\bottomrule",
+  font_size = "\\scriptsize"
+) {
+  
+  options(xtable.sanitize.text.function = identity)
+  
+  table <- xtable(
+    x = content,
+    align = align,
+    caption = caption,
+    label = label,
+    digits = digits
+  )
+  
+  midrule_placeholder <- "@midrule"
+  footer_placeholder <- "@footer"
+  continuation_message_placeholder <- "@continuation-message"
+  
+  col_names_row <- paste(
+    unlist(col_names),
+    collapse = " & "
+  )
+  
+  header <- paste(
+    c(
+      paste(col_names_row, "\\\\"),
+      midrule_placeholder,
+      "\\endhead",
+      continuation_message_placeholder,
+      "\\endfoot",
+      footer_placeholder,
+      "\\endlastfoot"
+    ),
+    collapse = "\n"
+  )
+  
+  header_options <- list(
+    pos = list(0),
+    command = header
+  )
+  
+  formatted <- print(
+    x = table,
+    tabular.environment = "longtable",
+    caption.placement = "top",
+    floating = FALSE,
+    booktabs = TRUE,
+    include.rownames = FALSE,
+    include.colnames = FALSE,
+    add.to.row = header_options,
+    size = font_size,
+    table.placement = "H"
+  )
+  
+  continuation_message <- paste(
+    "\\bottomrule",
+    paste(
+      multicolumn("Continued on the next page", align = "c", col_count = ncol(content)),
+      "\\\\"
+    ),
+    "\\bottomrule",
+    sep = "\n"
+  )
+  
+  formated_footer <- if (footer == "\\bottomrule") {
+    "\\bottomrule"
+  } else {
+    paste(
+      "\\bottomrule",
+      paste(footer, "\\\\"),
+      "\\bottomrule",
+      sep = " \n"
+    )
+  }
+  
+  write_table_with_linespacing(
+    content = sub("\\midrule", "", fixed = T, formatted) %>%
+      gsub("\\\\\\\\\\s+\\n\\s+\\\\bottomrule", "", .) %>%
+      gsub(midrule_placeholder, "\\midrule", fixed = TRUE, .) %>%
+      sub(continuation_message_placeholder, continuation_message, fixed = TRUE, .) %>%
+      sub(footer_placeholder, formated_footer, fixed = TRUE, .),
+    file = file,
+    line_spacing = line_spacing
+  )
+}
+
+get_tex_measure_units <- function (measures) {
+  get_units <- function(measure) {
+    if (grepl("mae", measure, fixed = TRUE)) {
+      "$ \\mu g / m^3 $"
+    } else {
+      ""
+    }
+  }
+  
+  unlist(lapply(
+    measures, get_units
+  ))
+}
+
+get_tex_full_measure_name <- function (measure_ids) {
+  get_name <- function (measure_id) {
+    phrase_to_name <- list(
+      mae = "Mean Absolute Error",
+      rmse = "Root Mean Square Error",
+      mse = "Mean Square Error",
+      mape = "Mean Absolute Percentage Error",
+      r2 = "$R^2$",
+      r = "Pearson correlation coefficient"
+    )
+    name <- "Unknown"
+    for (phrase in names(phrase_to_name)) {
+      if (grepl(phrase, measure_id, fixed = TRUE)) {
+        name <- phrase_to_name[[phrase]]
+        break
+      }
+    }
+    name
+  }
+  
+  unlist(lapply(
+    measure_ids, get_name
+  ))
+} 

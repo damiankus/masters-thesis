@@ -58,6 +58,8 @@ lapply(common_paths, function (common_path) {
   
   model_types <- unique(stats$model.type)
   seasons <- sort(unique(stats$season))
+  
+  # Note that stats have been sorted ascendingly by mean MAE
   which_top_per_season_and_model_type <- unname(do.call(
     c,
     lapply(seasons, function (season) {

@@ -1,14 +1,21 @@
+{
+\renewcommand\arraystretch{1}
 % latex table generated in R 3.4.4 by xtable 1.8-3 package
-% Mon Jun 17 15:10:12 2019
-\begin{table}[ht]
-\centering
-\caption{Acronyms used in the summary of the related work overview} 
-\label{tab:related-work-acronyms}
-\begingroup\scriptsize
-\begin{tabularx}{\linewidth}{lX}
+% Sun Jun 23 22:01:26 2019
+\begingroup\footnotesize
+\begin{longtable}{l>{\raggedright\arraybackslash}p{0.8\linewidth}%
+}
+\caption{Acronyms used in the summary of the related work overview} \\ 
   \toprule
-Acronym & Meaning \\ 
-  \midrule
+  Acronym & Meaning \\
+\midrule
+\endhead
+\bottomrule
+\multicolumn{2}{c}{Continued on the next page} \\
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot 
 \textbf{ ANN($h_1, h_2, ... h_n$) } &  artificial neural network with $n$ hidden layers, with $i^{th}$ layer composed of $h_i$ neurons (this notation is also used for acronyms representing specific network types) \\ 
   \textbf{ DET } &  deterministic model \\ 
   \textbf{ ELM } &  extreme learning machine \\ 
@@ -40,8 +47,9 @@ Acronym & Meaning \\
   \textbf{ STNN } &  spatiotemporal / space-time neural network \\ 
   \textbf{ SVR } &  support vector regression \\ 
   \textbf{ TDNN } &  time delay neural network \\ 
-  \textbf{ TPP } &  true prediction rate \\ 
-   \bottomrule
-\end{tabularx}
+  \textbf{ TPP } &  true prediction rate 
+\label{tab:related-work-acronyms}
+\end{longtable}
 \endgroup
-\end{table}
+
+}

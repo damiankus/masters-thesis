@@ -1,4 +1,4 @@
-SET TIME ZONE 'UTC';
+﻿SET TIME ZONE 'UTC';
 
 DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS stations;
@@ -181,8 +181,6 @@ ORDER BY station_id, utc_time;
 A function creating empty records for timestamps not
 present in the data set. Columns will then be imputed
 (wherever possible) with the fill_missing function.
-The remaining empty values will be imputed in an R script,
-using the MICE package.
 */
 
 DROP FUNCTION IF EXISTS create_empty_records();
@@ -397,7 +395,7 @@ SET day_of_week = EXTRACT(DOW FROM measurement_time);
 -- ===================================
 
 --------------------------------
-COPY observations TO '/tmp/observations_raw.csv' WITH CSV HEADER DELIMITER ';';iqr
+COPY observations TO '/tmp/observations_raw.csv' WITH CSV HEADER DELIMITER ';';
 COPY meteo_observations TO '/tmp/meteo_observations_raw.csv' WITH CSV HEADER DELIMITER ';';
 --------------------------------
 
@@ -407,15 +405,59 @@ We can remove any observation being outside the allowed
 range
 */
 
+SELECT COUNT(pm2_5) FROM observations WHERE pm2_5 < 0;
+SELECT COUNT(pm10) FROM observations WHERE pm10 < 0;
+
+SELECT COUNT(humidity) FROM meteo_observations WHERE humidity < 0 OR humidity > 100;
+SELECT COUNT(precip_rate) FROM meteo_observations WHERE precip_rate < 0 OR precip_rate > 180;
+SELECT COUNT(pressure) FROM meteo_observations WHERE pressure < 970 OR pressure > 1060;
+SELECT COUNT(temperature) FROM meteo_observations WHERE temperature < -30 OR temperature > 40;
+SELECT COUNT(wind_dir_deg) FROM meteo_observations WHERE wind_dir_deg < 0 OR wind_dir_deg > 360;
+SELECT COUNT(wind_speed) FROM meteo_observations WHERE wind_speed < 0 OR wind_speed > 80;
+
+SELECT COUNT(humidity) FROM meteo_observations WHERE humidity IS NOT NULL;
+SELECT COUNT(precip_rate) FROM meteo_observations WHERE precip_rate IS NOT NULL;
+SELECT COUNT(pressure) FROM meteo_observations WHERE pressure IS NOT NULL;
+SELECT COUNT(temperature) FROM meteo_observations WHERE temperature IS NOT NULL;
+SELECT COUNT(wind_dir_deg) FROM meteo_observations WHERE wind_dir_deg IS NOT NULL;
+SELECT COUNT(wind_speed) FROM meteo_observations WHERE wind_speed IS NOT NULL;
+
 UPDATE observations SET pm2_5 = NULL WHERE pm2_5 < 0;
 UPDATE observations SET pm10 = NULL WHERE pm10 < 0;
 
 UPDATE meteo_observations SET humidity = NULL WHERE humidity < 0 OR humidity > 100;
-UPDATE meteo_observations SET pressure = NULL WHERE pressure < 970 OR pressure > 1060;
 UPDATE meteo_observations SET precip_rate = NULL WHERE precip_rate < 0 OR precip_rate > 180;
+UPDATE meteo_observations SET pressure = NULL WHERE pressure < 970 OR pressure > 1060;
 UPDATE meteo_observations SET temperature = NULL WHERE temperature < -30 OR temperature > 40;
 UPDATE meteo_observations SET wind_dir_deg = NULL WHERE wind_dir_deg < 0 OR wind_dir_deg > 360;
 UPDATE meteo_observations SET wind_speed = NULL WHERE wind_speed < 0 OR wind_speed > 80;
+
+SELECT count(*)
+FROM meteo_observations AS observations_table
+JOIN (
+	SELECT 	stats.measurement_month, 
+		stats.q1 - 1.5 * stats.iqr AS min,
+		stats.q3 + 1.5 * stats.iqr AS max
+	FROM (
+		SELECT quartiles.measurement_month, quartiles.q1, quartiles.q3, quartiles.q3 - quartiles.q1 AS iqr 
+		FROM (
+			SELECT EXTRACT(MONTH FROM measurement_time) AS measurement_month,
+				percentile_cont(0.15) WITHIN GROUP (ORDER BY temperature ASC) AS q1,
+				percentile_cont(0.85) WITHIN GROUP (ORDER BY temperature ASC) AS q3
+			FROM meteo_observations
+			GROUP BY 1
+			ORDER BY 1
+		) AS quartiles
+	) AS stats
+) AS thresholds ON thresholds.measurement_month = EXTRACT(MONTH FROM observations_table.measurement_time)
+WHERE temperature < thresholds.min OR thresholds.max < temperature
+-- AND humidity IS NOT NULL
+-- AND precip_rate IS NOT NULL
+-- AND pressure IS NOT NULL
+-- AND temperature IS NOT NULL
+-- AND wind_dir_deg IS NOT NULL
+-- AND wind_speed IS NOT NULL
+
 
 --------------------------------
 COPY observations TO '/tmp/observations_filtered.csv' WITH CSV HEADER DELIMITER ';';
@@ -433,8 +475,8 @@ have been taken during different years and at different stations)
 e.g. Jan 2014, Jan 2015, Jan 2016, Jan 2017
 */
 
-DROP FUNCTION IF EXISTS delete_outliers_based_on_iqr(TEXT, TEXT[]);
-CREATE OR REPLACE FUNCTION delete_outliers_based_on_iqr(table_name TEXT, column_names TEXT[])
+DROP FUNCTION IF EXISTS replace_outliers_with_null_based_on_iqr(TEXT, TEXT[]);
+CREATE OR REPLACE FUNCTION replace_outliers_with_null_based_on_iqr(table_name TEXT, column_names TEXT[])
 RETURNS VOID AS $$
 DECLARE
 	column_name TEXT;
@@ -442,7 +484,7 @@ DECLARE
 	query TEXT;
 BEGIN
 	query_template := '
-		DELETE FROM %1$s WHERE id IN (
+		UPDATE %1$s SET %2$s = NULL WHERE id IN (
 			SELECT id
 			FROM %1$s AS observations_table
 			JOIN (
@@ -481,7 +523,7 @@ $$  LANGUAGE plpgsql;
 -- Additionally it has been assumed that using this method for variables with well defined 
 -- boundaries is redundant and can potentially lead to removing valid values
 -- (for example relative humisity which takes values between 0 and 100, or wind direction expressed in degrees)
-SELECT delete_outliers_based_on_iqr('meteo_observations', ARRAY['temperature']);
+-- SELECT replace_outliers_with_null_based_on_iqr('meteo_observations', ARRAY['temperature']);
 
 --------------------------------
 COPY observations TO '/tmp/observations_iqr.csv' WITH CSV HEADER DELIMITER ';';

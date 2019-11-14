@@ -51,3 +51,10 @@ lapply(c('month', 'weekday', 'season'), function (name) {
 
 A4_WIDTH <- 210
 A4_HEIGHT <- 297
+
+SEASON_PALETTE <- list(
+  winter = "CFFFFF",
+  spring = "C2FFCB",
+  summer = "FFFFC7",
+  autumn = "FFD7C7"
+)

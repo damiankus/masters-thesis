@@ -85,9 +85,9 @@ get_model_params_from_name <- function (raw_name) {
     
     formatted_params <- data.frame(params)
     formatted_params$value <- as.character(params$value)
-    formatted_params$key <- lapply(params$key, function (key) {
+    formatted_params$key <- unlist(lapply(params$key, function (key) {
       gsub("_", " ", key)
-    })
+    }))
     formatted_params[!which_to_exclude, ]
   }
 }
@@ -114,12 +114,19 @@ get_numeric_base_for_model <- function (model_type) {
   )
 }
 
+format_param_key <- function (key) {
+  if (key == 'l2') {
+    "L2 $\\lambda$"
+  } else {
+    key
+  }
+}
+
 get_tex_model_name <- function (raw_name) {
   params <- get_model_params_from_name(raw_name)
   model_type <- get_model_type_from_name(raw_name)
   numeric_base <- get_numeric_base_for_model(model_type)
   seemingly_numeric_params <- c("hidden")
-  upper_case_params <- c("l2")
   param_info <- if (nrow(params)) {
     tex_params <- sapply(seq(nrow(params)), function (idx) {
       param <- params[idx, ]
@@ -135,11 +142,7 @@ get_tex_model_name <- function (raw_name) {
         paste(numeric_base, "^{", get_exponent(numeric_val, base = numeric_base), "}", sep = "")
       }
       
-      formatted_key <- if (param$key %in% upper_case_params) {
-        toupper(param$key)
-      } else {
-        param$key
-      }
+      formatted_key <- format_param_key(param$key)
       key <- paste("\\textit{", formatted_key, "}", sep = "")
       paste(key, " = $", value, "$", sep = "")
     })
@@ -175,7 +178,7 @@ get_tex_measure_unit <- function(measure_name) {
   paste("{[$", base_unit, "$]}", sep = "")
 }
 
-get_tex_column_name <- function(colname) {
+get_tex_column_name_content <- function(colname) {
   sep <- "[\\._]"
   parts <- strsplit(colname, sep)[[1]]
   content <- if (colname == "training.strategy") {
@@ -183,7 +186,12 @@ get_tex_column_name <- function(colname) {
   } else {
     paste(parts, collapse = " ")
   }
-  multirow(cap(content), row_count = 3)
+  cap(content)
+}
+
+get_tex_column_name <- function(colname, row_count = 3) {
+  content <- get_tex_column_name_content(colname)
+  multirow(content, row_count = row_count)
 }
 
 get_tex_measure_column_name <- function (measure_name) {

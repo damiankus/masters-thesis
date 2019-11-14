@@ -151,10 +151,7 @@ lapply(phases, function(phase) {
           top_validation_stats_path <- file.path(output_dir, paste("top_models__validation", station, training_strategy, ".csv", sep = "__"))
           val_stats <- read.csv(file = top_validation_stats_path)
 
-          # Regression models are not used in the validation phase
-          # since they don't use any parameters which could be tuned
-          regression_keys <- get_keys_to_match_results(rep("regression", 4), seq(4))
-          validation_keys <- c(regression_keys, get_keys_to_match_results(val_stats$model, val_stats$season))
+          validation_keys <- get_keys_to_match_results(val_stats$model, val_stats$season)
           test_keys <- get_keys_to_match_results(sorted_stats$model, sorted_stats$season)
 
           which_test_stats_to_include <- sapply(test_keys, function(key) {

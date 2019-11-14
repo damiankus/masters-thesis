@@ -20,4 +20,7 @@ cp plots/training-history/history__neural_network__hidden=20-10-5-3__activation=
 cp plots/training-history/history__neural_network__hidden=20-10-5-3__activation=relu__epochs=100__min_delta=1e-04__patience_ratio=0.25__batch_size=32__learning_rate=0.001__epsilon=1e-05__l2=0.001@gios_bujaka@2019-05-21_06:00:46@dataset_2__validation__season_and_year__.png  $PLOT_DIR/training_history/over_fit.png
 cp plots/training-history/history__neural_network__hidden=10__activation=relu__epochs=100__min_delta=1e-04__patience_ratio=0.25__batch_size=32__learning_rate=1e-04__epsilon=1e-06__l2=1@gios_krasinskiego@2019-05-30_08:21:03@dataset_1__test__year__.png  $PLOT_DIR/training_history/good_fit.png
 
+mkdir $PLOT_DIR/season-station-parameter
+cp -r plots/season-station-parameter $PLOT_DIR
+
 echo "DONE!"

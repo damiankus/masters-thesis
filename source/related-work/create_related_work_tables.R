@@ -6,104 +6,6 @@ setwd(related_work_wd)
 import(c("xtable", "dplyr"))
 options(xtable.sanitize.text.function = identity)
 
-p <- function (width_fraction) {
-  paste(">{\\raggedright\\arraybackslash}p{", width_fraction, "\\linewidth}%\n", sep = "")
-}
-
-save_table <- function (
-  content,
-  align,
-  caption,
-  label,
-  col_names,
-  file,
-  footer = "\\bottomrule"
-) {
-  
-  table <- xtable(
-    x = content,
-    align = align,
-    caption = caption,
-    label = label
-  )
-  
-  midrule_placeholder <- "@midrule"
-  footer_placeholder <- "@footer"
-  continuation_message_placeholder <- "@continuation-message"
-  
-  col_names_row <- paste(
-    unlist(col_names),
-    collapse = " & "
-  )
-  
-  header <- paste(
-    c(
-      paste(col_names_row, "\\\\"),
-      midrule_placeholder,
-      "\\endhead",
-      continuation_message_placeholder,
-      "\\endfoot",
-      footer_placeholder,
-      "\\endlastfoot"
-    ),
-    collapse = "\n"
-  )
-  
-  header_options <- list(
-    pos = list(0),
-    command = header
-  )
-  
-  formatted <- print(
-    x = table,
-    tabular.environment = "longtable",
-    caption.placement = "top",
-    floating = FALSE,
-    booktabs = TRUE,
-    include.rownames = FALSE,
-    include.colnames = FALSE,
-    add.to.row = header_options,
-    size = "\\scriptsize"
-  )
-  
-  continuation_message <- paste(
-    "\\bottomrule",
-    paste(
-      multicolumn("Continued on next page", align = "c", col_count = ncol(content)),
-      "\\\\"
-    ),
-    "\\bottomrule",
-    sep = "\n"
-  )
-  
-  formated_footer <- if (footer == "\\bottomrule") {
-    "\\bottomrule"
-  } else {
-    paste(
-      "\\bottomrule",
-      paste(footer, "\\\\"),
-      "\\bottomrule",
-      sep = " \n"
-    )
-  }
-  
-  write(
-    x = paste(
-      "{",
-      "\\renewcommand\\arraystretch{2}",
-      sub("\\midrule", "", fixed = T, formatted) %>%
-        gsub("\\\\\\\\\\s+\\n\\s+\\\\bottomrule", "", .) %>%
-        gsub(midrule_placeholder, "\\midrule", fixed = TRUE, .) %>%
-        sub(continuation_message_placeholder, continuation_message, fixed = TRUE, .) %>%
-        sub(footer_placeholder, formated_footer, fixed = TRUE, .),
-      "}",
-      sep = "\n"
-    ),
-    file = file
-  )
-}
-
-
 # Main
 
 output_dir <- 'tex'
@@ -117,22 +19,15 @@ acronyms_content$Acronym <- lapply(acronyms$Acronym, function (acronym) {
   paste("\\textbf{", acronym ,"}")
 })
 
-acronyms_table <- xtable(
-  x = acronyms_content,
-  align = c("r", "l", "X"),
+save_table(
+  content = acronyms_content,
+  col_names = colnames(acronyms_content),
+  align = c("r", "l", p(0.8)),
   caption = paste("Acronyms used in the summary of the related work overview"),
-  label = "tab:related-work-acronyms"
-)
-
-print(
-  x = acronyms_table,
+  label = "tab:related-work-acronyms",
   file = file.path(output_dir, "acronyms.tex"),
-  include.rownames = FALSE,
-  booktabs = TRUE,
-  size = "\\scriptsize",
-  caption.placement = "top",
-  tabular.environment = "tabularx",
-  width = "\\linewidth"
+  line_spacing = 1,
+  font_size = "\\footnotesize"
 )
 
 # Summary

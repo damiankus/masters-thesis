@@ -36,11 +36,15 @@ options(xtable.sanitize.text.function = identity)
 
 lapply(stats_paths, function (stats_path) {
   meta <- get_stats_metadata(basename(stats_path))
-  top_stats <- read.csv(stats_path)
+  stat_types <- c("mean", "sd")
+  excluded_measure <- "r2"
+  excluded_cols <- paste(excluded_measure, stat_types, sep = ".")
+  
+  all_top_stats <- read.csv(stats_path)
+  top_stats <- all_top_stats[, !(colnames(all_top_stats) %in% excluded_cols)]
   cols <- colnames(top_stats)
   
   # Prepare accurracy columns
-  stat_types <- c('mean', 'sd')
   measure_search_key <- stat_types[[1]]
   measures <- gsub(paste('.', measure_search_key, sep = ""), '', cols[grepl(measure_search_key, cols)])
   measure_cols <- combine_names(measures, stat_types)
@@ -93,14 +97,8 @@ lapply(stats_paths, function (stats_path) {
   )
   
   table_content <- cbind(grouping_data, means_and_sds)
-  season_palette <- c(
-    winter = "99FFFF",
-    spring = "88FF99",
-    summer = "FFFF88",
-    autumn = "FFAA88"
-  )
   table_content$season <- lapply(grouping_data$season, function (season_idx) {
-    cellcolor(SEASONS[[season_idx]], color = season_palette[[season_idx]])
+    cellcolor(SEASONS[[season_idx]], color = SEASON_PALETTE[[season_idx]])
   })
   table_content$training.strategy <- lapply(as.character(table_content$training.strategy), function (strategy) {
     color <- switch(
@@ -134,7 +132,8 @@ lapply(stats_paths, function (stats_path) {
     add.to.row = header_config,
     booktabs = TRUE,
     size = "\\scriptsize",
-    caption.placement = "top"
+    caption.placement = "top",
+    table.placement = "H"
   )
   
   write(

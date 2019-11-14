@@ -6,7 +6,7 @@
 "\cite{Paschalidou2009}", "Athens, Greece", "MLR + PCA", "ln(\ozone)", "2001 - 2004", "\detcoef = 0.67 - 0.84"
 "\cite{COBOURN20103015}", "Louisville, USA", "NLR", "daily max PM2.5", "2003 - 2008", "MAE = 4.1 - 4.7 \mugcm \\ NMAE = 20 - 25 \% \\ IA = 0.86 - 0.88"
 "\cite{Sotoudeheian2014}", "Tehran, Iran", "MLR, NLR", "ln(\ozone)", "2009 - 2010", "NLR, \\ \detcoef = 0.51 - 0.55 \\ RMSE = 14.7 - 32.9 \mugcm \\ MAE = 13 - 30.1 \mugcm"
-"\cite{WESTERLUND201422}", "Bogota, Colombia", "MLR ensemble, ANN", "daily mean PM10, \cox, \nox[x], \nox[2], \sox[2], \ozone", "2005 - 2010", "MLR ensemble, \\ results expressed \\ relatively to \\ the best models"
+"\cite{WESTERLUND201422}", "Bogota, Colombia", "distributed lag models ensemble, ANN", "daily mean PM10, \cox, \nox[x], \nox[2], \sox[2], \ozone", "2005 - 2010", "dist. lag models, \\ results expressed \\ relatively to \\ the best models"
 "\cite{GARCIANIETO201450}", "Gijón, Spain", "MARS", "monthly mean \nox[2], \sox[2], PM10", "2006 - 2008", "\nox[2] \detcoef = 0.92 \\ \sox[2] \detcoef = 0.95 \\ PM10 \detcoef = 0.77"
 "\cite{GARDNER1999709}", "London, UK", "MLR, MLP", "hourly \nox[2], \nox[x] 1 h and 24 h ahead", "1990 - 1991", "MLP(20, 20), \\ \nox[2], 24 h ahead \\ MAE = 9.5 ppb \\ RMSE = 17.1 ppb \\ \detcoef =  0.51"
 "\cite{PEREZ20024555}", "Santiago, Chile", "MLP", "maximum of 24 h PM10 moving averages", "1998 - 2000", "MLP(4, 3), \\ APE: 16 \%"

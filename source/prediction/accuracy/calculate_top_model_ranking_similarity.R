@@ -15,7 +15,7 @@ import(packages)
 option_list <- list(
   make_option(c("-d", "--stats-dir"), type = "character", default = "stats"),
   make_option(c("-a", "--all-stats-output-file"), type = "character", default = "stats/merged/accuracy-merged.csv"),
-  make_option(c("-o", "--output-file"), type = "character", default = "stats/ranking-similarity/ranking-similarity.csv")
+  make_option(c("-o", "--output-file"), type = "character", default = "tables/ranking-similarity.tex")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -85,9 +85,9 @@ per_phase <- lapply(phases, function (phase) {
         models_1 <- all_models_1[all_models_1 %in% common_models]
         models_2 <- all_models_2[all_models_2 %in% common_models]
         data.frame(
-          station1 = pair$id1,
-          station2 = pair$id2,
-          kendall_cor = calculate_kendall_similarity(models_1, models_2)
+          station.1 = pair$id1,
+          station.2 = pair$id2,
+          kendall.cor = calculate_kendall_similarity(models_1, models_2)
         )
       })
       per_station_pair_merged <- do.call(rbind, per_station_pair)
@@ -104,5 +104,62 @@ per_phase <- lapply(phases, function (phase) {
 })
 
 per_phase_merged <- do.call(rbind, per_phase)
-write.csv(per_phase_merged[order(per_phase_merged$kendall_cor, decreasing = TRUE), ], file = opts[["output-file"]])
+sorted_taus <- per_phase_merged[order(per_phase_merged$kendall.cor, decreasing = TRUE), ]
+
+raw_cols <- c("station.1", "station.2", "season", "training.strategy", "kendall.cor")
+which_tau <- which(raw_cols == "kendall.cor")
+formatted_names <- lapply(seq_along(raw_cols), function (idx) {
+  col <- raw_cols[[idx]]
+  content <- get_tex_column_name_content(col)
+  align <- if (idx == which_tau) {
+    "tr"
+  } else {
+    "tl"
+  }
+  makecell(content, align = align)
+})
+formatted_names[[which_tau]] <- gsub(
+  "Kendall cor", 
+  "\\\\texttau\\\\ {[1]}",
+  formatted_names[[which_tau]]
+)
+
+ranking <- sorted_taus[, raw_cols]
+ranking$training.strategy <- lapply(sorted_taus$training.strategy, function (strategy) {
+  switch(
+    strategy,
+    year = "all",
+    season_and_year = "seasonal",
+    { "unknown" }
+  )
+})
+ranking$station.1 <- lapply(sorted_taus$station.1, function (id) {
+  gsub("GIOS ", "", get_pretty_station_id(id))
+})
+ranking$station.2 <- lapply(sorted_taus$station.2, function (id) {
+  gsub("GIOS ", "", get_pretty_station_id(id))
+})
+
+corr_threshold <- 0.7
+oringinal_kendall_cors <- ranking$kendall.cor
+ranking$kendall.cor <- unlist(lapply(oringinal_kendall_cors, function (corr) {
+  rounded_corr <- round_numeric(corr)
+  if (corr >= corr_threshold) {
+    cellcolor(rounded_corr, color = SEASON_PALETTE$spring)
+  } else {
+    rounded_corr
+  }
+}))
+
+save_table(
+  content = ranking,
+  align = c("r", rep("l", ncol(ranking) - 1), rep("r")),
+  caption = "Kendall correlation coefficients for pairs of model rankings corresponding to monitoring stations",
+  label = "tab:results-kendall-correlation-values",
+  col_names = formatted_names,
+  file = file.path(opts[["output-file"]]), 
+  line_spacing = 1.25,
+  font_size = "\\footnotesize"
+)
+
 
