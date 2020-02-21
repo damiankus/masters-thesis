@@ -1,0 +1,6 @@
+Statistic;Humidity;Precipitation rate;Pressure;Temperature;Wind direction;Wind speed
+Observation count;852534;185048;790918;852614;188888;188888
+Removed with thresholds;0;5;5724;619;0;0
+Removed with the 1.5 IQR rule;1885;371;1863;1885;290;290
+Total removed;1885;376;7587;2504;290;290
+Removed percentage [%];0.22;0.20;0.96;0.29;0.15;0.15

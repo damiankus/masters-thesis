@@ -1,0 +1,10 @@
+variable
+measurement_time
+future_measurement_time
+pm2_5
+future_pm2_5
+min_24_temperature
+hour_of_day_cosine
+min_24_humidity
+wind_speed
+max_24_precip_rate
